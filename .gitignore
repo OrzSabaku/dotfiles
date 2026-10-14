@@ -1,0 +1,25 @@
+# Only explicitly selected settings may be committed.
+/*
+!/README.md
+!/install.py
+!/.gitignore
+!/home/
+/home/*
+!/home/.bashrc
+!/home/.zshrc
+!/home/.vimrc
+!/home/.config/
+/home/.config/*
+!/home/.config/ghostty/
+!/home/.config/mise/
+!/home/.config/nvim/
+!/home/.config/sheldon/
+!/home/.config/starship.toml
+/home/.config/ghostty/*
+!/home/.config/ghostty/config.ghostty
+/home/.config/mise/*
+!/home/.config/mise/config.toml
+/home/.config/nvim/*
+!/home/.config/nvim/init.lua
+/home/.config/sheldon/*
+!/home/.config/sheldon/plugins.toml
