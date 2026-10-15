@@ -17,6 +17,9 @@ shell = "zsh"
 [plugins.zsh-syntax-highlighting]
 github = "zsh-users/zsh-syntax-highlighting"
 
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+
 [plugins.zsh-eza]
 github = "z-shell/zsh-eza"
 
