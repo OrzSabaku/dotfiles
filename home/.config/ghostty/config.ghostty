@@ -15,8 +15,13 @@ scrollback-limit = 10000
 window-save-state = always
 confirm-close-surface = false
 
+custom-shader = ~/.config/ghostty/shaders/cursor-shaders/ghostty/cursor_warp.glsl
+custom-shader = /home/kanazawa/.config/ghostty/shaders/ghostty-shaders2/shaders/my_raindrop_neo2_continuous.glsl
+custom-shader-animation = true
+
 keybind = ctrl+shift+w=close_surface
 keybind = ctrl+shift+r=new_split:right
+keybind = ctrl+shift+l=new_split:left
 keybind = ctrl+shift+t=new_tab
 # keybind = ctrl+shift+d=new_split:down
 # keybind = ctrl+d=new_split:right
