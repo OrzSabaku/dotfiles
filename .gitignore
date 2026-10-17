@@ -27,4 +27,5 @@
 !/install_omarchy.py
 !/common/
 !/profiles/
-!/omarchy_snapshot.py
+!/tests/
+/tests/__pycache__/

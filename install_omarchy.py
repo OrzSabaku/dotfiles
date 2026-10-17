@@ -1,4 +1,4 @@
-"""Small, backed-up Omarchy overlay; never writes package-owned defaults."""
+"""Backed-up per-file Omarchy links; never writes package-owned defaults."""
 import hashlib
 import json
 import os
@@ -44,46 +44,46 @@ def put_original(entry, backup):
         write(path, (backup / entry['saved']).read_bytes(), original['mode'])
 
 
+def managed_files():
+    manifest = json.loads((REPO / 'profiles/omarchy/files.json').read_text())
+    if manifest.get('version') != 1:
+        raise ValueError('Unsupported files manifest version')
+    seen = set()
+    for entry in manifest['files']:
+        name, source_name = Path(entry['path']), Path(entry['source'])
+        if (name.is_absolute() or '..' in name.parts or not name.parts
+                or source_name.is_absolute() or '..' in source_name.parts):
+            raise ValueError('Unsafe managed path')
+        if entry['path'] in seen:
+            raise ValueError('Duplicate managed path')
+        seen.add(entry['path'])
+        source = REPO / source_name
+        if not source.is_file() or source.is_symlink() or not source.resolve().is_relative_to(REPO):
+            raise ValueError(f'Expected a regular repository source: {source}')
+        yield entry, source
+
+
 def plan():
     changes = []
-    links = {
-        '.config/dotfiles/bash.sh': REPO / 'common/bash.sh',
-        '.config/ghostty/dotfiles.conf': REPO / 'profiles/omarchy/ghostty.conf',
-        '.config/starship.toml': REPO / 'common/starship.toml',
-        '.config/nvim-personal/init.lua': REPO / 'home/.config/nvim/init.lua',
-    }
-    for name, source in links.items():
-        if not source.is_file():
-            raise ValueError(f'Missing source: {source}')
+    for entry, source in managed_files():
+        name = entry['path']
         path = HOME / name
-        before = fingerprint(path)
-        if before and before.get('link') == str(source):
-            continue
-        if path.is_symlink():
-            raise ValueError(f'Refusing to replace an unrelated symlink: {path}')
-        changes.append({'path': name, 'before': before, 'link': str(source)})
-    additions = {
-        '.bashrc': '\n# Personal dotfiles (after Omarchy initialization)\n[[ -r "$HOME/.config/dotfiles/bash.sh" ]] && source "$HOME/.config/dotfiles/bash.sh"\n',
-        '.config/ghostty/config': '\n# Personal dotfiles (after Omarchy defaults)\nconfig-file = ?"~/.config/ghostty/dotfiles.conf"\n',
-    }
-    for name, addition in additions.items():
-        path = HOME / name
-        before = fingerprint(path)
-        if before is None or path.is_symlink():
-            raise ValueError(f'Expected an existing regular Omarchy config: {path}')
-        data = path.read_text()
-        if addition.strip() in data:
-            continue
-        if ('dotfiles/bash.sh' if name == '.bashrc' else 'ghostty/dotfiles.conf') in data:
-            raise ValueError(f'An existing custom include needs review: {path}')
-        changes.append({'path': name, 'before': before, 'text': data + addition})
-    # A symlink in any parent could redirect writes outside the intended directory.
-    for entry in changes:
-        for parent in (HOME / entry['path']).parents:
+        for parent in path.parents:
             if parent == HOME:
                 break
             if parent.is_symlink():
                 raise ValueError(f'Refusing a symlinked parent: {parent}')
+        before = fingerprint(path)
+        if path.is_symlink():
+            if path.resolve() == source.resolve():
+                continue
+            if os.readlink(path) != entry.get('migrate_from'):
+                raise ValueError(f'Refusing an unrelated symlink: {path}')
+        if before is not None and path.read_bytes() != source.read_bytes():
+            raise ValueError(f'Content conflict: {path}; compare with {source} before installing')
+        if before is not None and path.stat().st_mode & 0o777 != source.stat().st_mode & 0o777:
+            raise ValueError(f'Permission conflict: {path}; review source permissions')
+        changes.append({'path': name, 'before': before, 'link': str(source)})
     return changes
 
 
@@ -92,7 +92,7 @@ def install(apply=False):
         raise ValueError('This profile requires Omarchy')
     changes = plan()
     for entry in changes:
-        print(('LINK ' if 'link' in entry else 'APPEND ') + str(HOME / entry['path']))
+        print('LINK ' + str(HOME / entry['path']))
     if not changes:
         print('Already installed; no changes.')
         return
@@ -120,8 +120,11 @@ def install(apply=False):
             if 'link' in entry:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 temp = path.with_name(path.name + '.dotfiles-' + uuid.uuid4().hex)
-                temp.symlink_to(entry['link'])
-                os.replace(temp, path)
+                try:
+                    temp.symlink_to(entry['link'])
+                    os.replace(temp, path)
+                finally:
+                    temp.unlink(missing_ok=True)
             else:
                 write(path, entry['text'].encode(), entry['before']['mode'])
             done.append(entry)
