@@ -24,7 +24,7 @@
     },
     {
       "path": ".bashrc",
-      "sha256": "114a34444604b58a55fad0432ae8de2ee423c01d148344dfb0a914881f8808b6",
+      "sha256": "d78bd5405919c9c0d9aa5a3db47696286aa9c9d0a1c759785719054605da9a4b",
       "mode": 420
     },
     {
@@ -38,12 +38,6 @@
       "mode": 420
     },
     {
-      "path": ".config/dotfiles/bash.sh",
-      "sha256": "0f81e67af6f112cf2fc1f5927fb7b3cb9ef3627648904be3e74c79b22d881862",
-      "mode": 420,
-      "source_link": "/home/sabaku/dotfiles/common/bash.sh"
-    },
-    {
       "path": ".config/fontconfig/fonts.conf",
       "sha256": "6f94c722d7d3336fd79e2249ebe7e92299276d8638a7b1cc17cf79b94d821110",
       "mode": 420
@@ -55,14 +49,8 @@
     },
     {
       "path": ".config/ghostty/config",
-      "sha256": "30b5b06a16694a8d9ccc0ab99db0c99977246dc4482481b1ffa4d8823bf1618c",
+      "sha256": "87b7fa254cab399f461e5614a59fed5ac313e013bb1b409cbfbe756eaa439b92",
       "mode": 420
-    },
-    {
-      "path": ".config/ghostty/dotfiles.conf",
-      "sha256": "aa1c51ee6cb48f826f538075c6c18aa3130e6724fc589e2513e301e081cdb9a2",
-      "mode": 420,
-      "source_link": "/home/sabaku/dotfiles/profiles/omarchy/ghostty.conf"
     },
     {
       "path": ".config/hypr/.luarc.json",
@@ -220,12 +208,6 @@
       "mode": 420
     },
     {
-      "path": ".config/nvim-personal/init.lua",
-      "sha256": "df7fb516f064cf01c7644b0de08aba89d8b76bd89517bfe1ace5a9e306f5193f",
-      "mode": 420,
-      "source_link": "/home/sabaku/dotfiles/home/.config/nvim/init.lua"
-    },
-    {
       "path": ".config/omarchy/branding/about.txt",
       "sha256": "5fe8adced2fe67e410e177477a7272d1807b3fedc81fbc3f030dd479bc046b76",
       "mode": 420
@@ -307,14 +289,37 @@
     },
     {
       "path": ".config/starship.toml",
-      "sha256": "29452a7ab457555e116b836fbc7edeab85b32b26e4cbcbdcedc413ea9156e7de",
-      "mode": 420,
-      "source_link": "/home/sabaku/dotfiles/common/starship.toml"
+      "sha256": "b17c9b5f096fc125e97050e359171c6011d6b3c7d7e9ac28f630e75b4d4bb9db",
+      "mode": 420
     },
     {
       "path": ".config/tmux/tmux.conf",
       "sha256": "d3eeec762196b3132d4b187ed2eb95d113cea698a3833fe87a0f60df6e38e544",
       "mode": 420
     }
-  ]
+  ],
+  "absent_paths": [
+    ".config/dotfiles/bash.sh",
+    ".config/ghostty/dotfiles.conf",
+    ".config/nvim-personal/init.lua"
+  ],
+  "snapshot_state": "before-personal-dotfiles-installation",
+  "reconstruction": {
+    "reconstructed_at": "2026-10-18T02:11:59.090514+09:00",
+    "source_snapshot_tag": "omarchy-post-dotfiles-2026-10-18",
+    "source_commit": "d506df6ff54c3e217182ccc05ea887e7c9896cf1",
+    "backup_directory": "/home/sabaku/.local/state/dotfiles/backups/20261018-013918-7674d885",
+    "method": "Apply the six recorded pre-install states to the post-install snapshot; leave other captured files unchanged.",
+    "scope": "Before the personal dotfiles installation; includes pre-existing user customization, not a factory Omarchy image.",
+    "restored_paths": [
+      ".config/starship.toml",
+      ".bashrc",
+      ".config/ghostty/config"
+    ],
+    "removed_paths": [
+      ".config/dotfiles/bash.sh",
+      ".config/ghostty/dotfiles.conf",
+      ".config/nvim-personal/init.lua"
+    ]
+  }
 }

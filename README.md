@@ -63,8 +63,9 @@ python3 ~/dotfiles/install.py --profile fedora --apply
 
 ## Omarchy全体の設定の保存
 
-現在有効なユーザー設定59ファイルを `profiles/omarchy/snapshot/` にコピーして保存しています。
-実環境のファイルは置き換えていません。保存コピーを編集しても実環境は変わりません。
+個人設定を導入する前のユーザー設定56ファイルを `profiles/omarchy/snapshot/` にコピーして保存しています。
+最初の導入前バックアップから再構成した状態です。実環境のファイルは置き換えていません。
+保存コピーを編集しても実環境は変わりません。
 設定の地図、読み込み順、比較・個別復元の手順は
 [Omarchy設定ガイド](profiles/omarchy/README.md)を参照してください。
 
@@ -73,3 +74,7 @@ python3 ~/dotfiles/omarchy_snapshot.py
 ```
 
 このコマンドは保存時点との差分を確認するだけで、設定を変更しません。
+
+Gitタグ `omarchy-post-dotfiles-2026-10-18` が導入後、
+`omarchy-pre-dotfiles-2026-10-18` が導入前の保存状態です。
+現在の実環境は導入後なので、比較コマンドが差分を表示するのは正常です。

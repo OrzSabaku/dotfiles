@@ -82,6 +82,10 @@ def load():
     manifest = json.loads((SNAPSHOT / 'manifest.json').read_text())
     if manifest['home'] != str(HOME):
         raise ValueError('This machine snapshot belongs to another home directory.')
+    for name in manifest.get('absent_paths', []):
+        path = Path(name)
+        if path.is_absolute() or '..' in path.parts:
+            raise ValueError('Unsafe absent path')
     for entry in manifest['entries']:
         name = Path(entry['path'])
         if name.is_absolute() or '..' in name.parts:
@@ -124,6 +128,12 @@ def main():
         parser.error('Restore requires explicit --file paths; whole-desktop restore is intentionally unsupported.')
     selected = [e for e in entries if not args.file or e['path'] in args.file]
     changes = [e for e in selected if changed(e)]
+    additions = []
+    if not args.restore and not args.file:
+        additions = [name for name in manifest.get('absent_paths', [])
+                     if (HOME / name).exists() or (HOME / name).is_symlink()]
+        for name in additions:
+            print('ADDED ' + name + ' (absent in baseline)')
     for entry in changes:
         print(('RESTORE ' if args.restore else 'CHANGED ') + entry['path'])
         if args.diff:
@@ -132,7 +142,7 @@ def main():
             baseline = (SNAPSHOT / 'home' / entry['path']).read_text(errors='replace')
             print(''.join(difflib.unified_diff(current.splitlines(True), baseline.splitlines(True),
                                             fromfile='current/' + entry['path'], tofile='baseline/' + entry['path'])), end='')
-    if not changes:
+    if not changes and not additions:
         print(f'All {len(selected)} selected files match the saved baseline.')
         return 0
     if not args.restore or not args.apply:

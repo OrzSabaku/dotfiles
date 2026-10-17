@@ -12,6 +12,3 @@ source "$OMARCHY_PATH/default/bash/rc"
 #
 # Make an alias for invoking commands you use constantly
 # alias p='python'
-
-# Personal dotfiles (after Omarchy initialization)
-[[ -r "$HOME/.config/dotfiles/bash.sh" ]] && source "$HOME/.config/dotfiles/bash.sh"
