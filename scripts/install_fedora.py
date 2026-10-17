@@ -8,13 +8,19 @@ import sys
 from pathlib import Path
 
 
-FILES = (
+FEDORA_FILES = (
     ".bashrc",
     ".zshrc",
-    ".config/ghostty/config.ghostty",
+    ".config/ghostty/config",
     ".config/mise/config.toml",
+)
+COMMON_FILES = (
     ".config/sheldon/plugins.toml",
     ".config/starship.toml",
+    ".config/ghostty/dotfiles.conf",
+    ".config/dotfiles/env.sh",
+    ".config/dotfiles/bash.sh",
+    ".config/dotfiles/zsh.zsh",
 )
 
 
@@ -40,8 +46,9 @@ def main() -> int:
     # partially installed configuration.
     nvim_files = tuple(str(p.relative_to(root / "common"))
                        for p in sorted((root / "common/.config/nvim").rglob("*")) if p.is_file())
-    for name in FILES + nvim_files:
-        source = (root / "common" / name) if (name.startswith(".config/nvim/") or name == ".config/starship.toml") else repo / name
+    for name in FEDORA_FILES + COMMON_FILES + nvim_files:
+        source_root = root / "common" if name in COMMON_FILES or name in nvim_files else repo
+        source = source_root / name
         target = home / name
         if target.is_symlink():
             if target.resolve() == source and source.is_file():

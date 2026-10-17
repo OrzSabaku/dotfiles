@@ -1,9 +1,6 @@
-# Personal interactive settings; tool initialization belongs to the OS profile.
-export EDITOR=nvim
+# Personal interactive Bash settings; tool initialization belongs to the OS.
+[[ -r "$HOME/.config/dotfiles/env.sh" ]] && source "$HOME/.config/dotfiles/env.sh"
 HISTSIZE=50000
 HISTFILESIZE=50000
 HISTCONTROL=ignoreboth:erasedups
 shopt -s histappend
-export FZF_DEFAULT_OPTS="--preview 'bat --color=always --style=numbers --line-range :500 {}'"
-export BAT_THEME=base16
-export BAT_STYLE=full

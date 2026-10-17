@@ -43,7 +43,7 @@
     },
     {
       "path": ".config/ghostty/dotfiles.conf",
-      "source": "omarchy/.config/ghostty/dotfiles.conf",
+      "source": "common/.config/ghostty/dotfiles.conf",
       "mode": 420
     },
     {
@@ -289,6 +289,11 @@
     {
       "path": ".config/tmux/tmux.conf",
       "source": "omarchy/.config/tmux/tmux.conf",
+      "mode": 420
+    },
+    {
+      "path": ".config/dotfiles/env.sh",
+      "source": "common/.config/dotfiles/env.sh",
       "mode": 420
     }
   ]

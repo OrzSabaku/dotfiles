@@ -5,7 +5,9 @@
 ```text
 common/             OSをまたいで使う設定
   .config/
-    dotfiles/bash.sh
+    dotfiles/       env.sh・bash.sh・zsh.zsh
+    ghostty/        共通の見た目・操作設定
+    sheldon/        Zshプラグイン一覧
     starship.toml
     nvim/           共通のメインエディタ（LazyVim）
 omarchy/            Omarchy固有の設定
@@ -35,7 +37,7 @@ python3 ~/dotfiles/install.py --profile omarchy --dry-run
 python3 ~/dotfiles/install.py --profile omarchy --apply
 ```
 
-Omarchyの対象は58ファイルです。内容・権限が異なる既存ファイルや、無関係なリンクがあれば停止します。
+Omarchyの対象は59ファイルです。内容・権限が異なる既存ファイルや、無関係なリンクがあれば停止します。
 既存設定をバックアップした後、ファイル単位でリンクします。ディレクトリ全体はリンクしません。
 詳しくは[Omarchyの設定地図](omarchy/README.md)を参照してください。
 
@@ -86,3 +88,17 @@ Fedoraの新規導入ではOmarchy連携がなくても共通設定だけで動�
 `~/dotfiles/scripts/nvim-experiment`で明示的に起動します。
 設定・データ・状態・キャッシュを分離しますが、ホストへのファイルアクセスを制限するものではありません。
 旧`nvim-personal`は通常の導入対象から外しています。
+
+## シェルと端末の共通化
+
+- `common/.config/dotfiles/env.sh`: Bash/Zsh共通のEDITOR、bat、fzf表示設定（POSIX構文）。
+- `common/.config/dotfiles/bash.sh`: 共通環境設定の読み込みとBashの履歴設定。
+- `common/.config/dotfiles/zsh.zsh`: Zshの履歴・補完・キー操作と、存在するツールの初期化。
+- `common/.config/sheldon/plugins.toml`: Zshプラグイン一覧。
+- `common/.config/ghostty/dotfiles.conf`: 透過・余白・カーソル・分割キー。
+
+OmarchyはBashを維持し、Zsh・Sheldonは導入しません。Fedoraの`.bashrc`・`.zshrc`は
+OS固有の初期化を行ってから共通設定を読み込みます。miseのツール一覧はOSごとに維持しています。
+Ghosttyのテーマ・フォントなどはOS側に残しています。
+Fedoraのメイン設定名は標準の`config`へ統一し、存在しないシェーダー参照はコメントにしました。
+Zshの起動確認にはZsh本体と必要なツールが別途必要です。

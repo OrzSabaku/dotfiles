@@ -23,6 +23,12 @@ class FedoraInstallTests(unittest.TestCase):
                 target = home / '.config/nvim' / source.relative_to(common)
                 self.assertTrue(target.is_symlink(), str(target))
                 self.assertEqual(target.resolve(), source)
+            for name in ('.config/dotfiles/env.sh', '.config/dotfiles/bash.sh',
+                         '.config/dotfiles/zsh.zsh', '.config/sheldon/plugins.toml',
+                         '.config/ghostty/dotfiles.conf'):
+                self.assertEqual((home / name).resolve(), repo / 'common' / name)
+            self.assertTrue((home / '.config/ghostty/config').is_symlink())
+            self.assertFalse((home / '.config/ghostty/config.ghostty').exists())
             self.assertFalse((home / '.config/nvim-personal').exists())
             self.assertFalse((home / '.config/nvim/lua/omarchy').exists())
             self.assertFalse((home / '.config/nvim-experiment').exists())

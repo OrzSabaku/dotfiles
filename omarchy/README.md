@@ -1,7 +1,7 @@
 # Omarchyの設定地図
 
 このディレクトリはOmarchy固有の設定です。`.config/`などホームと同じ配置にしています。
-OS共通の設定は`../common/`にあり、導入する58ファイルの対応は`files.json`で管理します。
+OS共通の設定は`../common/`にあり、導入する59ファイルの対応は`files.json`で管理します。
 
 ```text
 ~/.config/hypr/input.lua → ~/dotfiles/omarchy/.config/hypr/input.lua
@@ -23,10 +23,12 @@ OS共通の設定は`../common/`にあり、導入する58ファイルの対応�
 | シェルのフォント補足 | `.config/omarchy/shell.toml` |
 | メニュー・フック | `.config/omarchy/extensions/`、`.config/omarchy/hooks/` |
 | テーマ生成テンプレート | `.config/omarchy/themed/` |
-| GhosttyのOmarchy連携・個人設定 | `.config/ghostty/config`、`.config/ghostty/dotfiles.conf` |
+| GhosttyのOmarchy連携 | `.config/ghostty/config` |
+| Ghosttyの共通操作設定 | `../common/.config/ghostty/dotfiles.conf` |
 | その他の端末 | `.config/alacritty/`、`.config/foot/`、`.config/kitty/` |
 | BashのOmarchy連携 | `.bashrc`、`.bash_profile` |
 | Bashの個人設定 | `../common/.config/dotfiles/bash.sh` |
+| Bash/Zsh共通の環境・表示設定 | `../common/.config/dotfiles/env.sh` |
 | プロンプト | `../common/.config/starship.toml` |
 | 共通のメインNeovim（LazyVim） | `../common/.config/nvim/` |
 | OmarchyのNeovimテーマ連携 | `.config/nvim/lua/omarchy/plugins/` |
@@ -93,3 +95,13 @@ Gitの過去タグを見るだけなら`git show`を使い、作業ツリー全�
 そのまま一括適用する操作は変更検出で停止する場合があります。
 戻す際はGit差分を確認して対象を選び、現在の変更を保存してから行います。
 共通設定単独・Omarchy追加設定ありの両方でヘッドレス起動を確認しています。
+
+## シェル・Ghostty共通化
+
+`env.sh`の追加で管理対象は59ファイルになりました。Omarchy標準のBash初期化はそのままです。
+ZshとSheldonは共通ディレクトリに保存されていますが、このOSには導入していません。
+Ghosttyの個人設定を共通側へ移した際のバックアップは
+`~/.local/state/dotfiles/backups/20261018-030904-9d12b6e5/`です。
+共通Bashの内容の変更前はGitタグ`nvim-common-2026-10-18`で確認できます。
+Bashの起動・Ghosttyの検証と、仮ホームでのFedora導入を確認しました。
+Zsh本体が未導入のため、Zshの実起動は未確認です。
