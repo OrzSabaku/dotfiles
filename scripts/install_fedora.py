@@ -31,7 +31,8 @@ def main() -> int:
         help="copy existing settings into the repository before linking (first run)",
     )
     args = parser.parse_args()
-    repo = Path(__file__).resolve().parent / "home"
+    root = Path(__file__).resolve().parents[1]
+    repo = root / "fedora"
     home = Path.home()
     actions = []
     errors = []
@@ -39,7 +40,7 @@ def main() -> int:
     # Check every path before changing anything, so a conflict cannot cause a
     # partially installed configuration.
     for name in FILES:
-        source = repo / name
+        source = (root / "common" / name) if name in (".config/nvim/init.lua", ".config/starship.toml") else repo / name
         target = home / name
         if target.is_symlink():
             if target.resolve() == source and source.is_file():

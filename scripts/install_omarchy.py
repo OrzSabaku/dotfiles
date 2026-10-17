@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent
+REPO = Path(__file__).resolve().parents[1]
 HOME = Path.home()
 
 
@@ -39,13 +39,20 @@ def put_original(entry, backup):
         path.unlink(missing_ok=True)
     elif 'link' in original:
         path.unlink(missing_ok=True)
-        path.symlink_to(original['link'])
+        old_source = Path(original['link'])
+        if not old_source.is_absolute():
+            old_source = path.parent / old_source
+        if old_source.is_file():
+            path.symlink_to(original['link'])
+        else:
+            # A directory reorganization may have retired the old source.
+            write(path, (backup / entry['saved']).read_bytes(), entry.get('before_mode') or 0o644)
     else:
         write(path, (backup / entry['saved']).read_bytes(), original['mode'])
 
 
 def managed_files():
-    manifest = json.loads((REPO / 'profiles/omarchy/files.json').read_text())
+    manifest = json.loads((REPO / 'omarchy/files.json').read_text())
     if manifest.get('version') != 1:
         raise ValueError('Unsupported files manifest version')
     seen = set()
@@ -83,7 +90,7 @@ def plan():
             raise ValueError(f'Content conflict: {path}; compare with {source} before installing')
         if before is not None and path.stat().st_mode & 0o777 != source.stat().st_mode & 0o777:
             raise ValueError(f'Permission conflict: {path}; review source permissions')
-        changes.append({'path': name, 'before': before, 'link': str(source)})
+        changes.append({'path': name, 'before': before, 'before_mode': path.stat().st_mode & 0o777 if before else None, 'link': str(source)})
     return changes
 
 

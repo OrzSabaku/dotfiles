@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -30,7 +32,7 @@ def main():
         if not args.apply:
             print('Fedora legacy installer: no changes. Use --profile fedora --apply to run.')
             return 0
-        command = [sys.executable, str(Path(__file__).with_name('install_fedora.py'))]
+        command = [sys.executable, str(Path(__file__).parent / 'scripts/install_fedora.py')]
         if args.import_existing:
             command.append('--import-existing')
         return subprocess.call(command)

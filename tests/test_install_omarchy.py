@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import install_omarchy as m
 
 
@@ -25,12 +25,12 @@ class LinkInstallTests(unittest.TestCase):
         self.output = contextlib.redirect_stdout(io.StringIO())
         self.output.__enter__()
         self.addCleanup(self.output.__exit__, None, None, None)
-        self.manifest = self.repo / 'profiles/omarchy/files.json'
+        self.manifest = self.repo / 'omarchy/files.json'
         self.manifest.parent.mkdir(parents=True)
         self.entries = []
 
     def add(self, name, data=b'settings\n', existing=True):
-        source = self.repo / 'profiles/omarchy/home' / name
+        source = self.repo / 'omarchy' / name
         source.parent.mkdir(parents=True, exist_ok=True)
         source.write_bytes(data)
         source.chmod(0o600)
@@ -95,6 +95,23 @@ class LinkInstallTests(unittest.TestCase):
         backup = next((self.home / '.local/state/dotfiles/backups').iterdir())
         m.restore(backup, True)
         self.assertEqual(target.resolve(), old)
+
+    def test_retired_source_restores_as_regular_file(self):
+        target, _ = self.add('.config/app/config')
+        old = self.repo / 'retired.conf'
+        old.write_bytes(target.read_bytes())
+        old.chmod(0o600)
+        target.unlink()
+        target.symlink_to(old)
+        self.entries[0]['migrate_from'] = str(old)
+        self.manifest.write_text(json.dumps({'version': 1, 'files': self.entries}))
+        m.install(True)
+        backup = next((self.home / '.local/state/dotfiles/backups').iterdir())
+        old.unlink()
+        m.restore(backup, True)
+        self.assertFalse(target.is_symlink())
+        self.assertEqual(target.read_bytes(), b'settings\n')
+        self.assertEqual(target.stat().st_mode & 0o777, 0o600)
 
     def test_restore_refuses_source_edits(self):
         target, source = self.add('.config/app/config')

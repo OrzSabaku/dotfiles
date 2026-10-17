@@ -3,298 +3,297 @@
   "files": [
     {
       "path": ".bash_profile",
-      "source": "profiles/omarchy/home/.bash_profile",
+      "source": "omarchy/.bash_profile",
       "mode": 420
     },
     {
       "path": ".bashrc",
-      "source": "profiles/omarchy/home/.bashrc",
+      "source": "omarchy/.bashrc",
       "mode": 420
     },
     {
       "path": ".config/alacritty/alacritty.toml",
-      "source": "profiles/omarchy/home/.config/alacritty/alacritty.toml",
+      "source": "omarchy/.config/alacritty/alacritty.toml",
       "mode": 420
     },
     {
       "path": ".config/btop/btop.conf",
-      "source": "profiles/omarchy/home/.config/btop/btop.conf",
+      "source": "omarchy/.config/btop/btop.conf",
       "mode": 420
     },
     {
       "path": ".config/dotfiles/bash.sh",
-      "source": "common/bash.sh",
+      "source": "common/.config/dotfiles/bash.sh",
       "mode": 420
     },
     {
       "path": ".config/fontconfig/fonts.conf",
-      "source": "profiles/omarchy/home/.config/fontconfig/fonts.conf",
+      "source": "omarchy/.config/fontconfig/fonts.conf",
       "mode": 420
     },
     {
       "path": ".config/foot/foot.ini",
-      "source": "profiles/omarchy/home/.config/foot/foot.ini",
+      "source": "omarchy/.config/foot/foot.ini",
       "mode": 420
     },
     {
       "path": ".config/ghostty/config",
-      "source": "profiles/omarchy/home/.config/ghostty/config",
+      "source": "omarchy/.config/ghostty/config",
       "mode": 420
     },
     {
       "path": ".config/ghostty/dotfiles.conf",
-      "source": "profiles/omarchy/home/.config/ghostty/dotfiles.conf",
-      "mode": 420,
-      "migrate_from": "/home/sabaku/dotfiles/profiles/omarchy/ghostty.conf"
+      "source": "omarchy/.config/ghostty/dotfiles.conf",
+      "mode": 420
     },
     {
       "path": ".config/hypr/.luarc.json",
-      "source": "profiles/omarchy/home/.config/hypr/.luarc.json",
+      "source": "omarchy/.config/hypr/.luarc.json",
       "mode": 420
     },
     {
       "path": ".config/hypr/autostart.lua",
-      "source": "profiles/omarchy/home/.config/hypr/autostart.lua",
+      "source": "omarchy/.config/hypr/autostart.lua",
       "mode": 420
     },
     {
       "path": ".config/hypr/bindings.lua",
-      "source": "profiles/omarchy/home/.config/hypr/bindings.lua",
+      "source": "omarchy/.config/hypr/bindings.lua",
       "mode": 420
     },
     {
       "path": ".config/hypr/hyprland.lua",
-      "source": "profiles/omarchy/home/.config/hypr/hyprland.lua",
+      "source": "omarchy/.config/hypr/hyprland.lua",
       "mode": 420
     },
     {
       "path": ".config/hypr/hyprsunset.conf",
-      "source": "profiles/omarchy/home/.config/hypr/hyprsunset.conf",
+      "source": "omarchy/.config/hypr/hyprsunset.conf",
       "mode": 420
     },
     {
       "path": ".config/hypr/input.lua",
-      "source": "profiles/omarchy/home/.config/hypr/input.lua",
+      "source": "omarchy/.config/hypr/input.lua",
       "mode": 420
     },
     {
       "path": ".config/hypr/looknfeel.lua",
-      "source": "profiles/omarchy/home/.config/hypr/looknfeel.lua",
+      "source": "omarchy/.config/hypr/looknfeel.lua",
       "mode": 420
     },
     {
       "path": ".config/hypr/monitors.lua",
-      "source": "profiles/omarchy/home/.config/hypr/monitors.lua",
+      "source": "omarchy/.config/hypr/monitors.lua",
       "mode": 420
     },
     {
       "path": ".config/hypr/xdph.conf",
-      "source": "profiles/omarchy/home/.config/hypr/xdph.conf",
+      "source": "omarchy/.config/hypr/xdph.conf",
       "mode": 420
     },
     {
       "path": ".config/kitty/kitty.conf",
-      "source": "profiles/omarchy/home/.config/kitty/kitty.conf",
+      "source": "omarchy/.config/kitty/kitty.conf",
       "mode": 420
     },
     {
       "path": ".config/lazygit/config.yml",
-      "source": "profiles/omarchy/home/.config/lazygit/config.yml",
+      "source": "omarchy/.config/lazygit/config.yml",
       "mode": 420
     },
     {
       "path": ".config/mise/config.toml",
-      "source": "profiles/omarchy/home/.config/mise/config.toml",
+      "source": "omarchy/.config/mise/config.toml",
       "mode": 420
     },
     {
       "path": ".config/nvim/.gitignore",
-      "source": "profiles/omarchy/home/.config/nvim/.gitignore",
+      "source": "omarchy/.config/nvim/.gitignore",
       "mode": 420
     },
     {
       "path": ".config/nvim/.neoconf.json",
-      "source": "profiles/omarchy/home/.config/nvim/.neoconf.json",
+      "source": "omarchy/.config/nvim/.neoconf.json",
       "mode": 420
     },
     {
       "path": ".config/nvim/LICENSE",
-      "source": "profiles/omarchy/home/.config/nvim/LICENSE",
+      "source": "omarchy/.config/nvim/LICENSE",
       "mode": 420
     },
     {
       "path": ".config/nvim/README.md",
-      "source": "profiles/omarchy/home/.config/nvim/README.md",
+      "source": "omarchy/.config/nvim/README.md",
       "mode": 420
     },
     {
       "path": ".config/nvim/init.lua",
-      "source": "profiles/omarchy/home/.config/nvim/init.lua",
+      "source": "omarchy/.config/nvim/init.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lazy-lock.json",
-      "source": "profiles/omarchy/home/.config/nvim/lazy-lock.json",
+      "source": "omarchy/.config/nvim/lazy-lock.json",
       "mode": 420
     },
     {
       "path": ".config/nvim/lazyvim.json",
-      "source": "profiles/omarchy/home/.config/nvim/lazyvim.json",
+      "source": "omarchy/.config/nvim/lazyvim.json",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/autocmds.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/config/autocmds.lua",
+      "source": "omarchy/.config/nvim/lua/config/autocmds.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/keymaps.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/config/keymaps.lua",
+      "source": "omarchy/.config/nvim/lua/config/keymaps.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/lazy.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/config/lazy.lua",
+      "source": "omarchy/.config/nvim/lua/config/lazy.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/options.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/config/options.lua",
+      "source": "omarchy/.config/nvim/lua/config/options.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/remote_clipboard.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/config/remote_clipboard.lua",
+      "source": "omarchy/.config/nvim/lua/config/remote_clipboard.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/all-themes.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/plugins/all-themes.lua",
+      "source": "omarchy/.config/nvim/lua/plugins/all-themes.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/disable-news-alert.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/plugins/disable-news-alert.lua",
+      "source": "omarchy/.config/nvim/lua/plugins/disable-news-alert.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/example.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/plugins/example.lua",
+      "source": "omarchy/.config/nvim/lua/plugins/example.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/omarchy-theme-hotreload.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/plugins/omarchy-theme-hotreload.lua",
+      "source": "omarchy/.config/nvim/lua/plugins/omarchy-theme-hotreload.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
-      "source": "profiles/omarchy/home/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
+      "source": "omarchy/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/plugin/after/transparency.lua",
-      "source": "profiles/omarchy/home/.config/nvim/plugin/after/transparency.lua",
+      "source": "omarchy/.config/nvim/plugin/after/transparency.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/stylua.toml",
-      "source": "profiles/omarchy/home/.config/nvim/stylua.toml",
+      "source": "omarchy/.config/nvim/stylua.toml",
       "mode": 420
     },
     {
       "path": ".config/nvim-personal/init.lua",
-      "source": "home/.config/nvim/init.lua",
+      "source": "common/.config/nvim/init.lua",
       "mode": 420
     },
     {
       "path": ".config/omarchy/branding/about.txt",
-      "source": "profiles/omarchy/home/.config/omarchy/branding/about.txt",
+      "source": "omarchy/.config/omarchy/branding/about.txt",
       "mode": 420
     },
     {
       "path": ".config/omarchy/branding/screensaver.txt",
-      "source": "profiles/omarchy/home/.config/omarchy/branding/screensaver.txt",
+      "source": "omarchy/.config/omarchy/branding/screensaver.txt",
       "mode": 420
     },
     {
       "path": ".config/omarchy/defaults/agent",
-      "source": "profiles/omarchy/home/.config/omarchy/defaults/agent",
+      "source": "omarchy/.config/omarchy/defaults/agent",
       "mode": 420
     },
     {
       "path": ".config/omarchy/extensions/omarchy-menu.jsonc",
-      "source": "profiles/omarchy/home/.config/omarchy/extensions/omarchy-menu.jsonc",
+      "source": "omarchy/.config/omarchy/extensions/omarchy-menu.jsonc",
       "mode": 420
     },
     {
       "path": ".config/omarchy/hooks/battery-low.d/play-warning-sound.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/battery-low.d/play-warning-sound.sample",
+      "source": "omarchy/.config/omarchy/hooks/battery-low.d/play-warning-sound.sample",
       "mode": 420
     },
     {
       "path": ".config/omarchy/hooks/font-set.d/show-font-notification.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/font-set.d/show-font-notification.sample",
+      "source": "omarchy/.config/omarchy/hooks/font-set.d/show-font-notification.sample",
       "mode": 420
     },
     {
       "path": ".config/omarchy/hooks/post-boot.d/weather.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/post-boot.d/weather.sample",
+      "source": "omarchy/.config/omarchy/hooks/post-boot.d/weather.sample",
       "mode": 420
     },
     {
       "path": ".config/omarchy/hooks/post-update.d/install-voxtype.hook",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/post-update.d/install-voxtype.hook",
+      "source": "omarchy/.config/omarchy/hooks/post-update.d/install-voxtype.hook",
       "mode": 493
     },
     {
       "path": ".config/omarchy/hooks/post-update.d/setup-agent.hook",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/post-update.d/setup-agent.hook",
+      "source": "omarchy/.config/omarchy/hooks/post-update.d/setup-agent.hook",
       "mode": 493
     },
     {
       "path": ".config/omarchy/hooks/post-update.d/setup-fingerprint.hook",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/post-update.d/setup-fingerprint.hook",
+      "source": "omarchy/.config/omarchy/hooks/post-update.d/setup-fingerprint.hook",
       "mode": 493
     },
     {
       "path": ".config/omarchy/hooks/post-update.d/show-update-notification.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/post-update.d/show-update-notification.sample",
+      "source": "omarchy/.config/omarchy/hooks/post-update.d/show-update-notification.sample",
       "mode": 420
     },
     {
       "path": ".config/omarchy/hooks/pre-refresh-pacman.d/add-custom-repo.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/pre-refresh-pacman.d/add-custom-repo.sample",
+      "source": "omarchy/.config/omarchy/hooks/pre-refresh-pacman.d/add-custom-repo.sample",
       "mode": 420
     },
     {
       "path": ".config/omarchy/hooks/theme-set.d/show-theme-notification.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/hooks/theme-set.d/show-theme-notification.sample",
+      "source": "omarchy/.config/omarchy/hooks/theme-set.d/show-theme-notification.sample",
       "mode": 420
     },
     {
       "path": ".config/omarchy/shell.json",
-      "source": "profiles/omarchy/home/.config/omarchy/shell.json",
+      "source": "omarchy/.config/omarchy/shell.json",
       "mode": 384
     },
     {
       "path": ".config/omarchy/shell.toml",
-      "source": "profiles/omarchy/home/.config/omarchy/shell.toml",
+      "source": "omarchy/.config/omarchy/shell.toml",
       "mode": 384
     },
     {
       "path": ".config/omarchy/themed/alacritty.toml.tpl.sample",
-      "source": "profiles/omarchy/home/.config/omarchy/themed/alacritty.toml.tpl.sample",
+      "source": "omarchy/.config/omarchy/themed/alacritty.toml.tpl.sample",
       "mode": 420
     },
     {
       "path": ".config/starship.toml",
-      "source": "common/starship.toml",
+      "source": "common/.config/starship.toml",
       "mode": 420
     },
     {
       "path": ".config/tmux/tmux.conf",
-      "source": "profiles/omarchy/home/.config/tmux/tmux.conf",
+      "source": "omarchy/.config/tmux/tmux.conf",
       "mode": 420
     }
   ]
