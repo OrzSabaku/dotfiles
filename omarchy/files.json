@@ -108,102 +108,97 @@
     },
     {
       "path": ".config/nvim/.gitignore",
-      "source": "omarchy/.config/nvim/.gitignore",
+      "source": "common/.config/nvim/.gitignore",
       "mode": 420
     },
     {
       "path": ".config/nvim/.neoconf.json",
-      "source": "omarchy/.config/nvim/.neoconf.json",
+      "source": "common/.config/nvim/.neoconf.json",
       "mode": 420
     },
     {
       "path": ".config/nvim/LICENSE",
-      "source": "omarchy/.config/nvim/LICENSE",
+      "source": "common/.config/nvim/LICENSE",
       "mode": 420
     },
     {
       "path": ".config/nvim/README.md",
-      "source": "omarchy/.config/nvim/README.md",
+      "source": "common/.config/nvim/README.md",
       "mode": 420
     },
     {
       "path": ".config/nvim/init.lua",
-      "source": "omarchy/.config/nvim/init.lua",
+      "source": "common/.config/nvim/init.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lazy-lock.json",
-      "source": "omarchy/.config/nvim/lazy-lock.json",
+      "source": "common/.config/nvim/lazy-lock.json",
       "mode": 420
     },
     {
       "path": ".config/nvim/lazyvim.json",
-      "source": "omarchy/.config/nvim/lazyvim.json",
+      "source": "common/.config/nvim/lazyvim.json",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/autocmds.lua",
-      "source": "omarchy/.config/nvim/lua/config/autocmds.lua",
+      "source": "common/.config/nvim/lua/config/autocmds.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/keymaps.lua",
-      "source": "omarchy/.config/nvim/lua/config/keymaps.lua",
+      "source": "common/.config/nvim/lua/config/keymaps.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/lazy.lua",
-      "source": "omarchy/.config/nvim/lua/config/lazy.lua",
+      "source": "common/.config/nvim/lua/config/lazy.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/options.lua",
-      "source": "omarchy/.config/nvim/lua/config/options.lua",
+      "source": "common/.config/nvim/lua/config/options.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/config/remote_clipboard.lua",
-      "source": "omarchy/.config/nvim/lua/config/remote_clipboard.lua",
+      "source": "common/.config/nvim/lua/config/remote_clipboard.lua",
       "mode": 420
     },
     {
-      "path": ".config/nvim/lua/plugins/all-themes.lua",
-      "source": "omarchy/.config/nvim/lua/plugins/all-themes.lua",
+      "path": ".config/nvim/lua/omarchy/plugins/all-themes.lua",
+      "source": "omarchy/.config/nvim/lua/omarchy/plugins/all-themes.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/disable-news-alert.lua",
-      "source": "omarchy/.config/nvim/lua/plugins/disable-news-alert.lua",
+      "source": "common/.config/nvim/lua/plugins/disable-news-alert.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/example.lua",
-      "source": "omarchy/.config/nvim/lua/plugins/example.lua",
+      "source": "common/.config/nvim/lua/plugins/example.lua",
       "mode": 420
     },
     {
-      "path": ".config/nvim/lua/plugins/omarchy-theme-hotreload.lua",
-      "source": "omarchy/.config/nvim/lua/plugins/omarchy-theme-hotreload.lua",
+      "path": ".config/nvim/lua/omarchy/plugins/omarchy-theme-hotreload.lua",
+      "source": "omarchy/.config/nvim/lua/omarchy/plugins/omarchy-theme-hotreload.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
-      "source": "omarchy/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
+      "source": "common/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/plugin/after/transparency.lua",
-      "source": "omarchy/.config/nvim/plugin/after/transparency.lua",
+      "source": "common/.config/nvim/plugin/after/transparency.lua",
       "mode": 420
     },
     {
       "path": ".config/nvim/stylua.toml",
-      "source": "omarchy/.config/nvim/stylua.toml",
-      "mode": 420
-    },
-    {
-      "path": ".config/nvim-personal/init.lua",
-      "source": "common/.config/nvim/init.lua",
+      "source": "common/.config/nvim/stylua.toml",
       "mode": 420
     },
     {

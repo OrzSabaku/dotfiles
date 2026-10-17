@@ -7,7 +7,7 @@ common/             OSをまたいで使う設定
   .config/
     dotfiles/bash.sh
     starship.toml
-    nvim/init.lua
+    nvim/           共通のメインエディタ（LazyVim）
 omarchy/            Omarchy固有の設定
   .bashrc
   .bash_profile
@@ -19,7 +19,8 @@ fedora/             Fedora固有の設定
   .zshrc
   .config/
   README.md
-scripts/            導入・復元処理
+experiments/        通常導入しない実験用設定
+scripts/            導入・復元・実験起動処理
 tests/             安全機構のテスト
 install.py          全環境共通の入口
 ```
@@ -34,7 +35,7 @@ python3 ~/dotfiles/install.py --profile omarchy --dry-run
 python3 ~/dotfiles/install.py --profile omarchy --apply
 ```
 
-Omarchyの対象は59ファイルです。内容・権限が異なる既存ファイルや、無関係なリンクがあれば停止します。
+Omarchyの対象は58ファイルです。内容・権限が異なる既存ファイルや、無関係なリンクがあれば停止します。
 既存設定をバックアップした後、ファイル単位でリンクします。ディレクトリ全体はリンクしません。
 詳しくは[Omarchyの設定地図](omarchy/README.md)を参照してください。
 
@@ -73,3 +74,15 @@ python3 -m unittest discover -s ~/dotfiles/tests -v
 
 復元は既定ではプレビューです。導入後に内容が変わった場合は停止します。
 バックアップは`~/.local/state/dotfiles/backups/`に保存します。
+
+## Neovim
+
+日常の`nvim`は両OSとも`common/.config/nvim/`のLazyVimを使用します。
+Omarchyのテーマ一覧・再読み込みだけ`omarchy/.config/nvim/lua/omarchy/plugins/`に分離しています。
+Omarchyが生成する`plugins/theme.lua`へのリンクは従来のままです。
+Fedoraの新規導入ではOmarchy連携がなくても共通設定だけで動作します。
+
+自作設定は[実験用設定](experiments/README.md)へ移動しました。
+`~/dotfiles/scripts/nvim-experiment`で明示的に起動します。
+設定・データ・状態・キャッシュを分離しますが、ホストへのファイルアクセスを制限するものではありません。
+旧`nvim-personal`は通常の導入対象から外しています。

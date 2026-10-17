@@ -1,7 +1,9 @@
 # Fedora固有の設定
 
 このディレクトリ内はホームと同じ配置です。Bash・Zsh・Ghostty・mise・Sheldonの設定を保存しています。
-StarshipとNeovimは`../common/.config/`の設定を使用します。
+StarshipとメインエディタのNeovim（LazyVim）は`../common/.config/`の設定を使用します。
+Neovimはinit.luaだけでなく設定一式をファイル単位で導入します。
+Omarchy固有のテーマ追加設定や、自作設定の実験は導入しません。
 `.vimrc`は元環境の記録として残していますが、導入しません。
 
 ```sh

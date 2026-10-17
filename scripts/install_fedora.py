@@ -13,7 +13,6 @@ FILES = (
     ".zshrc",
     ".config/ghostty/config.ghostty",
     ".config/mise/config.toml",
-    ".config/nvim/init.lua",
     ".config/sheldon/plugins.toml",
     ".config/starship.toml",
 )
@@ -39,8 +38,10 @@ def main() -> int:
 
     # Check every path before changing anything, so a conflict cannot cause a
     # partially installed configuration.
-    for name in FILES:
-        source = (root / "common" / name) if name in (".config/nvim/init.lua", ".config/starship.toml") else repo / name
+    nvim_files = tuple(str(p.relative_to(root / "common"))
+                       for p in sorted((root / "common/.config/nvim").rglob("*")) if p.is_file())
+    for name in FILES + nvim_files:
+        source = (root / "common" / name) if (name.startswith(".config/nvim/") or name == ".config/starship.toml") else repo / name
         target = home / name
         if target.is_symlink():
             if target.resolve() == source and source.is_file():

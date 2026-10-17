@@ -1,7 +1,7 @@
 # Omarchyの設定地図
 
 このディレクトリはOmarchy固有の設定です。`.config/`などホームと同じ配置にしています。
-OS共通の設定は`../common/`にあり、導入する59ファイルの対応は`files.json`で管理します。
+OS共通の設定は`../common/`にあり、導入する58ファイルの対応は`files.json`で管理します。
 
 ```text
 ~/.config/hypr/input.lua → ~/dotfiles/omarchy/.config/hypr/input.lua
@@ -28,8 +28,9 @@ OS共通の設定は`../common/`にあり、導入する59ファイルの対応�
 | BashのOmarchy連携 | `.bashrc`、`.bash_profile` |
 | Bashの個人設定 | `../common/.config/dotfiles/bash.sh` |
 | プロンプト | `../common/.config/starship.toml` |
-| 通常のNeovim（LazyVim） | `.config/nvim/lua/config/`、`.config/nvim/lua/plugins/` |
-| お試しNeovim（nvim-personal） | `../common/.config/nvim/init.lua` |
+| 共通のメインNeovim（LazyVim） | `../common/.config/nvim/` |
+| OmarchyのNeovimテーマ連携 | `.config/nvim/lua/omarchy/plugins/` |
+| 自作設定の実験 | `../experiments/nvim-experiment/init.lua`（通常導入対象外） |
 | mise | `.config/mise/config.toml` |
 | tmux・btop・lazygit | `.config/tmux/`、`.config/btop/`、`.config/lazygit/` |
 | フォント代替 | `.config/fontconfig/fonts.conf` |
@@ -41,7 +42,7 @@ Hyprland: Omarchy標準 → ~/.config/hypr/ の個人設定
 Bash:     ~/.bashrc → Omarchy標準 → commonのbash.sh
 Ghostty:  現在のテーマ → config → dotfiles.conf
 Starship: Bashが起動 → commonのstarship.toml
-Neovim:   nvimはLazyVim / nvim-personalは共通の個人設定
+Neovim:   共通のLazyVim → 存在する場合だけOmarchyテーマ追加設定
 ```
 
 Omarchy本体の`/usr/share/omarchy/`や生成状態の`~/.local/state/omarchy/`は変更しません。
@@ -56,7 +57,8 @@ btopとNeovimの生成テーマリンクもそのまま残しています。
 - Ghosttyは`ghostty +validate-config`で検証します。
 - ナイトライトや画面共有は別プロセスなので、Hyprlandの再読み込みだけでは反映されません。
 
-今回の配置変更では59ファイルの内容・権限を維持しています。
+前回の配置変更では59ファイルの内容・権限を維持しました。
+その後、メインのNeovimを共通化し、実験用の1ファイルを導入対象から除いて58ファイルになっています。
 Hyprlandのソケットにはエージェントから接続できないため、実行中のコンポジターでの確認はできていません。
 
 アプリがリンクを通常ファイルへ置き換えた場合は、次のプレビューで確認できます。
@@ -80,3 +82,14 @@ python3 ~/dotfiles/install.py --restore ~/.local/state/dotfiles/backups/20261018
 Gitの過去タグを見るだけなら`git show`を使い、作業ツリー全体を切り替えないでください。
 
 これは設定ファイルの管理です。OS・パッケージ・プラグイン・壁紙画像の全体バックアップではありません。
+
+## Neovim共通化時のバックアップ
+
+2026-10-18の共通化前の状態はGitタグ`dotfiles-layout-2026-10-18`にあります。
+リンク移行前のバックアップは`~/.local/state/dotfiles/backups/20261018-030634-842018b1/`、
+削除した旧テーマ読み込みリンクと実験リンクの内容は
+`~/.local/state/dotfiles/backups/neovim-retired-20261018-030633/`に保存しました。
+移行後に共通設定の読み込み処理も更新しているため、リンク移行のバックアップを
+そのまま一括適用する操作は変更検出で停止する場合があります。
+戻す際はGit差分を確認して対象を選び、現在の変更を保存してから行います。
+共通設定単独・Omarchy追加設定ありの両方でヘッドレス起動を確認しています。

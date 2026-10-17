@@ -6,6 +6,7 @@
 !/common/
 !/omarchy/
 !/fedora/
+!/experiments/
 !/scripts/
 !/tests/
 **/__pycache__/

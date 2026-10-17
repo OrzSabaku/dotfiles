@@ -14,13 +14,19 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
-  spec = {
+local specs = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- import/override with your plugins
     { import = "plugins" },
-  },
+}
+-- The OS profile may install optional integrations; Fedora has no such module.
+if vim.fn.isdirectory(vim.fn.stdpath("config") .. "/lua/omarchy/plugins") == 1 then
+  specs[#specs + 1] = { import = "omarchy.plugins" }
+end
+
+require("lazy").setup({
+  spec = specs,
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
     -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
