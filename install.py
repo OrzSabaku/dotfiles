@@ -1,87 +1,46 @@
 #!/usr/bin/env python3
-"""Install the explicitly managed dotfiles as symlinks into the home directory."""
-
+"""Explicit OS profiles. Preview by default; apply only with --apply."""
 import argparse
-import os
-import shutil
+import subprocess
 import sys
 from pathlib import Path
 
 
-FILES = (
-    ".bashrc",
-    ".zshrc",
-    ".vimrc",
-    ".config/ghostty/config.ghostty",
-    ".config/mise/config.toml",
-    ".config/nvim/init.lua",
-    ".config/sheldon/plugins.toml",
-    ".config/starship.toml",
-)
-
-
-def same_contents(a: Path, b: Path) -> bool:
-    return a.is_file() and b.is_file() and a.read_bytes() == b.read_bytes()
-
-
-def main() -> int:
+def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--import-existing",
-        action="store_true",
-        help="copy existing settings into the repository before linking (first run)",
-    )
+    parser.add_argument('--profile', choices=['omarchy', 'fedora'])
+    parser.add_argument('--apply', action='store_true')
+    parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--restore', type=Path, help='restore an Omarchy backup directory')
+    parser.add_argument('--import-existing', action='store_true')
     args = parser.parse_args()
-    repo = Path(__file__).resolve().parent / "home"
-    home = Path.home()
-    actions = []
-    errors = []
-
-    # Check every path before changing anything, so a conflict cannot cause a
-    # partially installed configuration.
-    for name in FILES:
-        source = repo / name
-        target = home / name
-        if target.is_symlink():
-            if target.resolve() == source and source.is_file():
-                actions.append(("already linked", source, target))
-            else:
-                errors.append(f"{target}: symlink points elsewhere")
-        elif target.exists():
-            if not target.is_file():
-                errors.append(f"{target}: not a regular file")
-            elif source.exists():
-                if same_contents(source, target):
-                    actions.append(("link", source, target))
-                else:
-                    errors.append(f"{target}: differs from {source}; resolve manually")
-            elif args.import_existing:
-                actions.append(("import and link", source, target))
-            else:
-                errors.append(f"{target}: run with --import-existing or resolve manually")
-        elif source.is_file():
-            actions.append(("link", source, target))
-        else:
-            actions.append(("skip", source, target))
-
-    if errors:
-        for error in errors:
-            print(error, file=sys.stderr)
-        return 1
-
-    for action, source, target in actions:
-        if action == "import and link":
-            source.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(target, source)
-    for action, source, target in actions:
-        if action in ("link", "import and link"):
-            target.parent.mkdir(parents=True, exist_ok=True)
-            if target.exists():
-                target.unlink()
-            os.symlink(source, target)
-        print(f"{action}: {target}")
+    if args.apply and args.dry_run:
+        parser.error('--apply and --dry-run are mutually exclusive')
+    if args.restore:
+        if args.import_existing or args.profile:
+            parser.error('--restore cannot be combined with profile/import')
+        from install_omarchy import restore
+        restore(args.restore, args.apply)
+    elif args.profile == 'omarchy':
+        if args.import_existing:
+            parser.error('--import-existing is only for Fedora')
+        from install_omarchy import install
+        install(args.apply)
+    elif args.profile == 'fedora':
+        if not args.apply:
+            print('Fedora legacy installer: no changes. Use --profile fedora --apply to run.')
+            return 0
+        command = [sys.executable, str(Path(__file__).with_name('install_fedora.py'))]
+        if args.import_existing:
+            command.append('--import-existing')
+        return subprocess.call(command)
+    else:
+        parser.error('choose --profile omarchy/fedora or --restore PATH')
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (OSError, ValueError) as error:
+        sys.exit(str(error))

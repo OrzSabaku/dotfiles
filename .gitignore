@@ -23,3 +23,8 @@
 !/home/.config/nvim/init.lua
 /home/.config/sheldon/*
 !/home/.config/sheldon/plugins.toml
+!/install_fedora.py
+!/install_omarchy.py
+!/common/
+!/profiles/
+!/omarchy_snapshot.py
