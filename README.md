@@ -37,7 +37,7 @@ python3 ~/dotfiles/install.py --profile omarchy --dry-run
 python3 ~/dotfiles/install.py --profile omarchy --apply
 ```
 
-Omarchyの対象は59ファイルです。内容・権限が異なる既存ファイルや、無関係なリンクがあれば停止します。
+Omarchyの対象はZsh設定を含め63ファイルです。内容・権限が異なる既存ファイルや、無関係なリンクがあれば停止します。
 既存設定をバックアップした後、ファイル単位でリンクします。ディレクトリ全体はリンクしません。
 詳しくは[Omarchyの設定地図](omarchy/README.md)を参照してください。
 
@@ -97,8 +97,25 @@ Fedoraの新規導入ではOmarchy連携がなくても共通設定だけで動�
 - `common/.config/sheldon/plugins.toml`: Zshプラグイン一覧。
 - `common/.config/ghostty/dotfiles.conf`: 透過・余白・カーソル・分割キー。
 
-OmarchyはBashを維持し、Zsh・Sheldonは導入しません。Fedoraの`.bashrc`・`.zshrc`は
+OmarchyはZshを主シェルにする構成で、Bashも復旧用に残します。Fedoraの`.bashrc`・`.zshrc`は
 OS固有の初期化を行ってから共通設定を読み込みます。miseのツール一覧はOSごとに維持しています。
 Ghosttyのテーマ・フォントなどはOS側に残しています。
 Fedoraのメイン設定名は標準の`config`へ統一し、存在しないシェーダー参照はコメントにしました。
 Zshの起動確認にはZsh本体と必要なツールが別途必要です。
+
+## OmarchyへのZsh導入
+
+通常のユーザー端末で次を実行してください（sudoは付けません）。
+
+```sh
+~/dotfiles/scripts/setup-zsh
+```
+
+Zsh・Sheldonのパッケージ導入、設定の検証・リンク、プラグイン取得、対話シェルの起動テストを
+順に実行し、成功した後だけ`chsh`でログインシェルを変更します。パスワード入力が必要な場合があります。
+新しい端末、必要なら再ログイン後に反映されます。Bashへ戻すには`chsh -s /usr/bin/bash`を使います。
+Bash側の設定、デスクトップ、Ghosttyの起動コマンドは変更しません。
+
+2026-10-18のエージェント実行ではsudoの実行制約によりパッケージ導入で停止しました。
+この時点では63ファイル中Zsh用4ファイルは未適用で、ログインシェルはBashのままです。
+設定・導入手順の準備と9テストは完了していますが、Zsh本体での検証はスクリプト実行時に行います。

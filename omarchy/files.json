@@ -295,6 +295,26 @@
       "path": ".config/dotfiles/env.sh",
       "source": "common/.config/dotfiles/env.sh",
       "mode": 420
+    },
+    {
+      "path": ".zshenv",
+      "source": "omarchy/.zshenv",
+      "mode": 420
+    },
+    {
+      "path": ".zshrc",
+      "source": "omarchy/.zshrc",
+      "mode": 420
+    },
+    {
+      "path": ".config/dotfiles/zsh.zsh",
+      "source": "common/.config/dotfiles/zsh.zsh",
+      "mode": 420
+    },
+    {
+      "path": ".config/sheldon/plugins.toml",
+      "source": "common/.config/sheldon/plugins.toml",
+      "mode": 420
     }
   ]
 }

@@ -1,7 +1,7 @@
 # Omarchyの設定地図
 
 このディレクトリはOmarchy固有の設定です。`.config/`などホームと同じ配置にしています。
-OS共通の設定は`../common/`にあり、導入する59ファイルの対応は`files.json`で管理します。
+OS共通の設定は`../common/`にあり、導入する63ファイルの対応は`files.json`で管理します。
 
 ```text
 ~/.config/hypr/input.lua → ~/dotfiles/omarchy/.config/hypr/input.lua
@@ -99,9 +99,31 @@ Gitの過去タグを見るだけなら`git show`を使い、作業ツリー全�
 ## シェル・Ghostty共通化
 
 `env.sh`の追加で管理対象は59ファイルになりました。Omarchy標準のBash初期化はそのままです。
-ZshとSheldonは共通ディレクトリに保存されていますが、このOSには導入していません。
+当時はZshとSheldonをこのOSへ導入していませんでした。現在は以下の専用手順で導入する構成です。
 Ghosttyの個人設定を共通側へ移した際のバックアップは
 `~/.local/state/dotfiles/backups/20261018-030904-9d12b6e5/`です。
 共通Bashの内容の変更前はGitタグ`nvim-common-2026-10-18`で確認できます。
 Bashの起動・Ghosttyの検証と、仮ホームでのFedora導入を確認しました。
 Zsh本体が未導入のため、Zshの実起動は未確認です。
+
+## Zsh
+
+通常のユーザー端末から`~/dotfiles/scripts/setup-zsh`を実行します。
+パッケージ導入から起動検証まで成功した後にだけ、ログインシェルをZshに変更します。
+Bashの設定は残り、`bash`で起動できます。ログインシェルを戻す場合は`chsh -s /usr/bin/bash`です。
+
+```text
+~/.zshenv → Omarchyのenv-bootstrap（PATH、mise shims）
+~/.zshrc  → Omarchyのenvs・aliases → 共通zsh.zsh
+                                     ├─ env.sh
+                                     ├─ 補完・履歴・キー操作
+                                     └─ mise・Starship・zoxide・fzf・Sheldon
+```
+
+Bash専用のrc・関数群はZshへ読み込みません。Sheldonのプラグインや履歴、補完キャッシュは
+実環境の通常ディレクトリに作られ、Gitへ取り込みません。
+旧ログインシェルの記録は`~/.local/state/dotfiles/shell-before-zsh-*.txt`へ保存します。
+
+2026-10-18時点のエージェントによる実行はsudo制約で止まり、Zshのインストールと実起動は未完了です。
+新しい4ファイル（`.zshenv`、`.zshrc`、共通Zsh設定、Sheldon設定）の導入は上記スクリプトに委ねています。
+この手順が成功するまで、実環境のログインシェルはBashのままです。

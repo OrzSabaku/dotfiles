@@ -26,9 +26,11 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 
 - 実環境の設定ファイルはリポジトリ内の原本へのシンボリックリンクです。ディレクトリ全体はリンクしません。
 - リポジトリ内の原本を編集すると実環境にも反映されます。保存時に自動再読み込みされる設定もあります。
-- OmarchyはBashを維持。Omarchy標準の環境設定・エイリアス・ツール初期化を読み込んでから個人設定を追加します。
+- OmarchyはZshを主シェルにする構成。`scripts/setup-zsh`で導入・検証してからログインシェルを変更します。
+  Bashの設定は復旧用に残します。実際の導入状態は`command -v zsh`と`getent passwd`で確認してください。
 - 共通の`env.sh`はBash/Zsh両方から読めるPOSIX構文。Bash固有処理は`bash.sh`、Zsh固有処理は`zsh.zsh`へ。
-- ZshとSheldonは共通管理ですが、Omarchyには導入しません。Fedoraの入口が共通Zsh設定を読み込みます。
+- ZshとSheldonは共通管理で、両OSの入口から使用します。Omarchyでは`.zshenv`が標準のPATH設定、
+  `.zshrc`が標準環境・エイリアスと共通Zsh設定を読み込みます。Bash固有のrc・関数群はZshへ読み込みません。
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
 - miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
@@ -86,3 +88,11 @@ git diff --check
 
 利用者向けの詳細は`README.md`、`omarchy/README.md`、`fedora/README.md`、`experiments/README.md`を参照。
 設定の構造や入口を変えたら、対応する文書も更新してください。
+
+## Zsh導入の権限制約（2026-10-18）
+
+このエージェント実行環境では`omarchy pkg add zsh sheldon`がsudoのno-new-privileges制約で失敗しました。
+この時点ではZsh本体・プラグインの導入やログインシェル変更は完了していません。
+通常のユーザー端末で`~/dotfiles/scripts/setup-zsh`を実行する手順を用意しています。
+スクリプトはパッケージ導入、構文検証、設定リンク、プラグイン取得、起動テストの後に`chsh`します。
+途中で失敗した場合にログインシェルを変更しない順序を維持してください。

@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Run in a regular user terminal; sudo/chsh may prompt for the user's password.
+set -euo pipefail
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+if (( EUID == 0 )); then
+  echo 'Run this script as your normal desktop user, without sudo.' >&2
+  exit 1
+fi
+if ! grep -qx 'ID=omarchy' /etc/os-release; then
+  echo 'This setup is for Omarchy.' >&2
+  exit 1
+fi
+old_shell=$(getent passwd "$(id -un)" | cut -d: -f7)
+if [[ -z "$old_shell" ]]; then
+  echo 'Could not determine the current login shell.' >&2
+  exit 1
+fi
+
+# Complete privileged work first. A failure here leaves the configuration alone.
+omarchy pkg add zsh sheldon
+for tool in zsh sheldon starship mise fzf zoxide eza bat; do
+  command -v "$tool" >/dev/null || { echo "Missing dependency: $tool" >&2; exit 1; }
+done
+zsh_bin=$(command -v zsh)
+if ! grep -Fxq "$zsh_bin" /etc/shells; then
+  echo "The installed shell is not registered in /etc/shells: $zsh_bin" >&2
+  exit 1
+fi
+
+for config in "$repo/omarchy/.zshenv" "$repo/omarchy/.zshrc" "$repo/common/.config/dotfiles/zsh.zsh"; do
+  zsh -n "$config"
+done
+python3 "$repo/install.py" --profile omarchy --apply
+# Fetch plugins explicitly, so the first interactive startup is already ready.
+sheldon lock
+sheldon source >/dev/null
+zsh -lic '[[ -o interactive && $EDITOR == nvim && -n $OMARCHY_PATH ]] || exit 1
+  whence -p mise starship fzf zoxide sheldon eza bat >/dev/null || exit 1
+  print -r -- "Zsh startup OK"'
+
+# Preserve an audit trail before changing the account's shell.
+state_dir="$HOME/.local/state/dotfiles"
+mkdir -p "$state_dir"
+(umask 077; printf '%s\n' "$old_shell" > "$state_dir/shell-before-zsh-$(date +%Y%m%d-%H%M%S).txt")
+if [[ "$old_shell" != "$zsh_bin" ]]; then
+  chsh -s "$zsh_bin"
+fi
+current_shell=$(getent passwd "$(id -un)" | cut -d: -f7)
+[[ "$current_shell" == "$zsh_bin" ]] || { echo 'Login shell change was not applied.' >&2; exit 1; }
+printf 'Default shell: %s\nOpen a new terminal; log out and back in if necessary.\n' "$current_shell"
+printf 'To return to the previous login shell: chsh -s %q\n' "$old_shell"
