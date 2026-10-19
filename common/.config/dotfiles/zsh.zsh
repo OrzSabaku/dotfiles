@@ -74,6 +74,7 @@ if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
 if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
 if command -v fzf >/dev/null 2>&1; then source <(fzf --zsh); fi
 if command -v sheldon >/dev/null 2>&1; then eval "$(sheldon source)"; fi
+if command -v gh >/dev/null 2>&1; then eval "$(gh completion -s zsh)"; fi
 
 # Unity CLI
 case ":${PATH}:" in *:"$HOME/.local/bin":*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
