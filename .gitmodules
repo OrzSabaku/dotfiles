@@ -1,0 +1,6 @@
+[submodule "ghostty-shaders"]
+	path = submodules/ghostty-shaders
+	url = https://github.com/Desert-sabaku/ghostty-shaders
+[submodule "cursor-shaders"]
+	path = submodules/cursor-shaders
+	url = https://github.com/sahaj-b/cursor-shaders

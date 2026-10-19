@@ -1,6 +1,8 @@
 # Configuration is added explicitly to common/, omarchy/ or fedora/.
 /*
 !/.gitignore
+!/.gitmodules
+!/submodules/
 !/README.md
 !/AGENTS.md
 !/install.py

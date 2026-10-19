@@ -50,6 +50,23 @@ python3 ~/dotfiles/install.py --profile fedora --apply
 Vim設定は保存されていますが導入対象外です。パッケージの導入・更新は行いません。
 認証情報・履歴・キャッシュ・個人用Git identity・生成テーマは対象外です。
 
+## Ghosttyシェーダー
+
+シェーダーはプロジェクトルートの`submodules/`配下にまとめて管理します。
+`submodules/ghostty-shaders/`は[個人フォーク](https://github.com/Desert-sabaku/ghostty-shaders)、
+`submodules/cursor-shaders/`は[上流](https://github.com/sahaj-b/cursor-shaders)を参照します。
+雨の方向と連続入力時のアニメーションを改善したコミットを固定しています。
+
+クローン後は次を実行してください。
+
+```sh
+git submodule update --init --recursive
+```
+
+Ghosttyの`common/.config/ghostty/dotfiles.conf`は`~/dotfiles/submodules/ghostty-shaders/`と
+`~/dotfiles/submodules/cursor-shaders/`内のファイルを参照します。
+修正はsubmodule内でコミット・pushし、親リポジトリでも参照コミットを更新してください。
+
 ## 変更と履歴
 
 リンク先の編集は実環境に反映されます。`git diff`で変更を確認してコミットします。
