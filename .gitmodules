@@ -4,3 +4,6 @@
 [submodule "cursor-shaders"]
 	path = submodules/cursor-shaders
 	url = https://github.com/sahaj-b/cursor-shaders
+[submodule "submodules/hondazn-dotfiles"]
+	path = submodules/hondazn-dotfiles
+	url = https://github.com/hondazn/dotfiles
