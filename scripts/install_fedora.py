@@ -15,6 +15,7 @@ FEDORA_FILES = (
     ".config/mise/config.toml",
 )
 COMMON_FILES = (
+    ".config/git/config",
     ".config/sheldon/plugins.toml",
     ".config/starship.toml",
     ".config/ghostty/dotfiles.conf",

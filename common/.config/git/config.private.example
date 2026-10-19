@@ -1,0 +1,9 @@
+# Copy to ~/.config/git/config.private, chmod 600, and edit locally.
+# Never add the real config.private, allowed_signers or private key to Git.
+[user]
+    name = YOUR_PUBLIC_ALIAS
+    email = YOUR_GITHUB_NOREPLY_EMAIL
+    signingKey = ~/.ssh/id_ed25519
+[gpg "ssh"]
+    allowedSignersFile = ~/.config/git/allowed_signers
+# Store credential helpers and machine-specific overrides here as well.

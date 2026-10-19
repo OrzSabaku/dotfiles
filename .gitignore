@@ -14,3 +14,10 @@
 !/tests/
 **/__pycache__/
 *.py[cod]
+
+# Machine-local Git identity, credentials and signature trust; never publish.
+**/config.private
+**/allowed_signers
+**/.git-credentials
+**/id_ed25519
+**/id_rsa

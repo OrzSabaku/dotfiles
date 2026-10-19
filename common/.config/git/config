@@ -1,0 +1,34 @@
+# Shared Git preferences. Identity, credentials and keys stay outside this repository.
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+[init]
+	defaultbranch = main
+[pull]
+	rebase = true
+[push]
+	autosetupremote = true
+[diff]
+	algorithm = histogram
+	colormoved = plain
+	mnemonicprefix = true
+[commit]
+	verbose = true
+	gpgSign = true
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[tag]
+	sort = -version:refname
+[rerere]
+	enabled = true
+	autoupdate = true
+[user]
+	useConfigOnly = true
+[gpg]
+	format = ssh
+[include]
+	path = ~/.config/git/config.private

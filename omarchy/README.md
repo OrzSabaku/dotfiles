@@ -141,3 +141,8 @@ Bash専用のrc・関数群はZshへ読み込みません。Sheldonのプラグ�
 設定は`.config/hypr/monitors.lua`です。配置変更前のバックアップは
 `~/.local/state/dotfiles/backups/monitors-20261018-202501/monitors.lua`です。
 Lua構文は検証済みですが、エージェントからのHyprland接続に失敗したため実配置の確認は未完了です。
+
+## Git
+
+共通のグローバルGit設定も導入対象です（設定一覧は`files.json`が正）。
+個人情報・認証・署名鍵はホーム側の非管理ファイルへ分離しています。詳細はルートREADMEを参照してください。

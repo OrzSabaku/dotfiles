@@ -315,6 +315,11 @@
       "path": ".config/sheldon/plugins.toml",
       "source": "common/.config/sheldon/plugins.toml",
       "mode": 420
+    },
+    {
+      "path": ".config/git/config",
+      "source": "common/.config/git/config",
+      "mode": 420
     }
   ]
 }

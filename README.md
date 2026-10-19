@@ -136,3 +136,48 @@ Bash側の設定、デスクトップ、Ghosttyの起動コマンドは変更し
 2026-10-18のエージェント実行ではsudoの実行制約によりパッケージ導入で停止しました。
 この時点では63ファイル中Zsh用4ファイルは未適用で、ログインシェルはBashのままです。
 設定・導入手順の準備と9テストは完了していますが、Zsh本体での検証はスクリプト実行時に行います。
+
+## グローバルGit設定と署名
+
+`~/.config/git/config`は`common/.config/git/config`へリンクし、両OSで共通のエイリアス・差分表示・
+ブランチ設定などと、SSH方式のコミット自動署名を管理します。
+名前・メール・署名鍵・認証ヘルパーは、リポジトリ外の`~/.config/git/config.private`から読み込みます。
+署名の検証先`~/.config/git/allowed_signers`も非管理です。両ファイルは権限600にします。
+
+新しい環境では`common/.config/git/config.private.example`を実環境の`config.private`へコピーし、
+公開用の作者名、GitHubのnoreplyメール、既存SSH鍵の場所を設定してください。
+この例示ファイルは自動導入しません。秘密鍵は別途安全に用意し、dotfilesへコピーしません。
+鍵・作者情報が未設定なら署名に失敗する状態を保ち、無署名へ自動で切り替えません。
+
+個人情報の変更は、共有原本への書き込みを避けて次のように行います。
+
+```sh
+git config --file ~/.config/git/config.private user.name YOUR_PUBLIC_ALIAS
+git config --file ~/.config/git/config.private user.email YOUR_GITHUB_NOREPLY_EMAIL
+git config --file ~/.config/git/config.private user.signingkey ~/.ssh/id_ed25519
+```
+
+`git config --global`は共有ファイルを直接書き換えるため、名前・メール・認証情報の保存には使わないでください。
+GitHub CLIの認証ヘルパーを設定し直す場合も、非管理ファイルへ書き込みます。
+
+```sh
+GIT_CONFIG_GLOBAL="$HOME/.config/git/config.private" gh auth setup-git
+```
+
+署名検証には`allowed_signers`へ`メールアドレス 鍵種別 公開鍵本体`の形式で登録し、
+`config.private`の`gpg.ssh.allowedSignersFile`でそのファイルを指定します。
+この環境では既存のSSH鍵を使い、通常の`git commit`の自動署名と`git verify-commit`を検証済みです。
+
+GitHubでVerifiedと表示するには、公開鍵をGitHubへ署名用の鍵として登録します。
+認証用のSSH鍵登録とは別の用途です。今回エージェントからはGitHub認証/APIを確認できていません。
+
+```sh
+gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "Git commit signing"
+```
+
+登録済みの署名鍵がある場合は重複追加せず、その鍵を使用します。
+GitHubの案内: https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key
+
+移行前の設定は`~/.local/state/dotfiles/backups/git-global-20261020-021309/`に保存しています。
+名前・メールの変更は今後のコミットへ適用します。既存履歴の作者情報は書き換えていません。
+リポジトリを公開する前には、設定ファイルだけでなく過去の履歴の作者情報も確認してください。
