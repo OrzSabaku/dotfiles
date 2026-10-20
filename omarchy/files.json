@@ -320,6 +320,36 @@
       "path": ".config/git/config",
       "source": "common/.config/git/config",
       "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.idle/IdleModel.js",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/IdleModel.js",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.idle/MediaIdle.js",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/MediaIdle.js",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.idle/Service.qml",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/Service.qml",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.idle/manifest.json",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/manifest.json",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.idle/upstream.json",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/upstream.json",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.idle/README.md",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/README.md",
+      "mode": 420
     }
   ]
 }

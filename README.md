@@ -181,3 +181,10 @@ GitHubの案内: https://docs.github.com/en/authentication/managing-commit-signa
 移行前の設定は`~/.local/state/dotfiles/backups/git-global-20261020-021309/`に保存しています。
 名前・メールの変更は今後のコミットへ適用します。既存履歴の作者情報は書き換えていません。
 リポジトリを公開する前には、設定ファイルだけでなく過去の履歴の作者情報も確認してください。
+
+## ブラウザー再生中のアイドル抑止
+
+Omarchy用の`dotfiles.idle`プラグインを追加しています。標準のスクリーンセーバー・自動ロックの
+時間は維持し、ブラウザーの動画・音声再生中だけ抑止します。
+有効化は通常のデスクトップ端末で`scripts/enable-browser-idle`を実行してください。
+実セッションの再生確認は未完了です。詳しくは[Omarchyの設定地図](omarchy/README.md)を参照してください。

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "dotfiles.idle",
+  "name": "Idle with browser playback",
+  "version": "1.0.0",
+  "author": "dotfiles",
+  "description": "Omarchy idle service with browser MPRIS playback inhibition.",
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.idle"
+  }
+}
