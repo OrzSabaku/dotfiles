@@ -61,6 +61,16 @@
     "lock": 300,
     "screensaver": 150
   },
-  "plugins": [],
-  "version": 1
+  "plugins": [
+    {
+      "id": "dotfiles.idle"
+    }
+  ],
+  "version": 1,
+  "disabledPlugins": [
+    "omarchy.idle"
+  ],
+  "cloneSourceRestores": [
+    "dotfiles.idle"
+  ]
 }
