@@ -45,7 +45,6 @@ setopt NO_CLOBBER
 setopt NO_NOMATCH
 # compinit & zstyle
 autoload -Uz compinit
-compinit
 
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
@@ -72,16 +71,24 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 if command -v mise >/dev/null 2>&1; then eval "$(mise activate zsh)"; fi
 if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
 if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
-if command -v fzf >/dev/null 2>&1; then source <(fzf --zsh); fi
 # Use the last validated source. Plugin downloads/updates are explicit so a
 # network or upstream failure cannot break every newly opened terminal.
-if command -v sheldon >/dev/null 2>&1; then
-  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/sheldon.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/sheldon.zsh"
-  else
-    eval "$(sheldon source)"
+() {
+  local plugin_source=''
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/sheldon.zsh"
+  if [[ -r "$cache" ]]; then
+    plugin_source=$(<"$cache")
+  elif command -v sheldon >/dev/null 2>&1; then
+    plugin_source=$(sheldon source) || plugin_source=''
   fi
-fi
+  # Older validated caches predate the completion phase. Keep them usable until
+  # an explicit successful update, without initializing compinit twice.
+  if [[ "$plugin_source" != *'# dotfiles: managed-compinit'* ]]; then
+    compinit
+    if (( $+commands[fzf] )); then source <(fzf --zsh); fi
+  fi
+  eval "$plugin_source"
+}
 if command -v gh >/dev/null 2>&1; then eval "$(gh completion -s zsh)"; fi
 
 # Unity CLI

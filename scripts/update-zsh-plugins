@@ -3,8 +3,19 @@
 set -euo pipefail
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 work=$(mktemp -d)
-trap 'rm -rf -- "$work"' EXIT
-sheldon --non-interactive source --relock > "$work/sheldon.zsh"
+# Each generation owns its repositories: Sheldon may prune unused sources.
+# Never relock the data directory referenced by a working cached source.
+generations="${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/sheldon"
+mkdir -p "$generations"
+generation=$(mktemp -d "$generations/generation.XXXXXX")
+activated=false
+cleanup() {
+  rm -rf -- "$work"
+  rm -f -- "${next:-}"
+  if [[ "$activated" != true ]]; then rm -rf -- "$generation"; fi
+}
+trap cleanup EXIT
+sheldon --non-interactive --data-dir "$generation" source --relock > "$work/sheldon.zsh"
 zsh -n "$work/sheldon.zsh"
 ZDOTDIR="$work" zsh -f -i "$repo/scripts/check-zsh-plugins.zsh" "$work/sheldon.zsh" "$work"
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles"
@@ -16,8 +27,8 @@ if [[ -f "$cache/sheldon.zsh" ]]; then
 fi
 # Rename on the same filesystem so terminals never read half a generated file.
 next=$(mktemp "$cache/.sheldon.XXXXXX")
-trap 'rm -rf -- "$work"; rm -f -- "${next:-}"' EXIT
 cat "$work/sheldon.zsh" > "$next"
 chmod 600 "$next"
 mv -f -- "$next" "$cache/sheldon.zsh"
+activated=true
 echo 'Validated Zsh plugins activated. Open a new terminal.'

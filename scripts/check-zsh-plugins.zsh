@@ -1,9 +1,14 @@
 # Run with zsh -f -i; caller isolates ZDOTDIR and supplies a temporary directory.
 setopt ERR_EXIT
 work=$2
-autoload -Uz compinit
-compinit -d "$work/zcompdump"
 source "$1"
+(( ${+functions[compdef]} && ${+functions[_fzf_tab]} && ${+functions[_zsh_highlight]} )) || {
+  print -u2 'Missing completion, fzf-tab or fast-syntax-highlighting functions'; exit 1
+}
+(( $+widgets[fzf-history-widget] )) || { print -u2 'Missing fzf history widget'; exit 1; }
+[[ ${fpath[(r)*/zsh-completions/src]} != '' ]] || {
+  print -u2 'Missing zsh-completions path'; exit 1
+}
 zmodload zsh/parameter
 for shortcut in g ga gst gd gcmsg gcm; do
   (( ${+aliases[$shortcut]} )) || { print -u2 "Missing Git alias: $shortcut"; exit 1; }

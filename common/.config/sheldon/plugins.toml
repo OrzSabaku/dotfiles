@@ -2,6 +2,9 @@ shell = "zsh"
 
 # Load only the selected Oh My Zsh files, not its framework or themes.
 [templates]
+completions = '''
+fpath=("{{ dir }}/src" $fpath)
+'''
 omz-aliases = '''
 autoload -Uz is-at-least
 zmodload zsh/parameter
@@ -33,6 +36,25 @@ fi
 }
 '''
 
+# Definitions must be present before compinit builds its function table.
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+use = ["src/*"]
+apply = ["completions"]
+
+[plugins.completion-init]
+inline = '''
+# dotfiles: managed-compinit
+autoload -Uz compinit
+compinit
+if (( $+commands[fzf] )); then
+    source <(fzf --zsh)
+fi
+zstyle ':completion:*' menu no
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':fzf-tab:*' switch-group '<' '>'
+'''
+
 [plugins.ohmyzsh-aliases]
 github = "ohmyzsh/ohmyzsh"
 use = ["plugins/git/git.plugin.zsh"]
@@ -44,9 +66,13 @@ github = "z-shell/zsh-eza"
 [plugins.zsh-you-should-use]
 github = "MichaelAquilina/zsh-you-should-use"
 
+# fzf-tab must follow compinit/fzf key bindings and precede widget wrappers.
+[plugins.fzf-tab]
+github = "Aloxaf/fzf-tab"
+
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
 
 # Highlighter comes after aliases and widget-wrapping plugins.
-[plugins.zsh-syntax-highlighting]
-github = "zsh-users/zsh-syntax-highlighting"
+[plugins.fast-syntax-highlighting]
+github = "zdharma-continuum/fast-syntax-highlighting"

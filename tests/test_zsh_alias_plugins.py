@@ -69,10 +69,16 @@ zmodload zsh/parameter
             cache.parent.mkdir(parents=True)
             cache.write_text('# working configuration\n')
             env = os.environ.copy()
-            env.update(HOME=str(root), XDG_CACHE_HOME=str(root / 'cache'), PATH=str(tools) + ':' + env['PATH'])
+            env.update(HOME=str(root), XDG_CACHE_HOME=str(root / 'cache'), XDG_DATA_HOME=str(root / 'data'), PATH=str(tools) + ':' + env['PATH'])
             result = subprocess.run(['bash', str(REPO / 'scripts/update-zsh-plugins')], env=env, capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(cache.read_text(), '# working configuration\n')
+
+    def test_update_uses_isolated_generation(self):
+        self.assert_failed_update_preserves_cache(
+            'case "$*" in *--data-dir*generation.*) exit 23;; esac\n'
+            'touch "$HOME/cache/dotfiles/sheldon.zsh"\n'
+            'echo damaged > "$HOME/cache/dotfiles/sheldon.zsh"\nexit 24\n')
 
     def test_failed_download_keeps_last_working_plugins(self):
         self.assert_failed_update_preserves_cache('exit 23\n')

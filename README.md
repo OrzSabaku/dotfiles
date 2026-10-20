@@ -221,10 +221,20 @@ Gitの署名設定自体を変更・無効化するラッパーは追加して�
 Zsh起動時は`~/.cache/dotfiles/sheldon.zsh`の最後に検証したソースを読み込みます。
 プラグイン設定を変更した場合も上のコマンドで更新してください。取得・検証に失敗した場合は旧キャッシュを維持します。
 変更前のキャッシュは`~/.local/state/dotfiles/backups/`へ保存します。
+取得は世代別の`~/.local/share/dotfiles/sheldon/`で行い、既存キャッシュが参照するプラグインを保護します。
+復元に備え古い世代は自動削除しません。
 キャッシュがない新規環境では通常のSheldon読み込みへフォールバックします。
 
 2026-10-21のエージェント環境からはGitHubの名前解決に失敗したため、新規プラグインの取得は未完了です。
 既存プラグインの起動を維持し、上記コマンドで取得成功後に新しい構成へ切り替わる状態にしています。
 実際の上流プラグインを使う最終検証も、その時点で実行されます。
-ハイライトは既存のzsh-syntax-highlightingを最後に読み込むよう整理しました。
-fast-syntax-highlighting、fzf-tab、npm・systemdプラグインは今回追加していません。
+新構成は`zsh-completions` → `compinit` → fzfキー設定 → エイリアス → `fzf-tab` →
+`zsh-autosuggestions` → `fast-syntax-highlighting`の順です。旧`zsh-syntax-highlighting`とは併用しません。
+
+- `Tab`: fzfで補完候補を絞り込み、Enterで選択。`<` / `>`で候補グループを切り替えます。
+- `Ctrl-R`: fzfでコマンド履歴を検索します。
+- `Ctrl-T`: fzfでファイルを選び、コマンドラインへ挿入します。
+- `Alt-C`: fzfでディレクトリを選んで移動します。
+- `fast-syntax-highlighting`: 入力中のコマンドや対応するサブコマンドを色分けします。
+
+npm・systemdのエイリアスプラグインは追加していません。
