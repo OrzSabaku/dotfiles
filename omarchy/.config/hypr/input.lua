@@ -56,5 +56,13 @@
 -- hl.gesture({ fingers = 3, direction = "left", action = function() hl.dispatch(hl.dsp.focus({ direction = "l" })) end })
 -- hl.gesture({ fingers = 3, direction = "right", action = function() hl.dispatch(hl.dsp.focus({ direction = "r" })) end })
 
--- Keep Num Lock off when starting a Hyprland session.
-hl.config({ input = { numlock_by_default = false } })
+-- Personal keyboard and touchpad defaults.
+hl.config({
+  input = {
+    numlock_by_default = false,
+    touchpad = {
+      -- Use the lower-right button area for right-click, rather than finger count.
+      clickfinger_behavior = false,
+    },
+  },
+})
