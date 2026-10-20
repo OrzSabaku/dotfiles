@@ -16,17 +16,4 @@
         source "$omz_dir/plugins/docker/docker.plugin.zsh"
         source "$omz_dir/plugins/docker-compose/docker-compose.plugin.zsh"
     fi
-    # In particular, upstream gwip explicitly disables signing. Remove that and
-    # any future alias with the same opt-out rather than overriding Git itself.
-    () {
-        local shortcut definition
-        for shortcut in ${(k)aliases}; do
-            definition=${(L)aliases[$shortcut]}
-            case "$definition" in
-                *--no-gpg-sign*|*commit.gpgsign=false*|*commit.gpgsign=0*)
-                    unalias "$shortcut"
-                    ;;
-            esac
-        done
-    }
 } "$1"

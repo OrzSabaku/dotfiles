@@ -113,7 +113,7 @@ Fedoraの新規導入ではOmarchy連携がなくても共通設定だけで動�
 - `common/.config/dotfiles/zsh.zsh`: Zshの履歴・補完・キー操作と、存在するツールの初期化。
 - `common/.config/sheldon/plugins.toml`: Zshプラグインの取得元・読み込み順と短いテンプレート。
 - `common/.config/sheldon/completion-init.zsh`: 補完初期化とfzfの連携設定。
-- `common/.config/sheldon/omz-aliases.zsh`: Oh My Zshの部分読み込みと署名を無効にするエイリアスの除去。
+- `common/.config/sheldon/omz-aliases.zsh`: Oh My Zshの依存関数と選択したプラグインの読み込み。
 - `common/.config/ghostty/dotfiles.conf`: 透過・余白・カーソル・分割キー。
 
 OmarchyはZshを主シェルにする構成で、Bashも復旧用に残します。Fedoraの`.bashrc`・`.zshrc`は
@@ -207,7 +207,8 @@ Omarchyの既存Git短縮形を優先する処理は廃止し、標準のプラ�
 | Compose起動・ログ追従・exec | `dcupd`、`dclf`、`dce` |
 
 旧`gcad`と、Git自身に定義していた`git co/br/ci/st`は廃止します。
-署名を無効にする`gwip`などは読み込み直後に除去し、他のコミット操作には共有Git設定の自動署名が適用されます。
+プラグインのエイリアスは上流の定義をそのまま使用します。通常のコミットは共有Git設定で自動署名されますが、
+`gwip`のように明示的に署名を無効にするエイリアスも、上流の挙動を維持します。
 Gitの署名設定自体を変更・無効化するラッパーは追加していません。
 
 プラグインの取得と検証・有効化は、通常の端末で次を実行します。
@@ -216,7 +217,7 @@ Gitの署名設定自体を変更・無効化するラッパーは追加して�
 ~/dotfiles/scripts/update-zsh-plugins
 ```
 
-取得したプラグインの構文、必要なエイリアスと補助関数、署名を無効化する定義が残っていないこと、
+取得したプラグインの構文、必要なエイリアスと補助関数、
 `gcmsg`による一時リポジトリへの署名付きコミットと検証を確認してから有効化します。
 有効化後は新しい端末を開いてください。署名鍵とGitの個人設定が必要です。
 

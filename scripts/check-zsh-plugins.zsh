@@ -21,12 +21,6 @@ for shortcut in g ga gst gd gcmsg gcm; do
 done
 (( ! ${+aliases[gcad]} )) || { print -u2 'Retired gcad alias still exists'; exit 1; }
 (( ${+functions[git_current_branch]} && ${+functions[git_main_branch]} && ${+functions[clipcopy]} )) || exit 1
-for definition in "${(@v)aliases}"; do
-  case "${(L)definition}" in
-    *--no-gpg-sign*|*commit.gpgsign=false*|*commit.gpgsign=0*)
-      print -u2 'An alias disables commit signing'; exit 1 ;;
-  esac
-done
 if (( $+commands[docker] )); then
   for shortcut in dps dlo dxcit dcupd dclf dce; do
     (( ${+aliases[$shortcut]} )) || { print -u2 "Missing Docker alias: $shortcut"; exit 1; }

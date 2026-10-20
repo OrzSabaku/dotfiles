@@ -12,7 +12,7 @@ REPO = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless(shutil.which('zsh') and shutil.which('sheldon'), 'Zsh and Sheldon are required')
 class ZshAliasPluginTests(unittest.TestCase):
-    def test_real_sheldon_template_preserves_plugin_names_and_removes_unsigned_aliases(self):
+    def test_real_sheldon_template_preserves_upstream_aliases(self):
         config = tomllib.loads((REPO / 'common/.config/sheldon/plugins.toml').read_text())
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -54,7 +54,9 @@ source "$1"
 zmodload zsh/parameter
 [[ $aliases[gcm] == 'git checkout $(git_main_branch)' ]] || exit 1
 [[ $aliases[gcmsg] == 'git commit --message' ]] || exit 2
-(( ! ${+aliases[gcad]} && ! ${+aliases[gwip]} && ! ${+aliases[unsafe]} )) || exit 3
+(( ! ${+aliases[gcad]} )) || exit 3
+[[ $aliases[gwip] == 'git commit --no-gpg-sign' ]] || exit 6
+[[ $aliases[unsafe] == 'git -c commit.gpgsign=false commit' ]] || exit 7
 [[ $aliases[dps] == 'docker ps' && $aliases[dcupd] == 'docker compose up -d' ]] || exit 4
 (( ${+functions[git_current_branch]} && ${+functions[clipcopy]} )) || exit 5
 '''
