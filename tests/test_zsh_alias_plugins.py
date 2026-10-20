@@ -58,6 +58,31 @@ zmodload zsh/parameter
             checked = subprocess.run(['zsh', '-f', '-c', script, 'test', str(generated)], env=env, capture_output=True, text=True)
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
 
+    def test_completion_checks_accept_upstream_function_names(self):
+        checker = (REPO / 'scripts/check-zsh-plugins.zsh').read_text()
+        preflight = checker.split('zmodload zsh/parameter', 1)[0]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'plugins.zsh'
+            source.write_text("""compdef() { :; }
+fzf-tab-complete() { :; }
+_zsh_highlight() { :; }
+typeset -g FAST_HIGHLIGHT_VERSION=1.55
+fzf-history-widget() { :; }
+zle -N fzf-history-widget
+fpath+=(/fixture/zsh-completions/src)
+""")
+            env = os.environ.copy()
+            env['ZDOTDIR'] = directory
+            result = subprocess.run(['zsh', '-f', '-i', '-c', preflight, 'test', str(source), directory],
+                                    env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            source.write_text(source.read_text().replace('fzf-tab-complete() { :; }', ''))
+            result = subprocess.run(['zsh', '-f', '-i', '-c', preflight, 'test', str(source), directory],
+                                    env=env, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('Missing plugin function: fzf-tab-complete', result.stderr)
+
     def assert_failed_update_preserves_cache(self, tool_body):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

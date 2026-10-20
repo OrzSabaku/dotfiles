@@ -2,8 +2,14 @@
 setopt ERR_EXIT
 work=$2
 source "$1"
-(( ${+functions[compdef]} && ${+functions[_fzf_tab]} && ${+functions[_zsh_highlight]} )) || {
-  print -u2 'Missing completion, fzf-tab or fast-syntax-highlighting functions'; exit 1
+# Check upstream's actual widget function, not the nonexistent _fzf_tab.
+for required in compdef fzf-tab-complete _zsh_highlight; do
+  (( ${+functions[$required]} )) || {
+    print -u2 "Missing plugin function: $required"; exit 1
+  }
+done
+[[ -n ${FAST_HIGHLIGHT_VERSION:-} ]] || {
+  print -u2 'fast-syntax-highlighting did not initialize'; exit 1
 }
 (( $+widgets[fzf-history-widget] )) || { print -u2 'Missing fzf history widget'; exit 1; }
 [[ ${fpath[(r)*/zsh-completions/src]} != '' ]] || {
