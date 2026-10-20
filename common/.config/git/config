@@ -1,9 +1,4 @@
 # Shared Git preferences. Identity, credentials and keys stay outside this repository.
-[alias]
-	co = checkout
-	br = branch
-	ci = commit
-	st = status
 [init]
 	defaultbranch = main
 [pull]

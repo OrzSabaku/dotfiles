@@ -73,7 +73,15 @@ if command -v mise >/dev/null 2>&1; then eval "$(mise activate zsh)"; fi
 if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
 if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
 if command -v fzf >/dev/null 2>&1; then source <(fzf --zsh); fi
-if command -v sheldon >/dev/null 2>&1; then eval "$(sheldon source)"; fi
+# Use the last validated source. Plugin downloads/updates are explicit so a
+# network or upstream failure cannot break every newly opened terminal.
+if command -v sheldon >/dev/null 2>&1; then
+  if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/sheldon.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/sheldon.zsh"
+  else
+    eval "$(sheldon source)"
+  fi
+fi
 if command -v gh >/dev/null 2>&1; then eval "$(gh completion -s zsh)"; fi
 
 # Unity CLI

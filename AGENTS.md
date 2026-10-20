@@ -89,6 +89,12 @@ git diff --check
 戻り先として名前を付けたい重要スナップショットだけにタグを使ってください。
 既存タグは保持します。リモートへの送信は明示的な依頼がある場合だけ行います。
 
+Zshプラグインは`common/.config/sheldon/plugins.toml`で管理します。
+Git・Docker・ComposeのエイリアスはOh My Zshの選択したファイルを使用し、自前の旧Git短縮形は維持しません。
+署名を無効化するエイリアスを復活させないでください。
+変更後は`scripts/update-zsh-plugins`で取得・検証してから生成済みキャッシュを切り替えます。
+Zsh起動時は最後に検証したキャッシュを使用するため、TOMLの編集だけでは既存環境へ即反映されません。
+
 利用者向けの詳細は`README.md`、`omarchy/README.md`、`fedora/README.md`、`experiments/README.md`を参照。
 設定の構造や入口を変えたら、対応する文書も更新してください。
 

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Fetch/render/test before replacing the plugin source used by interactive shells.
+set -euo pipefail
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+work=$(mktemp -d)
+trap 'rm -rf -- "$work"' EXIT
+sheldon --non-interactive source --relock > "$work/sheldon.zsh"
+zsh -n "$work/sheldon.zsh"
+ZDOTDIR="$work" zsh -f -i "$repo/scripts/check-zsh-plugins.zsh" "$work/sheldon.zsh" "$work"
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles"
+mkdir -p "$cache"
+if [[ -f "$cache/sheldon.zsh" ]]; then
+  backup="$HOME/.local/state/dotfiles/backups/zsh-plugins-$(date +%Y%m%d-%H%M%S)"
+  mkdir -m 700 -p "$backup"
+  cp "$cache/sheldon.zsh" "$backup/sheldon.zsh"
+fi
+# Rename on the same filesystem so terminals never read half a generated file.
+next=$(mktemp "$cache/.sheldon.XXXXXX")
+trap 'rm -rf -- "$work"; rm -f -- "${next:-}"' EXIT
+cat "$work/sheldon.zsh" > "$next"
+chmod 600 "$next"
+mv -f -- "$next" "$cache/sheldon.zsh"
+echo 'Validated Zsh plugins activated. Open a new terminal.'

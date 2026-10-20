@@ -139,7 +139,7 @@ Bash側の設定、デスクトップ、Ghosttyの起動コマンドは変更し
 
 ## グローバルGit設定と署名
 
-`~/.config/git/config`は`common/.config/git/config`へリンクし、両OSで共通のエイリアス・差分表示・
+`~/.config/git/config`は`common/.config/git/config`へリンクし、両OSで共通の差分表示・
 ブランチ設定などと、SSH方式のコミット自動署名を管理します。
 名前・メール・署名鍵・認証ヘルパーは、リポジトリ外の`~/.config/git/config.private`から読み込みます。
 署名の検証先`~/.config/git/allowed_signers`も非管理です。両ファイルは権限600にします。
@@ -188,3 +188,43 @@ Omarchy用の`dotfiles.idle`プラグインを追加しています。標準の�
 時間は維持し、ブラウザーの動画・音声再生中だけ抑止します。
 有効化は通常のデスクトップ端末で`scripts/enable-browser-idle`を実行してください。
 実セッションの再生確認は未完了です。詳しくは[Omarchyの設定地図](omarchy/README.md)を参照してください。
+
+## ZshのGit・Dockerエイリアス
+
+Oh My ZshのGit・Docker・Docker ComposeプラグインだけをSheldonで読み込みます。
+Oh My Zsh本体やテーマへは移行しません。必要なGit補助関数・クリップボード関数も読み込みます。
+Omarchyの既存Git短縮形を優先する処理は廃止し、標準のプラグイン定義へ揃えます。
+
+| 操作 | エイリアス |
+|---|---|
+| 状態・差分・追加 | `gst`、`gd`、`ga` |
+| コミットメッセージ指定 | `gcmsg "message"` |
+| メインブランチへ移動 | `gcm`（以前の`git commit -m`とは異なる） |
+| ブランチ・チェックアウト | `gb`、`gco` |
+| Docker一覧・ログ・対話exec | `dps`、`dlo`、`dxcit` |
+| Compose起動・ログ追従・exec | `dcupd`、`dclf`、`dce` |
+
+旧`gcad`と、Git自身に定義していた`git co/br/ci/st`は廃止します。
+署名を無効にする`gwip`などは読み込み直後に除去し、他のコミット操作には共有Git設定の自動署名が適用されます。
+Gitの署名設定自体を変更・無効化するラッパーは追加していません。
+
+プラグインの取得と検証・有効化は、通常の端末で次を実行します。
+
+```sh
+~/dotfiles/scripts/update-zsh-plugins
+```
+
+取得したプラグインの構文、必要なエイリアスと補助関数、署名を無効化する定義が残っていないこと、
+`gcmsg`による一時リポジトリへの署名付きコミットと検証を確認してから有効化します。
+有効化後は新しい端末を開いてください。署名鍵とGitの個人設定が必要です。
+
+Zsh起動時は`~/.cache/dotfiles/sheldon.zsh`の最後に検証したソースを読み込みます。
+プラグイン設定を変更した場合も上のコマンドで更新してください。取得・検証に失敗した場合は旧キャッシュを維持します。
+変更前のキャッシュは`~/.local/state/dotfiles/backups/`へ保存します。
+キャッシュがない新規環境では通常のSheldon読み込みへフォールバックします。
+
+2026-10-21のエージェント環境からはGitHubの名前解決に失敗したため、新規プラグインの取得は未完了です。
+既存プラグインの起動を維持し、上記コマンドで取得成功後に新しい構成へ切り替わる状態にしています。
+実際の上流プラグインを使う最終検証も、その時点で実行されます。
+ハイライトは既存のzsh-syntax-highlightingを最後に読み込むよう整理しました。
+fast-syntax-highlighting、fzf-tab、npm・systemdプラグインは今回追加していません。

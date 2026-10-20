@@ -32,8 +32,7 @@ for config in "$repo/omarchy/.zshenv" "$repo/omarchy/.zshrc" "$repo/common/.conf
 done
 python3 "$repo/install.py" --profile omarchy --apply
 # Fetch plugins explicitly, so the first interactive startup is already ready.
-sheldon lock
-sheldon source >/dev/null
+"$repo/scripts/update-zsh-plugins"
 zsh -lic '[[ -o interactive && $EDITOR == nvim && -n $OMARCHY_PATH ]] || exit 1
   whence -p mise starship fzf zoxide sheldon eza bat >/dev/null || exit 1
   print -r -- "Zsh startup OK"'
