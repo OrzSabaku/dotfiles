@@ -1,9 +1,11 @@
+#!/usr/bin/env zsh
+
 align_center() {
   local message="${1:-Ghostty}"
   local font="${2:-letter}"
   local filter="${3:-rainbow}"
 
-  if ! (( ${+command[toilet]} )); then
+  if ! (( ${+commands[toilet]} )); then
     echo "Error: toilet がインストールされていません。" >&2
     return 1
   fi
