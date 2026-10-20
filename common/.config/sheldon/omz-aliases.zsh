@@ -16,4 +16,6 @@
         source "$omz_dir/plugins/docker/docker.plugin.zsh"
         source "$omz_dir/plugins/docker-compose/docker-compose.plugin.zsh"
     fi
+    # Register Space expansion before autosuggestions and highlighting wrap widgets.
+    source "$omz_dir/plugins/globalias/globalias.plugin.zsh"
 } "$1"

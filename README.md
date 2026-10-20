@@ -193,7 +193,7 @@ Omarchy用の`dotfiles.idle`プラグインを追加しています。標準の�
 
 ## ZshのGit・Dockerエイリアス
 
-Oh My ZshのGit・Docker・Docker ComposeプラグインだけをSheldonで読み込みます。
+Oh My ZshのGit・Docker・Docker Composeと、入力展開用のglobaliasをSheldonで読み込みます。
 Oh My Zsh本体やテーマへは移行しません。必要なGit補助関数・クリップボード関数も読み込みます。
 Omarchyの既存Git短縮形を優先する処理は廃止し、標準のプラグイン定義へ揃えます。
 
@@ -210,6 +210,10 @@ Omarchyの既存Git短縮形を優先する処理は廃止し、標準のプラ�
 プラグインのエイリアスは上流の定義をそのまま使用します。通常のコミットは共有Git設定で自動署名されますが、
 `gwip`のように明示的に署名を無効にするエイリアスも、上流の挙動を維持します。
 Gitの署名設定自体を変更・無効化するラッパーは追加していません。
+
+`globalias`により、エイリアスの後でSpaceを押すと入力欄で展開されます。
+例：`gst` → Space → `git status `。展開せずスペースを入れるにはCtrl-Spaceを使います。
+上流の仕様として、エイリアスに加えglobやコマンド置換も入力中に展開します。
 
 プラグインの取得と検証・有効化は、通常の端末で次を実行します。
 

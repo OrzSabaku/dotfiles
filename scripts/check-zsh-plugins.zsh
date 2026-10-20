@@ -3,7 +3,7 @@ setopt ERR_EXIT
 work=$2
 source "$1"
 # Check upstream's actual widget function, not the nonexistent _fzf_tab.
-for required in compdef fzf-tab-complete _zsh_highlight; do
+for required in compdef fzf-tab-complete globalias _zsh_highlight; do
   (( ${+functions[$required]} )) || {
     print -u2 "Missing plugin function: $required"; exit 1
   }

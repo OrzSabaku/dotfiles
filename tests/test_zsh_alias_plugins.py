@@ -18,6 +18,7 @@ class ZshAliasPluginTests(unittest.TestCase):
             root = Path(directory)
             fixture = root / 'plugin'
             sources = {
+                'plugins/globalias/globalias.plugin.zsh': 'globalias() { :; }\n',
                 'lib/clipboard.zsh': 'clipcopy() { :; }\n',
                 'lib/git.zsh': 'git_current_branch() { print main; }\ngit_main_branch() { print main; }\n',
                 'plugins/git/git.plugin.zsh': "alias gcm='git checkout $(git_main_branch)'\nalias gcmsg='git commit --message'\nalias gwip='git commit --no-gpg-sign'\nalias unsafe='git -c commit.gpgsign=false commit'\n",
@@ -58,7 +59,7 @@ zmodload zsh/parameter
 [[ $aliases[gwip] == 'git commit --no-gpg-sign' ]] || exit 6
 [[ $aliases[unsafe] == 'git -c commit.gpgsign=false commit' ]] || exit 7
 [[ $aliases[dps] == 'docker ps' && $aliases[dcupd] == 'docker compose up -d' ]] || exit 4
-(( ${+functions[git_current_branch]} && ${+functions[clipcopy]} )) || exit 5
+(( ${+functions[git_current_branch]} && ${+functions[clipcopy]} && ${+functions[globalias]} )) || exit 5
 '''
             checked = subprocess.run(['zsh', '-f', '-c', script, 'test', str(generated)], env=env, capture_output=True, text=True)
             self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
@@ -71,6 +72,7 @@ zmodload zsh/parameter
             source = root / 'plugins.zsh'
             source.write_text("""compdef() { :; }
 fzf-tab-complete() { :; }
+globalias() { :; }
 _zsh_highlight() { :; }
 typeset -g FAST_HIGHLIGHT_VERSION=1.55
 fzf-history-widget() { :; }
