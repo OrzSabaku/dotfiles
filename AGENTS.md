@@ -109,7 +109,9 @@ Zsh起動時は最後に検証したキャッシュを使用するため、TOML�
 
 ## Omarchyプラグイン
 
-`dotfiles.idle`・`dotfiles.notifications`のソースは独立Gitリポジトリの
-`submodules/omarchy-plugins/plugins/`です。親は参照コミット・ファイルのリンク・個人の有効化状態を管理します。
-プラグインの変更はサブモジュール内でテスト・署名付きコミットした後、親の参照を更新してください。
-公開予定URLは設定済みですが、外部への公開はまだ行っていません。無断でpushしないでください。
+`dotfiles.idle`は`submodules/omarchy-browser-idle/`、`dotfiles.notifications`は
+`submodules/omarchy-notification-countdown/`にある独立Gitリポジトリです。
+どちらもルートのmanifest.jsonを持つ単独プラグインです。親は参照コミット・リンク・有効化状態を管理します。
+コード変更は対象サブモジュールでテスト・署名付きコミットした後、親の参照を更新してください。
+旧集合リポジトリの公開はユーザーが実施済みです。新しい2つのGitHubリポジトリ作成・pushと、
+移行後の旧リポジトリ削除が今回の依頼範囲です。公開状態は実際に確認してください。

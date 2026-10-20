@@ -249,12 +249,25 @@ npm・systemdのエイリアスプラグインは追加していません。
 
 ## Omarchyプラグインのソース
 
-ブラウザー再生中のアイドル抑止と通知の残量バーは、独立リポジトリ
-[`submodules/omarchy-plugins`](submodules/omarchy-plugins/README.md)へ切り出しました。
-このdotfilesはサブモジュールのコミットを固定し、`omarchy/files.json`から各ファイルをリンクします。
-プラグインのコード・テスト・ライセンス・有効化処理はサブモジュール側、個人の有効化状態は
-`omarchy/.config/omarchy/shell.json`で管理します。
+それぞれ独立したリポジトリをサブモジュールとして管理します。
 
-現在はローカルでの公開準備段階です。`.gitmodules`のOmarchyプラグインURLは公開予定先であり、
-GitHubのリポジトリ作成・pushは行っていません。公開されるまでは新しい環境でそのサブモジュールを取得できません。
-既存チェックアウトの内容は保存されています。更新はサブモジュール内で行い、動作確認後に親で参照コミットを更新してください。
+- [`submodules/omarchy-browser-idle`](submodules/omarchy-browser-idle/README.md): ブラウザー再生中のアイドル抑止
+- [`submodules/omarchy-notification-countdown`](submodules/omarchy-notification-countdown/README.md): 通知の自動消去と残量バー
+
+それぞれルートに`manifest.json`を持ち、公開後はOmarchy標準の`plugin add`・`plugin update`で利用できます。
+このdotfilesの開発環境では`omarchy/files.json`で各ソースを直接リンクしています。
+既に同じIDがあるため、この環境で重ねて`plugin add`しないでください。
+個人の有効化状態は`omarchy/.config/omarchy/shell.json`、コードとテストは各サブモジュールが管理します。
+親のGitコミットは各サブモジュールのバージョンを固定します。
+
+新しい2リポジトリの作成とpushは、通常の端末で以下を実行します。
+
+```sh
+~/dotfiles/scripts/publish-omarchy-plugins
+```
+
+旧`Desert-sabaku/omarchy-plugins`も削除する場合は`--delete-legacy`を付けます。
+両方のpushとGitHub上のコミット一致を確認できた場合だけ削除へ進みます。
+旧リポジトリに想定外の更新があった場合は削除しません。通常の公開処理では旧リポジトリを残します。
+旧履歴は切り出し前に`~/.local/state/dotfiles/backups/plugin-split-*/omarchy-plugins.bundle`へ保存しています。
+Marketplaceへの申請は公開・実機確認後の別工程です。

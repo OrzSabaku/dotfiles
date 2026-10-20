@@ -2,4 +2,4 @@
 # Compatibility entry point: plugin code and activation live in the submodule.
 set -euo pipefail
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-exec "$repo/submodules/omarchy-plugins/scripts/enable-notification-timeout" "$@"
+exec "$repo/submodules/omarchy-notification-countdown/scripts/enable-notification-timeout" "$@"

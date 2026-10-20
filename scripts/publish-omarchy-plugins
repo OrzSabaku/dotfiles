@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Publish both standalone plugins; optionally retire the verified legacy remote.
+set -euo pipefail
+repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+delete_legacy=false
+case "${1:-}" in
+  '') ;;
+  --delete-legacy) delete_legacy=true ;;
+  *) echo 'Usage: publish-omarchy-plugins [--delete-legacy]' >&2; exit 2 ;;
+esac
+# Check every local source before changing anything on GitHub.
+for name in omarchy-browser-idle omarchy-notification-countdown; do
+  source="$repo/submodules/$name"
+  [[ -z $(git -C "$source" status --porcelain) ]] || {
+    echo "Uncommitted changes in $source; commit/review before publishing." >&2; exit 1;
+  }
+  [[ $(git -C "$source" remote get-url origin) == "https://github.com/Desert-sabaku/$name.git" ]] || exit 1
+  git -C "$source" verify-commit HEAD
+  omarchy plugin validate "$source"
+done
+for name in omarchy-browser-idle omarchy-notification-countdown; do
+  source="$repo/submodules/$name"
+  target="Desert-sabaku/$name"
+  if ! gh repo view "$target" --json name >/dev/null 2>&1; then
+    gh repo create "$target" --public --description "$(jq -r .description "$source/manifest.json")"
+  fi
+  [[ $(gh repo view "$target" --json visibility --jq .visibility) == PUBLIC ]] || {
+    echo "$target is not public; refusing to alter its visibility." >&2; exit 1;
+  }
+  git -C "$source" push -u origin HEAD:refs/heads/main
+  expected=$(git -C "$source" rev-parse HEAD)
+  actual=$(gh api "repos/$target/git/ref/heads/main" --jq .object.sha)
+  [[ "$actual" == "$expected" ]] || { echo "Remote commit mismatch for $target" >&2; exit 1; }
+  echo "Published https://github.com/$target at $actual"
+done
+if [[ "$delete_legacy" == true ]]; then
+  legacy=Desert-sabaku/omarchy-plugins
+  # Never delete an old repository that has gained work since extraction.
+  if gh repo view "$legacy" --json name >/dev/null 2>&1; then
+    expected=02fc5bbf6cb7e467f5d6a3686b3240a0f678c7bd
+    actual=$(gh api "repos/$legacy/git/ref/heads/main" --jq .object.sha)
+    [[ "$actual" == "$expected" ]] || { echo 'Legacy main has changed; refusing deletion.' >&2; exit 1; }
+    # Extra branches or tags may contain work not represented by main.
+    [[ $(gh api --paginate "repos/$legacy/branches" --jq '.[].name') == main ]] || {
+      echo 'Legacy repository has unexpected branches; refusing deletion.' >&2; exit 1;
+    }
+    [[ -z $(gh api --paginate "repos/$legacy/tags" --jq '.[].name') ]] || {
+      echo 'Legacy repository has tags; refusing deletion.' >&2; exit 1;
+    }
+    gh repo delete "$legacy" --yes
+    echo "Deleted $legacy after verifying both replacement repositories."
+  else
+    echo 'Legacy repository is absent or inaccessible; no deletion attempted.'
+  fi
+fi
