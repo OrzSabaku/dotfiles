@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "dotfiles.notifications",
+  "name": "Notifications with critical timeout",
+  "version": "1.0.0",
+  "author": "dotfiles",
+  "description": "Notification daemon, popups, DND, and history",
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.notifications"
+  }
+}

@@ -167,3 +167,11 @@ Omarchyのレジストリでプラグインを有効化し、状態を確認で�
 `omarchy-shell idle status`の`browserMediaPlaying`が切り替わることを確認してください。
 元に戻す場合は`omarchy plugin enable omarchy.idle`です。
 詳細は`.config/omarchy/plugins/dotfiles.idle/README.md`を参照してください。
+
+## 通知を自動で閉じる
+
+`dotfiles.notifications`は標準の通知サービスを複製し、重要通知にも15秒の期限を設けます。
+右クリックで閉じる機能と、ホバー中のカウント停止は標準のままです。
+通常のデスクトップ端末で`~/dotfiles/scripts/enable-notification-timeout`を実行して有効化します。
+元に戻すには`omarchy plugin enable omarchy.notifications`を実行してください。
+詳細は`.config/omarchy/plugins/dotfiles.notifications/README.md`を参照してください。

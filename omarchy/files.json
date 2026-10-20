@@ -360,6 +360,36 @@
       "path": ".config/omarchy/plugins/dotfiles.idle/README.md",
       "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/README.md",
       "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/NotificationLogic.js",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/NotificationLogic.js",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/README.md",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/README.md",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/Service.qml",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/Service.qml",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/components/NotificationCard.qml",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/components/NotificationCard.qml",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/manifest.json",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/manifest.json",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/upstream.json",
+      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/upstream.json",
+      "mode": 420
     }
   ]
 }
