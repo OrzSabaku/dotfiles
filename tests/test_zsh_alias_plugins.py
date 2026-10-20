@@ -28,6 +28,9 @@ class ZshAliasPluginTests(unittest.TestCase):
                 path = fixture / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(content)
+            helpers = root / '.config/sheldon'
+            helpers.mkdir(parents=True)
+            shutil.copy(REPO / 'common/.config/sheldon/omz-aliases.zsh', helpers)
             config_dir = root / 'config'
             config_dir.mkdir()
             (config_dir / 'plugins.toml').write_text(

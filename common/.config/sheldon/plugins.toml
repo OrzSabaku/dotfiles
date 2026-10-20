@@ -5,36 +5,7 @@ shell = "zsh"
 completions = '''
 fpath=("{{ dir }}/src" $fpath)
 '''
-omz-aliases = '''
-autoload -Uz is-at-least
-zmodload zsh/parameter
-zstyle ':omz:alpha:lib:git' async-prompt no
-source "{{ dir }}/lib/clipboard.zsh"
-source "{{ dir }}/lib/git.zsh"
-# Retire the old Omarchy Git shortcuts; upstream names now take precedence.
-unalias g gcm gcam gcad 2>/dev/null || true
-source "{{ dir }}/plugins/git/git.plugin.zsh"
-if (( $+commands[docker] )); then
-    typeset -g ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/ohmyzsh"
-    mkdir -p "$ZSH_CACHE_DIR/completions"
-    fpath=("$ZSH_CACHE_DIR/completions" $fpath)
-    source "{{ dir }}/plugins/docker/docker.plugin.zsh"
-    source "{{ dir }}/plugins/docker-compose/docker-compose.plugin.zsh"
-fi
-# In particular, upstream gwip explicitly disables signing. Remove that and
-# any future alias with the same opt-out rather than overriding Git itself.
-() {
-    local shortcut definition
-    for shortcut in ${(k)aliases}; do
-        definition=${(L)aliases[$shortcut]}
-        case "$definition" in
-            *--no-gpg-sign*|*commit.gpgsign=false*|*commit.gpgsign=0*)
-                unalias "$shortcut"
-                ;;
-        esac
-    done
-}
-'''
+omz-aliases = 'source "$HOME/.config/sheldon/omz-aliases.zsh" "{{ dir }}"'
 
 # Definitions must be present before compinit builds its function table.
 [plugins.zsh-completions]
@@ -45,14 +16,7 @@ apply = ["completions"]
 [plugins.completion-init]
 inline = '''
 # dotfiles: managed-compinit
-autoload -Uz compinit
-compinit
-if (( $+commands[fzf] )); then
-    source <(fzf --zsh)
-fi
-zstyle ':completion:*' menu no
-zstyle ':completion:*:descriptions' format '[%d]'
-zstyle ':fzf-tab:*' switch-group '<' '>'
+source "$HOME/.config/sheldon/completion-init.zsh"
 '''
 
 [plugins.ohmyzsh-aliases]

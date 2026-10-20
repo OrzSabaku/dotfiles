@@ -17,6 +17,8 @@ FEDORA_FILES = (
 COMMON_FILES = (
     ".config/git/config",
     ".config/sheldon/plugins.toml",
+    ".config/sheldon/completion-init.zsh",
+    ".config/sheldon/omz-aliases.zsh",
     ".config/starship.toml",
     ".config/ghostty/dotfiles.conf",
     ".config/dotfiles/env.sh",

@@ -111,7 +111,9 @@ Fedoraの新規導入ではOmarchy連携がなくても共通設定だけで動�
 - `common/.config/dotfiles/env.sh`: Bash/Zsh共通のEDITOR、bat、fzf表示設定（POSIX構文）。
 - `common/.config/dotfiles/bash.sh`: 共通環境設定の読み込みとBashの履歴設定。
 - `common/.config/dotfiles/zsh.zsh`: Zshの履歴・補完・キー操作と、存在するツールの初期化。
-- `common/.config/sheldon/plugins.toml`: Zshプラグイン一覧。
+- `common/.config/sheldon/plugins.toml`: Zshプラグインの取得元・読み込み順と短いテンプレート。
+- `common/.config/sheldon/completion-init.zsh`: 補完初期化とfzfの連携設定。
+- `common/.config/sheldon/omz-aliases.zsh`: Oh My Zshの部分読み込みと署名を無効にするエイリアスの除去。
 - `common/.config/ghostty/dotfiles.conf`: 透過・余白・カーソル・分割キー。
 
 OmarchyはZshを主シェルにする構成で、Bashも復旧用に残します。Fedoraの`.bashrc`・`.zshrc`は
@@ -219,7 +221,8 @@ Gitの署名設定自体を変更・無効化するラッパーは追加して�
 有効化後は新しい端末を開いてください。署名鍵とGitの個人設定が必要です。
 
 Zsh起動時は`~/.cache/dotfiles/sheldon.zsh`の最後に検証したソースを読み込みます。
-プラグイン設定を変更した場合も上のコマンドで更新してください。取得・検証に失敗した場合は旧キャッシュを維持します。
+取得元・読み込み順・TOMLを変更した場合も上のコマンドで更新してください。
+分離した`.zsh`ファイルは起動時に読み込むため、内容の編集は新しい端末から反映されます。取得・検証に失敗した場合は旧キャッシュを維持します。
 変更前のキャッシュは`~/.local/state/dotfiles/backups/`へ保存します。
 取得は世代別の`~/.local/share/dotfiles/sheldon/`で行い、既存キャッシュが参照するプラグインを保護します。
 復元に備え古い世代は自動削除しません。

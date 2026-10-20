@@ -312,6 +312,16 @@
       "mode": 420
     },
     {
+      "path": ".config/sheldon/completion-init.zsh",
+      "source": "common/.config/sheldon/completion-init.zsh",
+      "mode": 420
+    },
+    {
+      "path": ".config/sheldon/omz-aliases.zsh",
+      "source": "common/.config/sheldon/omz-aliases.zsh",
+      "mode": 420
+    },
+    {
       "path": ".config/sheldon/plugins.toml",
       "source": "common/.config/sheldon/plugins.toml",
       "mode": 420
