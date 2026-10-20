@@ -29,6 +29,18 @@ class LinkInstallTests(unittest.TestCase):
         self.manifest.parent.mkdir(parents=True)
         self.entries = []
 
+    def test_repository_relative_migration(self):
+        target, source = self.add('config', existing=False)
+        old = self.repo / 'old/config'
+        old.parent.mkdir(parents=True)
+        old.write_bytes(source.read_bytes())
+        old.chmod(source.stat().st_mode & 0o777)
+        target.symlink_to(old)
+        self.entries[0]['migrate_from_repo'] = 'old/config'
+        self.manifest.write_text(json.dumps({'version': 1, 'files': self.entries}))
+        m.install(apply=True)
+        self.assertEqual(target.resolve(), source)
+
     def add(self, name, data=b'settings\n', existing=True):
         source = self.repo / 'omarchy' / name
         source.parent.mkdir(parents=True, exist_ok=True)

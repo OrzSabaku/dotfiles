@@ -49,7 +49,7 @@ if [ "$2" = enable ]; then printf '%s\\n' "$3" >> "$TEST_MARKER"; fi
         result, calls, home = self.run_setup()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(calls, ['dotfiles.idle'])
-        self.assertEqual(len(list((home / '.local/state/dotfiles/backups').glob('*/shell.json'))), 1)
+        self.assertEqual(len(list((home / '.local/state/omarchy-plugins/backups').glob('*/shell.json'))), 1)
 
     def test_failed_activation_restores_stock_service(self):
         result, calls, _ = self.run_setup(confirmed=False)

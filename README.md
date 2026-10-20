@@ -246,3 +246,15 @@ Zsh起動時は`~/.cache/dotfiles/sheldon.zsh`の最後に検証したソース�
 - `fast-syntax-highlighting`: 入力中のコマンドや対応するサブコマンドを色分けします。
 
 npm・systemdのエイリアスプラグインは追加していません。
+
+## Omarchyプラグインのソース
+
+ブラウザー再生中のアイドル抑止と通知の残量バーは、独立リポジトリ
+[`submodules/omarchy-plugins`](submodules/omarchy-plugins/README.md)へ切り出しました。
+このdotfilesはサブモジュールのコミットを固定し、`omarchy/files.json`から各ファイルをリンクします。
+プラグインのコード・テスト・ライセンス・有効化処理はサブモジュール側、個人の有効化状態は
+`omarchy/.config/omarchy/shell.json`で管理します。
+
+現在はローカルでの公開準備段階です。`.gitmodules`のOmarchyプラグインURLは公開予定先であり、
+GitHubのリポジトリ作成・pushは行っていません。公開されるまでは新しい環境でそのサブモジュールを取得できません。
+既存チェックアウトの内容は保存されています。更新はサブモジュール内で行い、動作確認後に親で参照コミットを更新してください。

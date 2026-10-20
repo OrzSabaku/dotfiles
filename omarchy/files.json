@@ -333,63 +333,75 @@
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.idle/IdleModel.js",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/IdleModel.js",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.idle/IdleModel.js",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.idle/IdleModel.js"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.idle/MediaIdle.js",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/MediaIdle.js",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.idle/MediaIdle.js",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.idle/MediaIdle.js"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.idle/Service.qml",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/Service.qml",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.idle/Service.qml",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.idle/Service.qml"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.idle/manifest.json",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/manifest.json",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.idle/manifest.json",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.idle/manifest.json"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.idle/upstream.json",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/upstream.json",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.idle/upstream.json",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.idle/upstream.json"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.idle/README.md",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.idle/README.md",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.idle/README.md",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.idle/README.md"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.notifications/NotificationLogic.js",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/NotificationLogic.js",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.notifications/NotificationLogic.js",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.notifications/NotificationLogic.js"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.notifications/README.md",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/README.md",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.notifications/README.md",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.notifications/README.md"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.notifications/Service.qml",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/Service.qml",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.notifications/Service.qml",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.notifications/Service.qml"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.notifications/components/NotificationCard.qml",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/components/NotificationCard.qml",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.notifications/components/NotificationCard.qml",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.notifications/components/NotificationCard.qml"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.notifications/manifest.json",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/manifest.json",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.notifications/manifest.json",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.notifications/manifest.json"
     },
     {
       "path": ".config/omarchy/plugins/dotfiles.notifications/upstream.json",
-      "source": "omarchy/.config/omarchy/plugins/dotfiles.notifications/upstream.json",
-      "mode": 420
+      "source": "submodules/omarchy-plugins/plugins/dotfiles.notifications/upstream.json",
+      "mode": 420,
+      "migrate_from_repo": "omarchy/.config/omarchy/plugins/dotfiles.notifications/upstream.json"
     }
   ]
 }

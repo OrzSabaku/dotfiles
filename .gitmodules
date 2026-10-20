@@ -7,3 +7,6 @@
 [submodule "submodules/hondazn-dotfiles"]
 	path = submodules/hondazn-dotfiles
 	url = https://github.com/hondazn/dotfiles
+[submodule "submodules/omarchy-plugins"]
+	path = submodules/omarchy-plugins
+	url = https://github.com/Desert-sabaku/omarchy-plugins.git

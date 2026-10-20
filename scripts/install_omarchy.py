@@ -67,6 +67,11 @@ def managed_files():
         source = REPO / source_name
         if not source.is_file() or source.is_symlink() or not source.resolve().is_relative_to(REPO):
             raise ValueError(f'Expected a regular repository source: {source}')
+        if 'migrate_from_repo' in entry:
+            previous = Path(entry['migrate_from_repo'])
+            if previous.is_absolute() or '..' in previous.parts or not previous.parts:
+                raise ValueError('Unsafe migration source')
+            entry = dict(entry, migrate_from=str(REPO / previous))
         yield entry, source
 
 
