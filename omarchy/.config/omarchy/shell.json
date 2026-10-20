@@ -64,13 +64,18 @@
   "plugins": [
     {
       "id": "dotfiles.idle"
+    },
+    {
+      "id": "dotfiles.notifications"
     }
   ],
   "version": 1,
   "disabledPlugins": [
-    "omarchy.idle"
+    "omarchy.idle",
+    "omarchy.notifications"
   ],
   "cloneSourceRestores": [
-    "dotfiles.idle"
+    "dotfiles.idle",
+    "dotfiles.notifications"
   ]
 }
