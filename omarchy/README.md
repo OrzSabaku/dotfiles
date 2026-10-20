@@ -171,8 +171,13 @@ Omarchyのレジストリでプラグインを有効化し、状態を確認で�
 ## 通知を自動で閉じる
 
 `dotfiles.notifications`は標準の通知サービスを複製し、重要通知にも15秒の期限を設けます。
-通知の下部には残り時間のバーが表示され、ホバー中は表示も一時停止します。
+通知の下部には全画面で同期した残り時間のバーが表示され、どの画面でもホバーすると全画面で停止します。
 右クリックで閉じる機能と、ホバー中のカウント停止は標準のままです。
 通常のデスクトップ端末で`~/dotfiles/scripts/enable-notification-timeout`を実行して有効化します。
 元に戻すには`omarchy plugin enable omarchy.notifications`を実行してください。
 詳細は`../submodules/omarchy-notification-countdown/README.md`を参照してください。
+
+通知・アイドルプラグインは`keepLoaded`で稼働中の状態を保つため、コード更新・編集後は
+ロックされていないデスクトップ端末で`omarchy restart shell`を実行してください。
+設定の再読み込みや`plugin update`だけでは稼働中の実装は切り替わりません。
+有効化ヘルパーはプラグインIDと実装バージョンを照合し、古い実装を成功扱いしません。

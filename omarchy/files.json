@@ -402,6 +402,16 @@
       "source": "submodules/omarchy-notification-countdown/upstream.json",
       "mode": 420,
       "migrate_from_repo": "submodules/omarchy-plugins/plugins/dotfiles.notifications/upstream.json"
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/PopupClock.qml",
+      "source": "submodules/omarchy-notification-countdown/PopupClock.qml",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/PopupHover.qml",
+      "source": "submodules/omarchy-notification-countdown/PopupHover.qml",
+      "mode": 420
     }
   ]
 }
