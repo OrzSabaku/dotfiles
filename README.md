@@ -188,7 +188,7 @@ GitHubの案内: https://docs.github.com/en/authentication/managing-commit-signa
 
 Omarchy用の`dotfiles.idle`プラグインを追加しています。標準のスクリーンセーバー・自動ロックの
 時間は維持し、ブラウザーの動画・音声再生中だけ抑止します。
-有効化は通常のデスクトップ端末で`scripts/enable-browser-idle`を実行してください。
+導入・有効化には通常の`omarchy plugin add ... --enable`を使います。
 実セッションの再生確認は未完了です。詳しくは[Omarchyの設定地図](omarchy/README.md)を参照してください。
 
 ## ZshのGit・Dockerエイリアス
@@ -247,28 +247,14 @@ Zsh起動時は`~/.cache/dotfiles/sheldon.zsh`の最後に検証したソース�
 
 npm・systemdのエイリアスプラグインは追加していません。
 
-## Omarchyプラグインのソース
+## Omarchyプラグイン
 
 実環境にはMarketplace掲載の公開リポジトリから、OmarchyのGit管理プラグインとして導入します。
-開発・テスト用のソースは引き続きサブモジュールで管理します。
+dotfilesは個人の有効化状態と導入手順を管理します。プラグイン本体の開発・テストは各公開リポジトリで行います。
 
-- [`submodules/omarchy-browser-idle`](submodules/omarchy-browser-idle/README.md): ブラウザー再生中のアイドル抑止
-- [`submodules/omarchy-notification-countdown`](submodules/omarchy-notification-countdown/README.md): 通知の自動消去と残量バー
+- [omarchy-browser-idle](https://github.com/Desert-sabaku/omarchy-browser-idle): ブラウザー再生中のアイドル抑止
+- [omarchy-notification-countdown](https://github.com/Desert-sabaku/omarchy-notification-countdown): 通知の自動消去と残量バー
 
 導入・更新のコマンドは[Omarchyの設定地図](omarchy/README.md#プラグインの導入と更新)を参照してください。
 `~/.config/omarchy/plugins/`の実行用コードはdotfilesからリンクせず、`omarchy plugin update`で更新します。
-各サブモジュールの編集や参照コミットの変更は、実行用コードには反映されません。
 個人の有効化状態は`omarchy/.config/omarchy/shell.json`が管理します。
-親のGitコミットは各サブモジュールのバージョンを固定します。
-
-新しい2リポジトリの作成とpushは、通常の端末で以下を実行します。
-
-```sh
-~/dotfiles/scripts/publish-omarchy-plugins
-```
-
-旧`Desert-sabaku/omarchy-plugins`も削除する場合は`--delete-legacy`を付けます。
-両方のpushとGitHub上のコミット一致を確認できた場合だけ削除へ進みます。
-旧リポジトリに想定外の更新があった場合は削除しません。通常の公開処理では旧リポジトリを残します。
-旧履歴は切り出し前に`~/.local/state/dotfiles/backups/plugin-split-*/omarchy-plugins.bundle`へ保存しています。
-Marketplaceへの申請は公開・実機確認後の別工程です。

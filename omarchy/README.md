@@ -155,15 +155,14 @@ MPRIS再生状態を見て、再生中だけスクリーンセーバーと自動
 動画と音声を識別できないため、ブラウザー内の音声再生も対象です。
 メディアのタイトルやURLは読み取らず、保存・ログ出力しません。
 
-有効化状態は`shell.json`で管理します。新規導入後に有効化・動作確認する場合は、
+有効化状態は`shell.json`で管理します。導入済みのプラグインを有効化する場合は、
 通常のデスクトップ端末で次を実行してください。
 
 ```sh
-~/dotfiles/scripts/enable-browser-idle
+omarchy plugin enable dotfiles.idle
 ```
 
-Omarchyのレジストリでプラグインを有効化し、状態を確認できなければ標準へ戻すスクリプトです。
-有効化前のshell.jsonはローカルにバックアップします。再生中と一時停止中に
+再生中と一時停止中に
 `omarchy-shell idle status`の`browserMediaPlaying`が切り替わることを確認してください。
 元に戻す場合は`omarchy plugin enable omarchy.idle`です。
 詳細は[公開リポジトリ](https://github.com/Desert-sabaku/omarchy-browser-idle)を参照してください。
@@ -173,7 +172,7 @@ Omarchyのレジストリでプラグインを有効化し、状態を確認で�
 `dotfiles.notifications`は標準の通知サービスを複製し、重要通知にも15秒の期限を設けます。
 通知の下部には全画面で同期した残り時間のバーが表示され、どの画面でもホバーすると全画面で停止します。
 右クリックで閉じる機能と、ホバー中のカウント停止は標準のままです。
-通常のデスクトップ端末で`~/dotfiles/scripts/enable-notification-timeout`を実行して有効化します。
+導入済みなら、通常のデスクトップ端末で`omarchy plugin enable dotfiles.notifications`を実行して有効化します。
 元に戻すには`omarchy plugin enable omarchy.notifications`を実行してください。
 詳細は[公開リポジトリ](https://github.com/Desert-sabaku/omarchy-notification-countdown)を参照してください。
 
@@ -181,20 +180,17 @@ Omarchyのレジストリでプラグインを有効化し、状態を確認で�
 
 上記2件はMarketplace掲載済みです。実行用コードは`~/.config/omarchy/plugins/<ID>/`にある
 独立したGitリポジトリで管理し、dotfilesの導入対象には含めません。
-`submodules/`は開発・テスト用として残しています。
+開発用ソースとテストは各公開リポジトリで管理します。
 
 新しい環境では通常のデスクトップ端末で導入します（既に導入済みなら不要です）。
 
 ```sh
-omarchy plugin add https://github.com/Desert-sabaku/omarchy-browser-idle.git --yes
-omarchy plugin add https://github.com/Desert-sabaku/omarchy-notification-countdown.git --yes
-omarchy restart shell
-~/dotfiles/scripts/enable-browser-idle
-~/dotfiles/scripts/enable-notification-timeout
+omarchy plugin add https://github.com/Desert-sabaku/omarchy-browser-idle.git --enable
+omarchy plugin add https://github.com/Desert-sabaku/omarchy-notification-countdown.git --enable
 ```
 
-このdotfilesの有効化ヘルパーは、インストール済みプラグインに付属するヘルパーを実行します。
-プラグインが未導入なら停止し、導入コマンドを表示します。
+`--enable`で導入と有効化が完了し、`clonedFrom`の宣言に従って標準サービスが無効化されます。
+独自スクリプトの実行は不要です。
 更新時も通常の端末で実行してください。
 
 ```sh
@@ -207,16 +203,17 @@ omarchy restart shell
 公開履歴と照合したローカルのGit履歴から独立したコピーを作り、`origin`を公開URLに設定しています。
 導入コミットはidleが`7860ff0`、notificationsが`f7a0cb0`です。通知側の公開最新コミット`96cb86f`は
 READMEの導入コマンド整形のみの変更で、今後の`plugin update`で取り込めます。
-元のリンク一式と移行前の`shell.json`は
-`~/.local/state/dotfiles/backups/marketplace-plugins-20261021-140256/`に退避しています。
-実行用コードを編集していなければ、導入したディレクトリを別の場所に退避し、同じIDのバックアップを
-`~/.config/omarchy/plugins/`へ戻すことで旧配置に戻せます。再導入時の競合を避けるため、
-リンク運用へ戻す場合は`files.json`の導入対象も移行前に揃えてください。
+移行前の`shell.json`は`~/.local/state/dotfiles/backups/marketplace-plugins-20261021-140256/`に退避しています。
+開発用サブモジュールはその後撤去しました。撤去時のGit履歴（bundle）と旧リンクの実体コピーは
+`~/.local/state/dotfiles/backups/plugin-development-removal-20261021-140835/`に保存しています。
+以前のバックアップ内のリンクは撤去済みソースを指すため、そのまま戻さず実体コピーを使ってください。
+開発を再開する場合は公開リポジトリ、またはbundleからdotfilesの外にcloneしてください。
 
 通知・アイドルプラグインは`keepLoaded`で稼働中の状態を保つため、コード更新・編集後は
 ロックされていないデスクトップ端末で`omarchy restart shell`を実行してください。
 設定の再読み込みや`plugin update`だけでは稼働中の実装は切り替わりません。
-有効化ヘルパーはプラグインIDと実装バージョンを照合し、古い実装を成功扱いしません。
+反映後は`omarchy-shell idle status`と`omarchy-shell notifications implementation`で
+稼働中のプラグインID・実装バージョンを確認できます。
 
 通知プラグイン1.0.2では、保存ヘルパーへ本文・画像パスを標準入力で渡し、起動時に既存の通知履歴・画像・旧設定を
 所有者専用の権限へ修復します。実行時にPython 3.9以上が必要です。詳細はプラグインのREADMEを参照してください。

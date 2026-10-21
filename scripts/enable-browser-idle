@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Compatibility entry point: use the installed, independently updated plugin.
-set -euo pipefail
-helper="$HOME/.config/omarchy/plugins/dotfiles.idle/scripts/enable-browser-idle"
-if [[ ! -f $helper ]]; then
-  echo 'Install first: omarchy plugin add https://github.com/Desert-sabaku/omarchy-browser-idle.git --yes' >&2
-  exit 1
-fi
-exec bash "$helper" "$@"
