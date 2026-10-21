@@ -111,7 +111,10 @@ Zsh起動時は最後に検証したキャッシュを使用するため、TOML�
 
 `dotfiles.idle`は`submodules/omarchy-browser-idle/`、`dotfiles.notifications`は
 `submodules/omarchy-notification-countdown/`にある独立Gitリポジトリです。
-どちらもルートのmanifest.jsonを持つ単独プラグインです。親は参照コミット・リンク・有効化状態を管理します。
+どちらもルートのmanifest.jsonを持つ単独プラグインです。サブモジュールは開発・テスト用です。
+実環境は`~/.config/omarchy/plugins/<ID>/`内の独立したGitリポジトリから読み込み、
+`omarchy plugin add`・`omarchy plugin update`で管理します。実行用コードをdotfilesからリンクしないでください。
+親は開発用の参照コミット・有効化状態・導入手順を管理します。
 コード変更は対象サブモジュールでテスト・署名付きコミットした後、親の参照を更新してください。
-旧集合リポジトリの公開はユーザーが実施済みです。新しい2つのGitHubリポジトリ作成・pushと、
-移行後の旧リポジトリ削除が今回の依頼範囲です。公開状態は実際に確認してください。
+2件ともMarketplace掲載済みです。開発用ソースの変更はインストール済みのコードには反映されません。
+リモートへの送信・Issueへの投稿はユーザーからの明示的な依頼がある場合だけ行ってください。

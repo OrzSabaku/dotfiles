@@ -155,8 +155,8 @@ MPRIS再生状態を見て、再生中だけスクリーンセーバーと自動
 動画と音声を識別できないため、ブラウザー内の音声再生も対象です。
 メディアのタイトルやURLは読み取らず、保存・ログ出力しません。
 
-エージェントからデスクトップIPCへ接続できないため、標準のアイドル処理はまだ切り替えていません。
-通常の端末で次を実行して有効化してください。
+有効化状態は`shell.json`で管理します。新規導入後に有効化・動作確認する場合は、
+通常のデスクトップ端末で次を実行してください。
 
 ```sh
 ~/dotfiles/scripts/enable-browser-idle
@@ -166,7 +166,7 @@ Omarchyのレジストリでプラグインを有効化し、状態を確認で�
 有効化前のshell.jsonはローカルにバックアップします。再生中と一時停止中に
 `omarchy-shell idle status`の`browserMediaPlaying`が切り替わることを確認してください。
 元に戻す場合は`omarchy plugin enable omarchy.idle`です。
-詳細は`../submodules/omarchy-browser-idle/README.md`を参照してください。
+詳細は[公開リポジトリ](https://github.com/Desert-sabaku/omarchy-browser-idle)を参照してください。
 
 ## 通知を自動で閉じる
 
@@ -175,7 +175,43 @@ Omarchyのレジストリでプラグインを有効化し、状態を確認で�
 右クリックで閉じる機能と、ホバー中のカウント停止は標準のままです。
 通常のデスクトップ端末で`~/dotfiles/scripts/enable-notification-timeout`を実行して有効化します。
 元に戻すには`omarchy plugin enable omarchy.notifications`を実行してください。
-詳細は`../submodules/omarchy-notification-countdown/README.md`を参照してください。
+詳細は[公開リポジトリ](https://github.com/Desert-sabaku/omarchy-notification-countdown)を参照してください。
+
+## プラグインの導入と更新
+
+上記2件はMarketplace掲載済みです。実行用コードは`~/.config/omarchy/plugins/<ID>/`にある
+独立したGitリポジトリで管理し、dotfilesの導入対象には含めません。
+`submodules/`は開発・テスト用として残しています。
+
+新しい環境では通常のデスクトップ端末で導入します（既に導入済みなら不要です）。
+
+```sh
+omarchy plugin add https://github.com/Desert-sabaku/omarchy-browser-idle.git --yes
+omarchy plugin add https://github.com/Desert-sabaku/omarchy-notification-countdown.git --yes
+omarchy restart shell
+~/dotfiles/scripts/enable-browser-idle
+~/dotfiles/scripts/enable-notification-timeout
+```
+
+このdotfilesの有効化ヘルパーは、インストール済みプラグインに付属するヘルパーを実行します。
+プラグインが未導入なら停止し、導入コマンドを表示します。
+更新時も通常の端末で実行してください。
+
+```sh
+omarchy plugin update dotfiles.idle
+omarchy plugin update dotfiles.notifications
+omarchy restart shell
+```
+
+2026-10-21に従来のファイル単位リンクから移行しました。エージェントのGit接続が使えなかったため、
+公開履歴と照合したローカルのGit履歴から独立したコピーを作り、`origin`を公開URLに設定しています。
+導入コミットはidleが`7860ff0`、notificationsが`f7a0cb0`です。通知側の公開最新コミット`96cb86f`は
+READMEの導入コマンド整形のみの変更で、今後の`plugin update`で取り込めます。
+元のリンク一式と移行前の`shell.json`は
+`~/.local/state/dotfiles/backups/marketplace-plugins-20261021-140256/`に退避しています。
+実行用コードを編集していなければ、導入したディレクトリを別の場所に退避し、同じIDのバックアップを
+`~/.config/omarchy/plugins/`へ戻すことで旧配置に戻せます。再導入時の競合を避けるため、
+リンク運用へ戻す場合は`files.json`の導入対象も移行前に揃えてください。
 
 通知・アイドルプラグインは`keepLoaded`で稼働中の状態を保つため、コード更新・編集後は
 ロックされていないデスクトップ端末で`omarchy restart shell`を実行してください。

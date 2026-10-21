@@ -249,15 +249,16 @@ npm・systemdのエイリアスプラグインは追加していません。
 
 ## Omarchyプラグインのソース
 
-それぞれ独立したリポジトリをサブモジュールとして管理します。
+実環境にはMarketplace掲載の公開リポジトリから、OmarchyのGit管理プラグインとして導入します。
+開発・テスト用のソースは引き続きサブモジュールで管理します。
 
 - [`submodules/omarchy-browser-idle`](submodules/omarchy-browser-idle/README.md): ブラウザー再生中のアイドル抑止
 - [`submodules/omarchy-notification-countdown`](submodules/omarchy-notification-countdown/README.md): 通知の自動消去と残量バー
 
-それぞれルートに`manifest.json`を持ち、公開後はOmarchy標準の`plugin add`・`plugin update`で利用できます。
-このdotfilesの開発環境では`omarchy/files.json`で各ソースを直接リンクしています。
-既に同じIDがあるため、この環境で重ねて`plugin add`しないでください。
-個人の有効化状態は`omarchy/.config/omarchy/shell.json`、コードとテストは各サブモジュールが管理します。
+導入・更新のコマンドは[Omarchyの設定地図](omarchy/README.md#プラグインの導入と更新)を参照してください。
+`~/.config/omarchy/plugins/`の実行用コードはdotfilesからリンクせず、`omarchy plugin update`で更新します。
+各サブモジュールの編集や参照コミットの変更は、実行用コードには反映されません。
+個人の有効化状態は`omarchy/.config/omarchy/shell.json`が管理します。
 親のGitコミットは各サブモジュールのバージョンを固定します。
 
 新しい2リポジトリの作成とpushは、通常の端末で以下を実行します。
