@@ -7,9 +7,3 @@
 [submodule "submodules/hondazn-dotfiles"]
 	path = submodules/hondazn-dotfiles
 	url = https://github.com/hondazn/dotfiles
-[submodule "submodules/omarchy-browser-idle"]
-	path = submodules/omarchy-browser-idle
-	url = https://github.com/Desert-sabaku/omarchy-browser-idle.git
-[submodule "submodules/omarchy-notification-countdown"]
-	path = submodules/omarchy-notification-countdown
-	url = https://github.com/Desert-sabaku/omarchy-notification-countdown.git
