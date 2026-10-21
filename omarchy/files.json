@@ -412,6 +412,16 @@
       "path": ".config/omarchy/plugins/dotfiles.notifications/PopupHover.qml",
       "source": "submodules/omarchy-notification-countdown/PopupHover.qml",
       "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/StorageJob.qml",
+      "source": "submodules/omarchy-notification-countdown/StorageJob.qml",
+      "mode": 420
+    },
+    {
+      "path": ".config/omarchy/plugins/dotfiles.notifications/scripts/notification-store.py",
+      "source": "submodules/omarchy-notification-countdown/scripts/notification-store.py",
+      "mode": 420
     }
   ]
 }
