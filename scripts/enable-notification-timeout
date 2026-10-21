@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Compatibility entry point: plugin code and activation live in the submodule.
+# Compatibility entry point: use the installed, independently updated plugin.
 set -euo pipefail
-repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-exec "$repo/submodules/omarchy-notification-countdown/scripts/enable-notification-timeout" "$@"
+helper="$HOME/.config/omarchy/plugins/dotfiles.notifications/scripts/enable-notification-timeout"
+if [[ ! -f $helper ]]; then
+  echo 'Install first: omarchy plugin add https://github.com/Desert-sabaku/omarchy-notification-countdown.git --yes' >&2
+  exit 1
+fi
+exec bash "$helper" "$@"

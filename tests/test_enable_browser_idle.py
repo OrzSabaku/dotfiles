@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -16,6 +17,9 @@ class EnableBrowserIdleTests(unittest.TestCase):
         config = home / '.config/omarchy/shell.json'
         config.parent.mkdir(parents=True)
         config.write_text('{"idle":{"screensaver":150,"lock":300}}\n')
+        helper = home / '.config/omarchy/plugins/dotfiles.idle/scripts/enable-browser-idle'
+        helper.parent.mkdir(parents=True)
+        shutil.copy2(repo / 'submodules/omarchy-browser-idle/scripts/enable-browser-idle', helper)
         marker = root / 'enables'
         (tools / 'omarchy-shell').write_text('''#!/bin/sh
 if [ "$TEST_REACHABLE" != 1 ]; then exit 17; fi
