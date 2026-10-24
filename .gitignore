@@ -1,4 +1,12 @@
 # Configuration is added explicitly to common/, omarchy/ or fedora/.
+# Marksman uses the first matching rule; Git uses the last.
+# Repeat document exceptions before /* so Marksman can index linked Markdown.
+!/*.md
+!/common/
+!/omarchy/
+!/fedora/
+!/experiments/
+!/docs/
 /*
 !/.gitignore
 !/.gitmodules
@@ -12,6 +20,7 @@
 !/experiments/
 !/scripts/
 !/tests/
+!/docs/
 **/__pycache__/
 *.py[cod]
 
