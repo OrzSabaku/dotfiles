@@ -7,8 +7,8 @@
           "id": "omarchy.indicators"
         },
         {
-          "format": "dddd HH:mm",
-          "formatAlt": "d MMMM 'W'ww yyyy",
+          "format": "yyyy-MM-dd'T'HH:mmttt",
+          "formatAlt": "yyyy-MM-dd'T'HH:mm",
           "id": "omarchy.clock",
           "verticalFormat": "HH\n—\nmm"
         },
