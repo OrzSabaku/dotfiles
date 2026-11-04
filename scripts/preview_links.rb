@@ -13,10 +13,18 @@ def main
   mappings = []
   has_conflict = false
   manifest['files'].each do |entry|
+    %w[source path].each do |key|
+      is_unsafe_path = entry[key].start_with?('/') || entry[key].split('/').include?('..') || entry[key].empty?
+      abort "Unsafe #{key}: #{entry[key].inspect}" if is_unsafe_path
+    end
+
     source = File.join(root, entry['source'])
     path = File.join(Dir.home, entry['path'])
 
+    abort "Symlinked parent of: #{path}" if symlink_in_parent?(path)
+    abort "the source file is symbolic link: #{source}" if File.symlink? source
     abort "the source file for the link does not exist: #{source}" unless File.file? source
+    abort "the source file is outside the repo #{source}" unless File.realpath(source).start_with?(File.join(root, '/'))
 
     file_type = determine_file_type(path, source)
     has_conflict = true if %i[CONFLICT OTHER].include?(file_type)
@@ -28,6 +36,17 @@ def main
 end
 
 def abbreviate_home(path) = path.gsub(Dir.home, '~')
+
+def symlink_in_parent?(path)
+  parent = File.dirname(path)
+  loop do
+    break if parent == Dir.home || parent == '/'
+    return true if File.symlink?(parent)
+
+    parent = File.dirname(parent)
+  end
+  false
+end
 
 def get_permission(path) = File.stat(path).mode & 0o777
 
