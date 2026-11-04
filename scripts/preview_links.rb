@@ -29,6 +29,8 @@ end
 
 def abbreviate_home(path) = path.gsub(Dir.home, '~')
 
+def get_permission(path) = File.stat(path).mode & 0o777
+
 def determine_file_type(path, source)
   if File.symlink?(path)
     target_file = File.expand_path(File.readlink(path), File.dirname(path))
@@ -43,7 +45,8 @@ def determine_file_type(path, source)
     # 3. 今回ではあまり関係ないが，バイナリファイルでも読み込める．
     # 4. ただし，このCRubyにおいては実装上当てはまらない箇所も多いのに留意されたい．本来ならFileUtilを使いたいところであるが，Spinelが未対応．
     is_same_content = File.binread(path) == File.binread(source)
-    is_same_content ? :SAME : :CONFLICT
+    is_same_mode = get_permission(path) == get_permission(source)
+    is_same_content && is_same_mode ? :SAME : :CONFLICT
   elsif File.exist?(path)
     :OTHER
   else
