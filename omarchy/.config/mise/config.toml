@@ -1,6 +1,7 @@
 [tools]
 codex = "latest"
 gh = "latest"
+go = "latest"
 node = "26.8.2"
 ruby = "4.0.9"
 
