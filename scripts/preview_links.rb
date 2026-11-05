@@ -12,6 +12,7 @@ end
 
 def build_plan(root, manifest)
   mappings = []
+  has_conflict = false
   manifest["files"].each do |entry|
     %w[source path].each do |key|
       is_unsafe_path = entry[key].start_with?("/") || entry[key].split("/").include?("..") || entry[key].empty?
@@ -27,7 +28,7 @@ def build_plan(root, manifest)
     abort "source is outside the repo #{source}" unless File.realpath(source).start_with?(File.join(root, "/"))
 
     file_type = determine_file_type(path, source)
-    true if %i[CONFLICT OTHER].include?(file_type)
+    has_conflict = true if %i[CONFLICT OTHER].include?(file_type)
 
     mappings <<
       {
@@ -37,7 +38,7 @@ def build_plan(root, manifest)
       }
   end
 
-  # abort "files.json has incorret source & path" if has_conflict
+  abort "files.json has incorret source & path" if has_conflict
   mappings
 end
 
