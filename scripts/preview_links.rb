@@ -52,7 +52,11 @@ def main
   exit 1 if plan.any? { |record| %i[CONFLICT OTHER].include?(record[:status]) }
 end
 
-def abbreviate_home(path) = path.gsub(Dir.home, "~")
+def abbreviate_home(path)
+  return path unless path.start_with?(Dir.home)
+
+  path.sub(Dir.home, "~")
+end
 
 def symlink_in_parent?(path)
   parent = File.dirname(path)
