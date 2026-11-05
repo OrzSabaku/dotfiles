@@ -1,46 +1,68 @@
 # frozen_string_literal: true
 
-require 'json'
+require "json"
 
-def main
-  root = File.expand_path('..', __dir__)
-  files_json = File.join(root, 'omarchy/files.json')
-  abort "#{files_json} does not exist" unless File.file? files_json
+def load_manifest(root)
+  files_json = File.join(root, "omarchy/files.json")
+  abort "#{files_json} does not exist" unless File.exist?(files_json)
   manifest = JSON.parse(File.read(files_json))
+  abort "the version must be 1" unless manifest["version"] == 1
+  manifest
+end
 
-  abort 'the version must be 1' unless manifest['version'] == 1
-
+def build_plan(root, manifest)
   mappings = []
-  has_conflict = false
-  manifest['files'].each do |entry|
+  manifest["files"].each do |entry|
     %w[source path].each do |key|
-      is_unsafe_path = entry[key].start_with?('/') || entry[key].split('/').include?('..') || entry[key].empty?
+      is_unsafe_path = entry[key].start_with?("/") || entry[key].split("/").include?("..") || entry[key].empty?
       abort "Unsafe #{key}: #{entry[key].inspect}" if is_unsafe_path
     end
 
-    source = File.join(root, entry['source'])
-    path = File.join(Dir.home, entry['path'])
+    source = File.join(root, entry["source"])
+    path = File.join(Dir.home, entry["path"])
 
     abort "Symlinked parent of: #{path}" if symlink_in_parent?(path)
-    abort "the source file is symbolic link: #{source}" if File.symlink? source
-    abort "the source file for the link does not exist: #{source}" unless File.file? source
-    abort "the source file is outside the repo #{source}" unless File.realpath(source).start_with?(File.join(root, '/'))
+    abort "source is symbolic link: #{source}" if File.symlink? source
+    abort "source for the link does not exist: #{source}" unless File.file? source
+    abort "source is outside the repo #{source}" unless File.realpath(source).start_with?(File.join(root, "/"))
 
     file_type = determine_file_type(path, source)
-    has_conflict = true if %i[CONFLICT OTHER].include?(file_type)
-    mappings << "#{file_type.to_s.ljust(8)} #{abbreviate_home(source)} -> #{abbreviate_home(path)}"
+    true if %i[CONFLICT OTHER].include?(file_type)
+
+    mappings <<
+      {
+        source: source,
+        path: path,
+        status: file_type
+      }
   end
 
-  puts mappings
-  exit 1 if has_conflict
+  # abort "files.json has incorret source & path" if has_conflict
+  mappings
 end
 
-def abbreviate_home(path) = path.gsub(Dir.home, '~')
+def print_plan(plan)
+  plan.each do |record|
+    status = record[:status].to_s.ljust(8)
+    source = abbreviate_home(record[:source])
+    path = abbreviate_home(record[:path])
+    puts "#{status} #{source} -> #{path}"
+  end
+end
+
+def main
+  root = File.expand_path("..", __dir__)
+  manifest = load_manifest(root)
+  plan = build_plan(root, manifest)
+  print_plan(plan)
+end
+
+def abbreviate_home(path) = path.gsub(Dir.home, "~")
 
 def symlink_in_parent?(path)
   parent = File.dirname(path)
   loop do
-    break if parent == Dir.home || parent == '/'
+    break if parent == Dir.home || parent == "/"
     return true if File.symlink?(parent)
 
     parent = File.dirname(parent)
