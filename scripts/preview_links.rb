@@ -11,8 +11,7 @@ def load_manifest(root)
 end
 
 def build_plan(root, manifest)
-  mappings = []
-  manifest["files"].each do |entry|
+  manifest["files"].map do |entry|
     %w[source path].each do |key|
       is_unsafe_path = entry[key].start_with?("/") || entry[key].split("/").include?("..") || entry[key].empty?
       abort "Unsafe #{key}: #{entry[key].inspect}" if is_unsafe_path
@@ -28,15 +27,12 @@ def build_plan(root, manifest)
 
     file_type = determine_file_type(path, source)
 
-    mappings <<
-      {
-        source: source,
-        path: path,
-        status: file_type
-      }
+    {
+      source: source,
+      path: path,
+      status: file_type
+    }
   end
-
-  mappings
 end
 
 def print_plan(plan)
