@@ -4,7 +4,7 @@ require "json"
 
 def load_manifest(root)
   files_json = File.join(root, "omarchy/files.json")
-  abort "#{files_json} does not exist" unless File.exist?(files_json)
+  abort "#{files_json} does not exist" unless File.file?(files_json)
   manifest = JSON.parse(File.read(files_json))
   abort "the version must be 1" unless manifest["version"] == 1
   manifest
