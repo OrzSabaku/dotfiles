@@ -30,3 +30,16 @@
 **/.git-credentials
 **/id_ed25519
 **/id_rsa
+
+# Fcitx5: explicitly select preferences; keep runtime data and Mozc databases local.
+**/.config/fcitx5/**
+!**/.config/fcitx5/config
+!**/.config/fcitx5/profile
+!**/.config/fcitx5/conf/
+!**/.config/fcitx5/conf/classicui.conf
+!**/.config/fcitx5/conf/clipboard.conf
+!**/.config/fcitx5/conf/pinyin.conf
+!**/.config/fcitx5/conf/quickphrase.conf
+!**/.config/fcitx5/conf/xcb.conf
+**/.config/mozc/
+**/.local/share/fcitx5/
