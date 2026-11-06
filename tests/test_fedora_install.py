@@ -27,6 +27,11 @@ class FedoraInstallTests(unittest.TestCase):
                          '.config/dotfiles/zsh.zsh', '.config/sheldon/plugins.toml',
                          '.config/ghostty/dotfiles.conf'):
                 self.assertEqual((home / name).resolve(), repo / 'common' / name)
+            for source in (repo / 'common/.config/fcitx5').rglob('*'):
+                if source.is_file():
+                    target = home / source.relative_to(repo / 'common')
+                    self.assertTrue(target.is_symlink(), str(target))
+                    self.assertEqual(target.resolve(), source)
             self.assertTrue((home / '.config/ghostty/config').is_symlink())
             self.assertFalse((home / '.config/ghostty/config.ghostty').exists())
             self.assertFalse((home / '.config/nvim-personal').exists())

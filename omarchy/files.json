@@ -330,6 +330,41 @@
       "path": ".config/git/config",
       "source": "common/.config/git/config",
       "mode": 420
+    },
+    {
+      "path": ".config/fcitx5/config",
+      "source": "common/.config/fcitx5/config",
+      "mode": 384
+    },
+    {
+      "path": ".config/fcitx5/profile",
+      "source": "common/.config/fcitx5/profile",
+      "mode": 384
+    },
+    {
+      "path": ".config/fcitx5/conf/classicui.conf",
+      "source": "common/.config/fcitx5/conf/classicui.conf",
+      "mode": 384
+    },
+    {
+      "path": ".config/fcitx5/conf/clipboard.conf",
+      "source": "common/.config/fcitx5/conf/clipboard.conf",
+      "mode": 420
+    },
+    {
+      "path": ".config/fcitx5/conf/pinyin.conf",
+      "source": "common/.config/fcitx5/conf/pinyin.conf",
+      "mode": 420
+    },
+    {
+      "path": ".config/fcitx5/conf/quickphrase.conf",
+      "source": "common/.config/fcitx5/conf/quickphrase.conf",
+      "mode": 420
+    },
+    {
+      "path": ".config/fcitx5/conf/xcb.conf",
+      "source": "common/.config/fcitx5/conf/xcb.conf",
+      "mode": 420
     }
   ]
 }

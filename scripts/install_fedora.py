@@ -15,6 +15,13 @@ FEDORA_FILES = (
     ".config/mise/config.toml",
 )
 COMMON_FILES = (
+    ".config/fcitx5/config",
+    ".config/fcitx5/profile",
+    ".config/fcitx5/conf/classicui.conf",
+    ".config/fcitx5/conf/clipboard.conf",
+    ".config/fcitx5/conf/pinyin.conf",
+    ".config/fcitx5/conf/quickphrase.conf",
+    ".config/fcitx5/conf/xcb.conf",
     ".config/git/config",
     ".config/sheldon/plugins.toml",
     ".config/sheldon/completion-init.zsh",
