@@ -13,4 +13,10 @@ hl.monitor({ output = "eDP-1", mode = "1920x1080@60", position = "0x0", scale = 
 
 -- External screen above, centered: (1280 - 1920) / 2 = -320.
 -- Its bottom edge meets the built-in panel's top edge at y = 0.
-hl.monitor({ output = "HDMI-A-1", mode = "1920x1080@60", position = "-320x-1080", scale = 1 })
+hl.monitor({
+	output = "HDMI-A-1",
+	mode = "1920x1080@60",
+	position = "100x-1920",
+	scale = 1,
+	transform = 1,
+})
