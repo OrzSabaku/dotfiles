@@ -2,6 +2,14 @@
 
 require "json"
 
+def main
+  root = File.expand_path("..", __dir__)
+  manifest = load_manifest(root)
+  plan = build_plan(root, manifest)
+  print_plan(plan)
+  exit 1 if plan.any? { |record| %i[CONFLICT OTHER].include?(record[:status]) }
+end
+
 def load_manifest(root)
   files_json = File.join(root, "omarchy/files.json")
   abort "#{files_json} does not exist" unless File.file?(files_json)
@@ -42,14 +50,6 @@ def print_plan(plan)
     path = abbreviate_home(record[:path])
     puts "#{status} #{source} -> #{path}"
   end
-end
-
-def main
-  root = File.expand_path("..", __dir__)
-  manifest = load_manifest(root)
-  plan = build_plan(root, manifest)
-  print_plan(plan)
-  exit 1 if plan.any? { |record| %i[CONFLICT OTHER].include?(record[:status]) }
 end
 
 def abbreviate_home(path)
