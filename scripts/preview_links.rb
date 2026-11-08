@@ -57,7 +57,7 @@ end
 
 def abbreviate_home(path, home)
   return "~" if path == home
-  return path unless path.start_with?(home, "+")
+  return path unless path.start_with?("#{home}/")
 
   path.sub(home, "~")
 end
