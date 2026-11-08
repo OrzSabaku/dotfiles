@@ -52,10 +52,11 @@ def print_plan(plan)
   end
 end
 
-def abbreviate_home(path)
-  return path unless path.start_with?(Dir.home)
+def abbreviate_home(path, home)
+  return "~" if path == home
+  return path unless path.start_with?(home, "+")
 
-  path.sub(Dir.home, "~")
+  path.sub(home, "~")
 end
 
 def symlink_in_parent?(path)
