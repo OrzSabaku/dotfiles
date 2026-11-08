@@ -3,10 +3,13 @@
 require "json"
 
 def main
+  home = ARGV[0] == "--home" ? File.expand_path(ARGV[1]) : Dir.home
+
   root = File.expand_path("..", __dir__)
+
   manifest = load_manifest(root)
-  plan = build_plan(root, manifest)
-  print_plan(plan)
+  plan = build_plan(root, home, manifest)
+  print_plan(plan, home)
   exit 1 if plan.any? { |record| %i[CONFLICT OTHER].include?(record[:status]) }
 end
 
@@ -18,7 +21,7 @@ def load_manifest(root)
   manifest
 end
 
-def build_plan(root, manifest)
+def build_plan(root, home, manifest)
   manifest["files"].map do |entry|
     %w[source path].each do |key|
       is_unsafe_path = entry[key].start_with?("/") || entry[key].split("/").include?("..") || entry[key].empty?
@@ -26,9 +29,9 @@ def build_plan(root, manifest)
     end
 
     source = File.join(root, entry["source"])
-    path = File.join(Dir.home, entry["path"])
+    path = File.join(home, entry["path"])
 
-    abort "Symlinked parent of: #{path}" if symlink_in_parent?(path)
+    abort "Symlinked parent of: #{path}" if symlink_in_parent?(path, home)
     abort "source is symbolic link: #{source}" if File.symlink? source
     abort "source for the link does not exist: #{source}" unless File.file? source
     abort "source is outside the repo #{source}" unless File.realpath(source).start_with?(File.join(root, "/"))
@@ -43,11 +46,11 @@ def build_plan(root, manifest)
   end
 end
 
-def print_plan(plan)
+def print_plan(plan, home)
   plan.each do |record|
     status = record[:status].to_s.ljust(8)
-    source = abbreviate_home(record[:source])
-    path = abbreviate_home(record[:path])
+    source = abbreviate_home(record[:source], home)
+    path = abbreviate_home(record[:path], home)
     puts "#{status} #{source} -> #{path}"
   end
 end
@@ -59,10 +62,10 @@ def abbreviate_home(path, home)
   path.sub(home, "~")
 end
 
-def symlink_in_parent?(path)
+def symlink_in_parent?(path, home)
   parent = File.dirname(path)
   loop do
-    break if parent == Dir.home || parent == "/"
+    break if parent == home || parent == "/"
     return true if File.symlink?(parent)
 
     parent = File.dirname(parent)
