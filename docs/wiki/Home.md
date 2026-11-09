@@ -5,6 +5,7 @@ READMEに収まらない手順や、あとで調べ直したくないことを�
 
 - [導入・復元](Setup.md)
 - [ZshとSheldon](Shell.md)
+- [NeovimでRubyを書く](Neovim.md)
 - [Fcitx5の設定](Input-Method.md)
 - [Gitの個人設定と署名](Git.md)
 - [Omarchyの設定・プラグイン](Omarchy.md)
