@@ -10,6 +10,8 @@
 /*
 !/.gitignore
 !/.gitmodules
+!/.rubocop.yml
+!/.solargraph.yml
 !/submodules/
 !/README.md
 !/AGENTS.md
