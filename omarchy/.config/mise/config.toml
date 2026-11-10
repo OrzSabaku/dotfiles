@@ -4,7 +4,7 @@ gh = "latest"
 go = "latest"
 node = "latest"
 "npm:@indxjp/jevlint" = "latest"
-ruby = "4.0.9"
+ruby = "latest"
 
 [settings.upgrade]
 auto_prune = false
