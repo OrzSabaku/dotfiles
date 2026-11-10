@@ -49,7 +49,7 @@ def build_plan(root, home, manifest)
     abort "source for the link does not exist: #{source}" unless File.file? source
     abort "source is outside the repo #{source}" unless File.realpath(source).start_with?(File.join(root, "/"))
 
-    file_type = determine_file_type(path, source)
+    file_type = determine_status(path, source)
     before = fingerprint(source)
 
     {
@@ -147,22 +147,32 @@ end
 Status = Data.define(
   # @param ftype [String]
   :ftype,
-  # @param hash [String]
-  :hash,
+  # @param content_hash [String]
+  :content_hash,
   # @param permission [Integer]
   :permission,
   # @param link_to [String, nil]
   :link_to
 )
 
-# @param path [String]
+# @param before [String]
+# @param original [String]
 # @return [void]
-def determine_status(path)
-  case inspect_path(path)
-  in Status(ftype: "file", hash:, permission:, link_to:)
-    puts "helo"
+def determine_status(before, original)
+  case inspect_path(before)
+  in nil
+    :OTHER
+  in ftype: "link"
+    target_file = File.expand_path(File.readlink(before), File.dirname(before))
+    original == target_file ? :LINKED : :CONFLICT
+  in ftype: "file", content_hash:, permission:
+    original_status = inspect_path(original)
+    is_same_content = original_status.content_hash == content_hash
+    is_same_mode = original_status.permission == permission
+
+    is_same_content && is_same_mode ? :SAME : :CONFLICT
   else
-    puts "he"
+    :MISSING
   end
 end
 
@@ -173,10 +183,19 @@ def inspect_path(path)
 
   Status.new(
     ftype: File.ftype(path),
-    hash: Digest::SHA256.hexdigest(File.binread(path)),
+    content_hash: Digest::SHA256.hexdigest(File.binread(path)),
     permission: get_permission(path),
-    link_to: File.readlink(path)
+    link_to: (File.ftype(path) == "link" ? File.readlink(path) : nil)
   )
 end
 
 main if __FILE__ == $PROGRAM_NAME
+
+__END__
+
+if __FILE__ == $PROGRAM_NAME
+  to = "/home/sabaku/.zshrc"
+  from = "/home/sabaku/dotfiles/omarchy/.zshrc"
+  puts determine_status(to, from)
+
+end
