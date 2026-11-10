@@ -9,3 +9,7 @@
 
 # Added by Antigravity CLI installer
 export PATH="/home/sabaku/.local/bin:$PATH"
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"
