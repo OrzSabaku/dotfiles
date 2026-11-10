@@ -2,17 +2,19 @@
 
 ## 読み込み順
 
-Omarchyでは `.zshenv` が標準の `env-bootstrap` を読み、PATHとmise shimsを設定します。
+Omarchyでは `.zshenv` が非対話シェルでも必要な標準の `env-bootstrap` を読み込みます。
 `.zshrc` はOmarchyの環境変数・エイリアスを読み込んでから共通設定へ進みます。
+普段の設定は `common/.config/dotfiles/zsh.zsh` に集めます。
+OS別の `.zshrc` には標準設定の読み込みやロケールだけを置きます。
 Bash専用のrcや関数はZshへ読み込みません。
 
 | ファイル（common/.config/以下） | 内容 |
 |---|---|
 | `dotfiles/env.sh` | Bash/Zsh共通の環境変数。POSIX構文で書く |
 | `dotfiles/bash.sh` | 共通環境設定の読み込みとBashの履歴 |
-| `dotfiles/zsh.zsh` | Zshの履歴・補完・キー操作・ツール初期化 |
+| `dotfiles/zsh.zsh` | ZshのPATH・履歴・キー操作・ツール初期化・共通関数 |
 | `sheldon/plugins.toml` | プラグインの取得元・読み込み順 |
-| `sheldon/completion-init.zsh` | compinitとfzfの連携 |
+| `sheldon/completion-init.zsh` | 補完の設定・compinit・fzfの連携 |
 | `sheldon/omz-aliases.zsh` | Oh My Zshの補助関数・選択したプラグイン |
 
 miseのツール一覧はOSごとに管理します。

@@ -1,15 +1,8 @@
-# setopt - enable an option
-# unsetopt - disable an option
-# bindkey - bind a function to a keysequence
-# zle - ZLE stands for Zsh Line Editor. Resister function to zle.
-# zstyle - inject value to contex pattern to define appearance and behavior, for example comsys (complement system)
-# autoload - mark functions specified in fpath and load it when it is called first time.
-# zmodload - load zsh binary module to memory
-# alias - assign an alias.
-# hash - cache a path, define named dir
-
-
 [[ -r "$HOME/.config/dotfiles/env.sh" ]] && source "$HOME/.config/dotfiles/env.sh"
+
+# 個人用コマンドの検索パスはここで管理する。
+path=("$HOME/.local/bin" $path)
+fpath+=("${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions")
 
 # History
 HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
@@ -43,15 +36,6 @@ setopt AUTO_LIST
 setopt NO_BEEP
 setopt NO_CLOBBER
 setopt NO_NOMATCH
-# compinit & zstyle
-autoload -Uz compinit
-
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-zstyle ':completion:*' format '%B%F{yellow}--- %d ---%f%b'
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:processes' command 'ps x -o pid,s,args'
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 # keybind
 bindkey -e
@@ -81,20 +65,36 @@ if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
   elif command -v sheldon >/dev/null 2>&1; then
     plugin_source=$(sheldon source) || plugin_source=''
   fi
-  # Older validated caches predate the completion phase. Keep them usable until
-  # an explicit successful update, without initializing compinit twice.
+  # 旧キャッシュも、現在と同じ補完初期化を一度だけ実行する。
   if [[ "$plugin_source" != *'# dotfiles: managed-compinit'* ]]; then
-    compinit
-    if (( $+commands[fzf] )); then source <(fzf --zsh); fi
+    source "$HOME/.config/sheldon/completion-init.zsh"
   fi
   eval "$plugin_source"
 }
 if command -v gh >/dev/null 2>&1; then eval "$(gh completion -s zsh)"; fi
 
-# Unity CLI
-case ":${PATH}:" in *:"$HOME/.local/bin":*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+# Atuinはfzfなどの履歴キーバインドを初期化した後に読み込む。
+[[ -r "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
+if command -v atuin >/dev/null 2>&1; then eval "$(atuin init zsh)"; fi
 
-typeset -U path
-path=(
-   $path
-)
+# ツールがPATHを追加した後で、重複を取り除く。
+typeset -U path fpath
+
+# コマンドを実行する前に、インストール済みか確認する。
+exists() {
+  local command="$1"
+  if ! (( ${+commands[$command]} )); then
+    print -u2 -- "Error: ${command} がインストールされていません。"
+    return 1
+  fi
+}
+
+# Yaziで最後に開いていたディレクトリへ移動する。
+y() {
+  local tmp cwd
+  tmp="$(mktemp -t yazi-cwd.XXXXXX)" || return
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+  [[ "$cwd" != "$PWD" && -d "$cwd" ]] && builtin cd -- "$cwd"
+  command rm -f -- "$tmp"
+}
