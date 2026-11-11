@@ -51,14 +51,14 @@ def build_plan(root, home, manifest)
     abort "source for the link does not exist: #{link_from}" unless File.file? link_from
     abort "source is outside the repo #{link_from}" unless File.realpath(link_from).start_with?(File.join(root, "/"))
 
-    file_type = determine_status(link_to, link_from)
-    fingerprint = get_fingerprint(link_from)
+    support = determine_status(link_to, link_from)
+    status_link_to = inspect_path(link_to)
 
     {
       link_from: link_from,
       link_to: link_to,
-      status: file_type,
-      fingerprint: fingerprint
+      support: support,
+      status_link_to: status_link_to
     }
   end
 end
@@ -68,10 +68,10 @@ end
 # @return [void]
 def print_plan(plan, home)
   plan.each do |record|
-    status = record[:status].to_s.ljust(8)
+    support = record[:support].to_s.ljust(8)
     link_from = abbreviate_home(record[:link_from].to_s, home)
     link_to = abbreviate_home(record[:link_to].to_s, home)
-    puts "#{status} #{link_from} -> #{link_to}"
+    puts "#{support} #{link_from} -> #{link_to}"
   end
 end
 
@@ -99,59 +99,12 @@ def symlink_in_parent?(link_to, home)
   false
 end
 
-# @param path [String]
-# @return [Integer]
-def get_permission(link_to) = File.stat(link_to).mode & 0o777
-
-# @param path [String]
-# @return [Hash{Symbol => Object}, nil]
-def get_fingerprint(link_to)
-  if File.symlink?(link_to)
-    {
-      link: File.readlink(link_to),
-      sha256: Digest::SHA256.hexdigest(File.binread(link_to))
-    }
-  elsif File.file?(link_to)
-    {
-      sha256: Digest::SHA256.hexdigest(File.binread(link_to)),
-      mode: get_permission(link_to)
-    }
-
-  end
-end
-
-# @param link_to [String]
-# @param link_form [String]
-# @return [Symbol]
-def determine_file_type(link_to, link_from)
-  if File.symlink?(link_to)
-    target_file = File.expand_path(File.readlink(link_to), File.dirname(link_to))
-    target_file == link_from ? :LINKED : :CONFLICT
-  elsif File.file?(link_to)
-    # Q. なぜテキストとして解釈しないのか？
-    # A. 処理的には，バイト列として保存されているものをテキストとして解釈していることになる．
-    # 1. 単純にオーバーヘッド．バイト列で実現可能ならバイト列でやりたい．
-    # バイナリ比較ではCPUが得意とする定長バイト比較コマンドが叩けたり
-    # 1Bでも違う箇所を見つけたら早期離脱できたりと比較という用途においてはかなり利点が多い．
-    # 2. 処理系は自動的にデータを変換するものもある．改行コード，BOM，末尾の空白など．用途によってはそれも比較したい場合がある．
-    # 3. 今回ではあまり関係ないが，バイナリファイルでも読み込める．
-    # 4. ただし，このCRubyにおいては実装上当てはまらない箇所も多いのに留意されたい．本来ならFileUtilを使いたいところであるが，Spinelが未対応．
-    is_same_content = File.binread(link_to) == File.binread(link_from)
-    is_same_mode = get_permission(link_to) == get_permission(link_from)
-    is_same_content && is_same_mode ? :SAME : :CONFLICT
-  elsif File.exist?(link_to)
-    :OTHER
-  else
-    :MISSING
-  end
-end
-
 Status = Data.define(
   # @param ftype [String]
   :ftype,
-  # @param content_hash [String]
+  # @param content_hash [String, nil]
   :content_hash,
-  # @param permission [Integer]
+  # @param permission [Integer, nil]
   :permission,
   # @param link_to [String, nil]
   :link_to
@@ -162,8 +115,6 @@ Status = Data.define(
 # @return [void]
 def determine_status(link_to, link_from)
   case inspect_path(link_to)
-  in nil
-    :OTHER
   in ftype: "link"
     target_file = File.expand_path(File.readlink(link_to), File.dirname(link_to))
     link_from == target_file ? :LINKED : :CONFLICT
@@ -173,21 +124,31 @@ def determine_status(link_to, link_from)
     is_same_mode = original_status.permission == permission
 
     is_same_content && is_same_mode ? :SAME : :CONFLICT
-  else
+  in ftype: "missing"
     :MISSING
+  else
+    :OTHER
   end
 end
 
-# @param link_to [String]
-# @return [Status, nil]
-def inspect_path(link_to)
-  return unless File.exist?(link_to)
+# @param path [String]
+# @return [Status]
+def inspect_path(path)
+  stat = begin
+    File.lstat(path)
+  rescue Errno::ENOENT
+    nil
+  end
+
+  permission = stat.mode & 0o777 if stat&.file?
+  content_hash = Digest::SHA256.hexdigest(File.binread(path)) if stat&.file?
+  link_to = File.readlink(path) if stat&.symlink?
 
   Status.new(
-    ftype: File.ftype(link_to),
-    content_hash: Digest::SHA256.hexdigest(File.binread(link_to)),
-    permission: get_permission(link_to),
-    link_to: (File.ftype(link_to) == "link" ? File.readlink(link_to) : nil)
+    ftype: stat ? stat.ftype : "missing",
+    content_hash: content_hash,
+    permission: permission,
+    link_to: link_to,
   )
 end
 
