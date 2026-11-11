@@ -13,5 +13,5 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 4.0
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
+inherit_gem:
+  rubocop-shopify: rubocop.yml
