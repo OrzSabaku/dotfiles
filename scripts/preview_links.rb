@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# TODO: Support cross-platform functionality
+
 require "json"
 require "digest"
 
@@ -54,9 +56,9 @@ def build_plan(root, home, manifest)
 
     {
       link_from: link_from,
-      path: link_to,
+      link_to: link_to,
       status: file_type,
-      link_to: fingerprint
+      fingerprint: fingerprint
     }
   end
 end
@@ -67,8 +69,8 @@ end
 def print_plan(plan, home)
   plan.each do |record|
     status = record[:status].to_s.ljust(8)
-    link_from = abbreviate_home(record[:source].to_s, home)
-    link_to = abbreviate_home(record[:path].to_s, home)
+    link_from = abbreviate_home(record[:link_from].to_s, home)
+    link_to = abbreviate_home(record[:link_to].to_s, home)
     puts "#{status} #{link_from} -> #{link_to}"
   end
 end
