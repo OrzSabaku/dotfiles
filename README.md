@@ -53,5 +53,4 @@ python3 install.py --restore <バックアップディレクトリ> --apply
 
 [Omarchy](omarchy/README.md) · [Fedora](fedora/README.md) · [Neovimの実験](experiments/README.md)
 
-詳しい手順は[Wiki原稿](docs/wiki/Home.md)へ。
-[書き分けと更新の方針](docs/README.md)に沿って、あとで必要になることだけ残します。
+詳しい手順は[GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。

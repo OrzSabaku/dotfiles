@@ -6,7 +6,6 @@
 !/omarchy/
 !/fedora/
 !/experiments/
-!/docs/
 /*
 !/.gitignore
 !/.gitmodules
@@ -24,7 +23,6 @@
 !/experiments/
 !/scripts/
 !/tests/
-!/docs/
 **/__pycache__/
 *.py[cod]
 

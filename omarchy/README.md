@@ -32,5 +32,5 @@ Omarchy標準を読み込み、個人設定を追加します。導入対象は 
 通知・アイドルのプラグイン本体は別リポジトリで管理します。
 更新後は、ロックされていないデスクトップ端末で `omarchy restart shell` が必要です。
 
-詳しくはWiki原稿の[Omarchy](../docs/wiki/Omarchy.md)と[導入・復元](../docs/wiki/Setup.md)へ。
-Fcitx5の管理範囲・再読み込みは[Fcitx5の設定](../docs/wiki/Input-Method.md)を参照してください。
+詳しくはWikiの[Omarchy](https://github.com/OrzSabaku/dotfiles/wiki/Omarchy)を参照してください。
+Fcitx5の管理範囲・再読み込みは[Fcitx5の設定](https://github.com/OrzSabaku/dotfiles/wiki/Input-Method)を参照してください。
