@@ -79,6 +79,7 @@ end
 # @param home [String]
 # @return [String]
 def abbreviate_home(path, home)
+  # TODO: 流石に実装がダサすぎるのでpathnameのサポート開始次第書き換える
   return "~" if path == home
   return path unless path.start_with?("#{home}/")
 
