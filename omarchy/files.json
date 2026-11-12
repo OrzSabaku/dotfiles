@@ -187,6 +187,11 @@
       "mode": 420
     },
     {
+      "path": ".config/nvim/lua/plugins/ruby-formatting.lua",
+      "source": "common/.config/nvim/lua/plugins/ruby-formatting.lua",
+      "mode": 420
+    },
+    {
       "path": ".config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
       "source": "common/.config/nvim/lua/plugins/snacks-animated-scrolling-off.lua",
       "mode": 420
