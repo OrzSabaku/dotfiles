@@ -3,7 +3,7 @@
 align_center() {
   local message="${1:-Ghostty}"
   local font="${2:-letter}"
-  local filter="${3:-rainbow}"
+  local filter="${3:-gay}"
 
   if ! (( ${+commands[toilet]} )); then
     echo "Error: toilet がインストールされていません。" >&2
@@ -51,4 +51,4 @@ align_center() {
 }
 
 username=$USER
-align_center "WELCOME BOARD, ${(U)username}" pagga
+align_center $'WELCOME BOARD, \n'"${(U)username}!" pagga
