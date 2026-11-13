@@ -5,6 +5,7 @@ go = "latest"
 node = "latest"
 "npm:@indxjp/jevlint" = "latest"
 ruby = "latest"
+"pipx:online-judge-tools-ng" = "latest"
 
 [settings.upgrade]
 auto_prune = false
