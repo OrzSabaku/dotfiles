@@ -31,6 +31,7 @@ COMMON_FILES = (
     ".config/dotfiles/env.sh",
     ".config/dotfiles/bash.sh",
     ".config/dotfiles/zsh.zsh",
+    ".config/rubocop/config.yml",
 )
 
 

@@ -25,7 +25,7 @@ class FedoraInstallTests(unittest.TestCase):
                 self.assertEqual(target.resolve(), source)
             for name in ('.config/dotfiles/env.sh', '.config/dotfiles/bash.sh',
                          '.config/dotfiles/zsh.zsh', '.config/sheldon/plugins.toml',
-                         '.config/ghostty/dotfiles.conf'):
+                         '.config/ghostty/dotfiles.conf', '.config/rubocop/config.yml'):
                 self.assertEqual((home / name).resolve(), repo / 'common' / name)
             for source in (repo / 'common/.config/fcitx5').rglob('*'):
                 if source.is_file():

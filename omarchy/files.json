@@ -370,6 +370,11 @@
       "path": ".config/fcitx5/conf/xcb.conf",
       "source": "common/.config/fcitx5/conf/xcb.conf",
       "mode": 420
+    },
+    {
+      "path": ".config/rubocop/config.yml",
+      "source": "common/.config/rubocop/config.yml",
+      "mode": 420
     }
   ]
 }
