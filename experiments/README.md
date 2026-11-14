@@ -1,7 +1,7 @@
 # Neovimの実験
 
 自作設定を試すためのもの。通常の導入には含めません。
-普段の `nvim` は `common/.config/nvim/` のLazyVimです。
+普段の `nvim` は `home/dot_config/nvim/` のLazyVimです。
 
 ```sh
 ~/dotfiles/scripts/nvim-experiment

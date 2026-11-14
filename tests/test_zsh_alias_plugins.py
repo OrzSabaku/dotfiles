@@ -13,7 +13,7 @@ REPO = Path(__file__).resolve().parents[1]
 @unittest.skipUnless(shutil.which('zsh') and shutil.which('sheldon'), 'Zsh and Sheldon are required')
 class ZshAliasPluginTests(unittest.TestCase):
     def test_real_sheldon_template_preserves_upstream_aliases(self):
-        config = tomllib.loads((REPO / 'common/.config/sheldon/plugins.toml').read_text())
+        config = tomllib.loads((REPO / 'home/dot_config/sheldon/plugins.toml').read_text())
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             fixture = root / 'plugin'
@@ -31,7 +31,7 @@ class ZshAliasPluginTests(unittest.TestCase):
                 path.write_text(content)
             helpers = root / '.config/sheldon'
             helpers.mkdir(parents=True)
-            shutil.copy(REPO / 'common/.config/sheldon/omz-aliases.zsh', helpers)
+            shutil.copy(REPO / 'home/dot_config/sheldon/omz-aliases.zsh', helpers)
             config_dir = root / 'config'
             config_dir.mkdir()
             (config_dir / 'plugins.toml').write_text(

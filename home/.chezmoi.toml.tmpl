@@ -1,0 +1,19 @@
+{{- $defaultProfile := "omarchy" -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{- if eq .chezmoi.osRelease.id "fedora" -}}{{- $defaultProfile = "fedora" -}}{{- end -}}
+{{- end -}}
+{{- $profile := promptChoiceOnce . "profile" "Environment" (list "omarchy" "fedora") $defaultProfile -}}
+{{- $zsh := promptBoolOnce . "apps.zsh" "Manage Zsh configuration" true -}}
+{{- $nvim := promptBoolOnce . "apps.nvim" "Manage Neovim configuration" true -}}
+{{- $ghostty := promptBoolOnce . "apps.ghostty" "Manage Ghostty configuration" true -}}
+{{- $fcitx5 := promptBoolOnce . "apps.fcitx5" "Manage Fcitx5 preferences" true -}}
+# Keep this checkout as the source, including when initialized with --source.
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+    profile = {{ $profile | quote }}
+[data.apps]
+    zsh = {{ $zsh }}
+    nvim = {{ $nvim }}
+    ghostty = {{ $ghostty }}
+    fcitx5 = {{ $fcitx5 }}

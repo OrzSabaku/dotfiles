@@ -6,7 +6,7 @@ import unittest
 class SharedGitConfigTests(unittest.TestCase):
     def setUp(self):
         self.repo = Path(__file__).resolve().parents[1]
-        self.config = self.repo / 'common/.config/git/config'
+        self.config = self.repo / 'home/dot_config/git/config'
 
     def get(self, key):
         return subprocess.check_output(['git', 'config', '--file', str(self.config),
@@ -24,8 +24,8 @@ class SharedGitConfigTests(unittest.TestCase):
         self.assertEqual(self.get('include.path'), '~/.config/git/config.private')
 
     def test_private_files_are_ignored(self):
-        for path in ('common/.config/git/config.private', 'common/.config/git/allowed_signers',
-                     'common/.git-credentials', 'common/.ssh/id_ed25519'):
+        for path in ('home/dot_config/git/config.private', 'home/dot_config/git/allowed_signers',
+                     'home/dot_git-credentials', 'home/dot_ssh/id_ed25519'):
             result = subprocess.run(['git', '-C', str(self.repo), 'check-ignore', '--no-index', path],
                                     capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, path)

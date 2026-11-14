@@ -10,22 +10,27 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 
 ## 構成
 
-- `common/`: OSに依存しない個人設定。中はホームディレクトリと同じ配置。
-- `omarchy/`: Omarchy固有の設定。同じくホームと同じ配置。`files.json`が明示的な導入対象一覧。
-- `fedora/`: Fedora固有の設定。共通ファイルとの対応は`scripts/install_fedora.py`を参照。
+- `home/`: chezmoiのsource state。`.chezmoiroot`でこのディレクトリを指定します。
+- `home/dot_config/`: OSに依存しない設定と、条件付きで配置するOS固有設定。
+- `home/.chezmoitemplates/<環境>/`: `.zshrc`など、同じ配置先で内容が異なるOS別設定。
+- `home/.chezmoiignore`: 環境・アプリによる対象選択。共通設定をOS別に複製しないでください。
+- `home/.chezmoi.toml.tmpl`: 初期化時に環境と対象アプリを選び、ローカル設定を生成します。
 - `experiments/`: 通常の導入対象に含めない実験用設定。
-- `scripts/`: 導入・復元処理、実験用ランチャー。
-- `tests/`: インストーラーの安全機構と仮ホームへの導入テスト。
-- `install.py`: 共通のCLI入口。
+- `scripts/`: 明示的なセットアップ、実験用ランチャー、旧バックアップの復元。
+- `tests/`: chezmoiによる仮ホームへの配置と、シェル・Git設定の検証。
+- `examples/`・`docs/`: 記入例と個人用の補足メモ。
 
-`common`は「両OSに必ず導入するもの」ではなく「OSに依存しないもの」です。
-使うシェルやアプリに応じ、対象を選んで導入します。
-以前の`home/`・`profiles/`・`snapshot/`構成は廃止済みです。
+旧`common/`・`omarchy/`・`fedora/`と独自インストーラーはchezmoiへ移行済みです。
+`dot_`は先頭の`.`、`private_`は非公開権限、`executable_`は実行権限、`empty_`は空ファイルの配置を表します。
+`exact_`や`.chezmoiremove`で管理外ファイルを消す構成は使わないでください。
 
 ## 現在の運用
 
-- 実環境の設定ファイルはリポジトリ内の原本へのシンボリックリンクです。ディレクトリ全体はリンクしません。
-- リポジトリ内の原本を編集すると実環境にも反映されます。保存時に自動再読み込みされる設定もあります。
+- 実環境には通常ファイルを配置します。原本の編集だけでは反映されず、`chezmoi diff` → `chezmoi apply`で反映します。
+- アプリが書き戻した設定は差分を確認し、通常ファイルは`chezmoi re-add <パス>`で取り込みます。
+  OS別テンプレートの設定は対応する`.chezmoitemplates/<環境>/`へ反映します。
+- 環境・対象アプリの選択は非管理の`~/.config/chezmoi/chezmoi.toml`に保存します。
+  対象から外す操作は既存ファイルを削除しません。OSを切り替える場合も残存ファイルを確認してください。
 - OmarchyはZshを主シェルにする構成。`scripts/setup-zsh`で導入・検証してからログインシェルを変更します。
   Bashの設定は復旧用に残します。実際の導入状態は`command -v zsh`と`getent passwd`で確認してください。
 - 共通の`env.sh`はBash/Zsh両方から読めるPOSIX構文。Bash固有処理は`bash.sh`、Zsh固有処理は`zsh.zsh`へ。
@@ -37,50 +42,50 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment`で明示的に起動します。
   `NVIM_APPNAME`で設定・データ・状態・キャッシュを分けますが、ファイルアクセスの隔離ではありません。
   Docker環境はまだ作っていません。旧`nvim-personal`のリンク・関数は廃止済みです。
-- Vim設定はFedora側に記録として残していますが、導入しません。
+- 旧Vim設定と歓迎画面用Zprofileは`experiments/`に記録として残していますが、導入しません。
 
 ## 安全に変更する
 
 1. 作業前に`git status`、実ファイル、リンク先、読み込み順を確認し、ユーザーの未コミット変更を保護してください。
 2. 内容を変える作業と配置を変える作業を区別し、配置変更では移行前後の内容・権限を比較してください。
-3. 移動時は新しい原本を先に作り、実環境のリンクを切り替えてから旧原本を削除してください。
-4. 既存ファイルのバックアップ、競合時の停止、プレビュー、復元時の変更検出を維持してください。
+3. 適用前に`chezmoi diff`と`chezmoi apply --dry-run --verbose`で確認してください。
+4. 安全機構はchezmoi標準を使います。通常の適用で`--force`を使わず、競合は差分を確認して解消します。
+   独自インストーラーや毎回のバックアップ処理を再実装しないでください。
 5. 認証情報、Git identity、履歴、キャッシュ、ブラウザー状態、生成テーマは管理対象外です。
-   Gitの共有設定は`common/.config/git/config`、個人情報は実環境の`~/.config/git/config.private`です。
+   Gitの共有設定は`home/dot_config/git/config`、個人情報は実環境の`~/.config/git/config.private`です。
    個人情報・鍵・認証ヘルパーには`git config --global`を使わず、非管理ファイルを`--file`で指定します。
    コミットはSSH署名が既定です。署名に失敗した際に無断で`--no-gpg-sign`へ逃げないでください。
 6. Omarchyの本体`/usr/share/omarchy/`は編集しません。標準設定への参照を維持します。
    対応するOmarchyスキルが利用できる場合は、デスクトップ・端末・Omarchy設定の作業で使用してください。
-7. 過去を見るだけなら`git show`を使います。作業ツリー全体の`git switch`・`git restore`は
-   実環境にも影響するため、閲覧の代わりに使わないでください。
+7. 過去を見るだけなら`git show`を使います。Gitで原本を戻しても実環境は変わらず、反映にはchezmoiの適用が必要です。
 8. 必要な変更は認められた範囲で進め、通常の可逆的な作業のたびに確認を求める必要はありません。
    依頼範囲を超えるツール導入や、設定全体のリセットを勝手に行わないでください。
 
-バックアップは`~/.local/state/dotfiles/backups/`です。
+旧方式と移行時のバックアップは`~/.local/state/dotfiles/backups/`に残します。
+`python3 scripts/restore-legacy.py <ディレクトリ>`でプレビューし、`--apply`で復元できます。
 復元時に旧リンク先が移動済みなら、バックアップ内容を通常ファイルとして復元する場合があります。
-Gitはファイルの実行ビット以外の権限を完全には保存しません。秘密情報を含まないことと権限を別途確認してください。
+復元後はchezmoiの原本との差分を確認してください。
 
 ## コマンドと検証
 
 ```sh
-python3 install.py --profile omarchy --dry-run
-python3 install.py --profile omarchy --apply
-python3 install.py --restore <バックアップディレクトリ>
-python3 install.py --restore <バックアップディレクトリ> --apply
+chezmoi diff
+chezmoi apply --dry-run --verbose
+chezmoi apply
+chezmoi verify
 python3 -m unittest discover -s tests -v
 git diff --check
 ```
 
-- Omarchyの導入・復元は既定ではプレビュー。適用には`--apply`が必要です。
-- Fedoraの旧インストーラーにはOmarchy版のバックアップ・復元機能がありません。
-  `--profile fedora --dry-run`は実際の競合計画を表示せず、適用しない旨を表示するだけです。
-- インストーラー変更では上記テストを実行します。テストは仮ホームを使い、実環境に導入しないでください。
+- chezmoi構成変更では上記テストを実行します。テストは仮ホームを使い、実環境に導入しません。
+- テンプレートはOmarchy・Fedoraの両方を検証し、権限と管理外ファイルの保持も確認します。
 - シェル変更は構文検証と新しいシェルでの起動確認。Zsh未導入なら未検証と明示します。
 - Ghosttyは`ghostty +validate-config`で確認します。
 - Hyprland Lua変更後は`hyprctl reload`、`hyprctl configerrors`で確認します。
   エージェント環境ではソケット接続が失敗した実績があります。成功したと扱わず制約を報告してください。
 - Neovim変更は共通設定単独とOmarchy追加設定ありの両方を確認します。
-  実験の起動確認だけのために、プラグイン取得や外部ツール導入を発生させないでください。
+  起動確認だけのために、プラグイン取得や外部ツール導入を発生させないでください。
+- chezmoiのapplyからパッケージ導入、mise更新、ログインシェル変更を自動実行しないでください。
 
 ## Gitの運用
 
@@ -89,7 +94,7 @@ git diff --check
 戻り先として名前を付けたい重要スナップショットだけにタグを使ってください。
 既存タグは保持します。リモートへの送信は明示的な依頼がある場合だけ行います。
 
-Zshプラグインは`common/.config/sheldon/plugins.toml`で管理します。
+Zshプラグインは`home/dot_config/sheldon/plugins.toml`で管理します。
 Git・Docker・ComposeのエイリアスはOh My Zshの選択したファイルを使用し、自前の旧Git短縮形は維持しません。
 プラグインのエイリアスは上流の挙動を維持し、`gwip`などを独自に除去・改変しないでください。
 通常のコミットの自動署名は維持します。エージェント自身のコミットで署名を迂回してはいけません。
@@ -103,13 +108,12 @@ READMEは個人用の短いメモです。構成・よく使うコマンド・�
 設定変更で操作が変わったら該当するメモも直し、重複説明や完了した作業の報告を増やさないでください。
 Wikiへの送信・編集も、ほかのリモート送信と同様に明示的な依頼がある場合だけ行います。
 
-## Zsh導入の権限制約（2026-10-18）
+## Zshの初回導入
 
-このエージェント実行環境では`omarchy pkg add zsh sheldon`がsudoのno-new-privileges制約で失敗しました。
-この時点ではZsh本体・プラグインの導入やログインシェル変更は完了していません。
-通常のユーザー端末で`~/dotfiles/scripts/setup-zsh`を実行する手順を用意しています。
-スクリプトはパッケージ導入、構文検証、設定リンク、プラグイン取得、起動テストの後に`chsh`します。
+通常のユーザー端末で`~/dotfiles/scripts/setup-zsh`を実行します。
+パッケージ導入、chezmoi初期化、生成内容の構文検証、適用、プラグイン取得、起動テストの後に`chsh`します。
 途中で失敗した場合にログインシェルを変更しない順序を維持してください。
+エージェント環境ではsudoが制限される場合があります。導入済みかは現在の実環境で確認してください。
 
 ## Omarchyプラグイン
 
