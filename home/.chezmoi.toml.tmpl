@@ -7,9 +7,6 @@
 {{- $nvim := promptBoolOnce . "apps.nvim" "Manage Neovim configuration" true -}}
 {{- $ghostty := promptBoolOnce . "apps.ghostty" "Manage Ghostty configuration" true -}}
 {{- $fcitx5 := promptBoolOnce . "apps.fcitx5" "Manage Fcitx5 preferences" true -}}
-# Keep this checkout as the source, including when initialized with --source.
-sourceDir = {{ .chezmoi.workingTree | quote }}
-
 [data]
     profile = {{ $profile | quote }}
 [data.apps]

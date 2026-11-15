@@ -5,11 +5,10 @@ FedoraとOmarchyで使う個人設定。chezmoiで管理します。
 
 ## 導入
 
-Git・chezmoiが必要です。シェーダーの参照先に合わせ、`~/dotfiles`に置きます。
+Git・chezmoiが必要です。管理元は既定の `~/.local/share/chezmoi` です。
 
 ```sh
-git clone --recurse-submodules https://github.com/OrzSabaku/dotfiles.git ~/dotfiles
-chezmoi --source ~/dotfiles init
+chezmoi init OrzSabaku
 chezmoi diff
 chezmoi apply --dry-run --verbose
 chezmoi apply

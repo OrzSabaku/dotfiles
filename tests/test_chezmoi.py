@@ -40,7 +40,7 @@ class ChezmoiTests(unittest.TestCase):
 
     def initialize(self, profile, apps=True):
         self.run_chezmoi('init', '--promptDefaults', '--promptChoice', 'Environment=' + profile)
-        self.assertEqual(tomllib.loads(self.config.read_text())['sourceDir'], str(REPO))
+        self.assertNotIn('sourceDir', tomllib.loads(self.config.read_text()))
         if not apps:
             self.config.write_text(self.config.read_text().replace('= true', '= false'))
 
