@@ -1,4 +1,0 @@
-reporters:
-  - rubocop
-  # 未定義メソッドと引数の誤りも検査する。型を推論できない箇所は警告になる。
-  - typecheck:strict

@@ -1,7 +1,7 @@
 # dotfiles
 
 FedoraとOmarchyで使う個人設定。chezmoiで管理します。
-普段はOmarchy・Zsh・Ghostty・Neovim（LazyVim）の組み合わせです。
+普段はOmarchy・Zsh・Ghostty・Neovim（LazyVim）を使います。
 
 ## 導入
 
@@ -14,10 +14,9 @@ chezmoi apply --dry-run --verbose
 chezmoi apply
 ```
 
-`init`で環境（`omarchy` / `fedora`）とZsh・Neovim・Ghostty・Fcitx5の管理有無を選びます。
-選択はローカルの `~/.config/chezmoi/chezmoi.toml` に保存します。変更は `chezmoi init --prompt`。
-パッケージ導入・miseツール更新・ログインシェル変更は自動実行しません。
-OmarchyでZshを初めて導入するときは、通常の端末で `scripts/setup-zsh` を実行します。
+`init`で環境（`omarchy` / `fedora`）と管理するアプリを選びます。
+選択は `~/.config/chezmoi/chezmoi.toml` に保存されます。選び直す場合は `chezmoi init --prompt`。
+パッケージ導入・ツール更新・ログインシェル変更は自動実行しません。
 
 ## 普段の操作
 
@@ -27,24 +26,25 @@ chezmoi diff
 chezmoi apply
 ```
 
-- 原本の変更は `apply` するまで実環境に反映されません。
-- アプリや実ファイル側で変更した設定は差分を確認し、通常ファイルなら `chezmoi re-add <パス>` で取り込みます。
-  OS別テンプレートの設定は `home/.chezmoitemplates/<環境>/` の該当ファイルへ反映します。
-- Zshプラグインは設定適用後に `scripts/update-zsh-plugins` を実行し、新しい端末を開きます。
+- 原本の変更は `apply` で反映します。管理元で作業するときは `chezmoi cd`。
+- 実ファイル側の変更は差分を確認してから取り込みます。通常ファイルは `chezmoi re-add <パス>`、
+  OS別テンプレートは `home/.chezmoitemplates/<環境>/` の該当ファイルを編集します。
 - Gitの名前・メール・署名鍵は非管理の `~/.config/git/config.private` へ。
   [記入例](examples/git/config.private.example)を参照し、権限は `600` にします。
-- Git操作で原本が変わったら `chezmoi diff` → `chezmoi apply`。リモート送信は手動です。
+- Gitで原本を戻した場合も、反映前に `chezmoi diff` を確認します。リモート送信は手動です。
+
+## 管理元で使うスクリプト
+
+`chezmoi cd` で移動してから実行します。
+
+- `scripts/setup-zsh` — OmarchyでのZsh初回導入。通常の端末で実行します。
+- `scripts/update-zsh-plugins` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。
+- `scripts/nvim-experiment` — [実験用Neovim](experiments/README.md)を起動します。
 
 ## 構成
 
-- `home/` — chezmoiの管理対象。`dot_`は先頭の`.`、`private_`は非公開権限、`executable_`は実行権限。
-- `home/.chezmoitemplates/` — OS別の初期化・アプリ設定。共通設定は `home/dot_config/` に1か所で保存。
-- `home/.chezmoiignore` — 環境・アプリごとの配置対象の選択。
-- `scripts/`・`tests/` — 明示的なセットアップと仮ホームでの検証。
-- `experiments/` — [Neovimなどの実験](experiments/README.md)。通常の導入には含めません。
+`home/` がchezmoiの管理対象です。共通設定は `home/dot_config/`、OS別の内容は
+`home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
+`experiments/` は通常の導入には含めません。
 
-旧方式のバックアップは `~/.local/state/dotfiles/backups/` に残します。
-読み出しは `python3 scripts/restore-legacy.py <バックアップディレクトリ>`、適用には `--apply` が必要です。
-復元後はchezmoiの原本との差分が生じます。
-
-詳しいメモは [Omarchy](docs/omarchy.md) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。
+補足は [Omarchy](docs/omarchy.md) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。

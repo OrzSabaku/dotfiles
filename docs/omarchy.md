@@ -18,7 +18,7 @@ Omarchy標準を読み込み、個人設定を追加します。配置対象は 
 | ショートカット | [.config/hypr/bindings.lua](../home/dot_config/hypr/bindings.lua) |
 | 枠・余白・アニメーション | [.config/hypr/looknfeel.lua](../home/dot_config/hypr/looknfeel.lua) |
 | バー・プラグインの有効化状態 | [.config/omarchy/shell.json](../home/dot_config/omarchy/private_shell.json) |
-| Ghosttyの共通操作 | [共通のdotfiles.conf](../home/dot_config/ghostty/dotfiles.conf) |
+| Ghosttyの共通操作 | [共通のdotfiles.conf](../home/dot_config/ghostty/dotfiles.conf.tmpl) |
 | 日本語入力・候補表示 | [共通のFcitx5設定](../home/dot_config/fcitx5/) |
 
 外部画面は上、内蔵画面は下。倍率を考慮した論理座標で中央を揃えています。

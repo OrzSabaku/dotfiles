@@ -9,10 +9,6 @@
 /*
 !/.gitignore
 !/.gitmodules
-!/Gemfile
-!/Gemfile.lock
-!/.rubocop.yml
-!/.solargraph.yml
 !/submodules/
 !/README.md
 !/AGENTS.md
