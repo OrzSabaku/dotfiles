@@ -90,6 +90,9 @@ git diff --check
 Gemfile・Gemfile.lockで開発用gemを管理し、テストはMinitestで書きます。
 スクリプトの実行には追加gemを要求しないでください。
 既存ツールとRuby標準ライブラリを優先し、自作の処理は必要最小限にしてください。
+Linux x86_64用バイナリは`.github/workflows/native-scripts.yml`でビルドします。
+ローカル用のビルドタスクや実行モード切り替えは追加しないでください。
+ネイティブ版の検証はCIのビルド後に`bundle exec ruby -Itests tests/native_test.rb`を明示的に実行します。
 開発手順は[WikiのRubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 
 ## Gitの運用

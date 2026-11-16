@@ -47,6 +47,6 @@ Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから
 `home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
 `experiments/` は通常の導入には含めません。
 
-開発・テストは [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
+開発・テストとLinux x86_64用バイナリの配布手順は [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 
 補足は [Omarchy](https://github.com/OrzSabaku/dotfiles/wiki/Omarchy) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。
