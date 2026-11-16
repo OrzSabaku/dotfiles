@@ -7,7 +7,6 @@ require "open3"
 
 # 通常のユーザー端末で実行する。sudo/chshの入力は端末に引き継ぐ。
 class ZshSetup
-  REPO = File.expand_path("..", __dir__)
   DEPENDENCIES = %w[zsh sheldon starship mise fzf zoxide eza bat chezmoi].freeze
 
   def run
@@ -18,7 +17,11 @@ class ZshSetup
     system("omarchy", "pkg", "add", "zsh", "sheldon", exception: true)
     zsh = check_dependencies
     apply_configuration
-    updater = File.join(REPO, "scripts/update-zsh-plugins.rb")
+    updater = if RUBY_ENGINE == "spinel"
+      File.join(File.dirname(File.realpath("/proc/self/exe")), "update-zsh-plugins")
+    else
+      File.join(@repo, "scripts/update-zsh-plugins.rb")
+    end
     system([updater, updater], exception: true)
     check_startup
 
@@ -30,7 +33,8 @@ class ZshSetup
   rescue SystemCallError, RuntimeError => error
     warn error.message
     status = $?
-    exit(status && !status.success? ? status.exitstatus || 128 + status.termsig : 1)
+    exit 1 if status.nil? || status.success?
+    exit(status.exitstatus || 128 + status.termsig)
   rescue Interrupt
     exit 130
   end
@@ -71,10 +75,14 @@ class ZshSetup
   end
 
   def chezmoi(*arguments)
-    ["chezmoi", "--source", REPO, *arguments]
+    ["chezmoi", "--source", @repo, *arguments]
   end
 
   def apply_configuration
+    # CIのソース配置ではなく、利用者がchezmoiで管理するチェックアウトを使う。
+    repo, status = Open3.capture2("chezmoi", "execute-template", "{{ .chezmoi.workingTree }}")
+    exit(status.exitstatus || 128 + status.termsig) unless status.success?
+    @repo = repo.strip
     system(*chezmoi("init"), exception: true)
     profile, status = Open3.capture2(*chezmoi("execute-template", "{{ .profile }}"))
     exit(status.exitstatus || 128 + status.termsig) unless status.success?
@@ -84,10 +92,10 @@ class ZshSetup
     raise "Enable apps.zsh in the chezmoi config first." unless zsh_enabled.strip == "true"
 
     %w[.zshenv .zshrc .config/dotfiles/zsh.zsh].each do |name|
-      statuses = Open3.pipeline(chezmoi("cat", File.join(Dir.home, name)), ["zsh", "-n"])
-      statuses.each do |status|
-        exit(status.exitstatus || 128 + status.termsig) unless status.success?
-      end
+      content, status = Open3.capture2(*chezmoi("cat", File.join(Dir.home, name)))
+      exit(status.exitstatus || 128 + status.termsig) unless status.success?
+      _, status = Open3.capture2("zsh", "-n", stdin_data: content)
+      exit(status.exitstatus || 128 + status.termsig) unless status.success?
     end
     system(*chezmoi("diff"), exception: true)
     system(*chezmoi("apply"), exception: true)

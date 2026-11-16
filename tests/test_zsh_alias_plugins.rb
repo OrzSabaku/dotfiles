@@ -5,7 +5,7 @@ require_relative "test_helper"
 class ZshAliasPluginsTest < RepositoryTest
   def setup
     super
-    skip "Zsh and Sheldon are required" unless resolve_command("zsh") && resolve_command("sheldon")
+    skip "Zsh and Sheldon are required" unless resolve_command("zsh") && SHELDON
   end
 
   def test_real_sheldon_template_preserves_upstream_aliases
@@ -35,7 +35,7 @@ class ZshAliasPluginsTest < RepositoryTest
       apply = ["omz-aliases"]
     TOML
     config = write(@root / "config/plugins.toml", configuration)
-    rendered = checked_command("sheldon", "--config-dir", config.dirname.to_s,
+    rendered = checked_command(SHELDON, "--config-dir", config.dirname.to_s,
       "--data-dir", (@root / "data").to_s, "source")
     generated = write(@root / "generated.zsh", rendered.stdout)
     tool("docker", "exit 0\n")

@@ -4,11 +4,13 @@
 require "fileutils"
 require "tempfile"
 require "tmpdir"
+require "open3"
 
 class ZshPluginUpdate
-  REPO = File.expand_path("..", __dir__)
-
   def run
+    repo, status = Open3.capture2("chezmoi", "execute-template", "{{ .chezmoi.workingTree }}")
+    exit(status.exitstatus || 128 + status.termsig) unless status.success?
+    @repo = repo.strip
     generations = File.join(xdg_directory("XDG_DATA_HOME", ".local/share"), "dotfiles/sheldon")
     FileUtils.mkdir_p(generations)
     generation = Dir.mktmpdir("generation.", generations)
@@ -31,7 +33,8 @@ class ZshPluginUpdate
   rescue SystemCallError, RuntimeError => error
     warn error.message
     status = $?
-    exit(status && !status.success? ? status.exitstatus || 128 + status.termsig : 1)
+    exit 1 if status.nil? || status.success?
+    exit(status.exitstatus || 128 + status.termsig)
   rescue Interrupt
     exit 130
   end
@@ -52,7 +55,7 @@ class ZshPluginUpdate
 
   def validate_plugins(work, source)
     system("zsh", "-n", source, exception: true)
-    checker = File.join(REPO, "scripts/check-zsh-plugins.zsh")
+    checker = File.join(@repo, "scripts/check-zsh-plugins.zsh")
     system({ "ZDOTDIR" => work }, "zsh", "-f", "-i", checker, source, work, exception: true)
   end
 

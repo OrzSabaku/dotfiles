@@ -3,6 +3,11 @@
 require_relative "test_helper"
 
 class ScriptsTest < RepositoryTest
+  def setup
+    super
+    tool("chezmoi", "puts #{REPO.to_s.inspect}\n")
+  end
+
   def plugin_fixture(validation_status: 0)
     tool("sheldon", <<~'STUB')
       location = ARGV.fetch(ARGV.index("--data-dir") + 1)

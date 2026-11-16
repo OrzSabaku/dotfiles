@@ -31,9 +31,9 @@ class ZshSetupTest < RepositoryTest
           tool(name, setup_stub, directory: name == "update-zsh-plugins.rb" ? scripts : @tools)
         end
         current_shell = write(case_home / "current-shell", "/bin/bash")
-        env = @env.merge("HOME" => case_home.to_s, "FAIL_STAGE" => failure)
+        env = @env.merge("HOME" => case_home.to_s, "FAIL_STAGE" => failure, "TEST_REPO" => fixture_repo.to_s)
         result = run_command(RUBY, "-e", setup_runner, (REPO / "scripts/setup-zsh.rb").to_s,
-          fixture_repo.to_s, env: env)
+          env: env)
         log = case_home / "calls.jsonl"
         assert log.exist?, result.stderr
         calls = log.readlines.map { |line| JSON.parse(line) }
@@ -68,8 +68,6 @@ class ZshSetupTest < RepositoryTest
   def setup_runner
     <<~'CODE'
       load ARGV.shift
-      ZshSetup.send(:remove_const, :REPO)
-      ZshSetup.const_set(:REPO, ARGV.shift)
       class ZshSetup
         def check_dependencies
           "/usr/bin/zsh"
@@ -92,6 +90,10 @@ class ZshSetupTest < RepositoryTest
       when "getent"
         puts "test-user:x:1000:1000::/home/test:#{File.read(File.join(home, 'current-shell'))}"
       when "chezmoi"
+        if ARGV == ["execute-template", "{{ .chezmoi.workingTree }}"]
+          puts ENV.fetch("TEST_REPO")
+          exit
+        end
         action = ARGV.fetch(2)
         exit 23 if action == failure
         if action == "execute-template"
