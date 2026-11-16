@@ -75,7 +75,7 @@ class ZshSetupTest < RepositoryTest
           "/usr/bin/zsh"
         end
       end
-      ScriptCommands.main { ZshSetup.new.run }
+      ZshSetup.new.run
     CODE
   end
 
@@ -100,6 +100,7 @@ class ZshSetupTest < RepositoryTest
           puts "export EDITOR=nvim"
         end
       when "zsh"
+        STDIN.read if ARGV.first == "-n"
         exit 23 if (ARGV.first == "-n" && failure == "syntax") || (ARGV.first == "-lic" && failure == "startup")
       when "update-zsh-plugins.rb"
         exit 23 if failure == "plugins"

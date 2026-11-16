@@ -60,19 +60,15 @@ class ScriptsTest < RepositoryTest
     refute (@root / "should-not-exist").exist?
   end
 
-  def test_command_helper_preserves_literal_arguments_and_failure_status
-    tool("record", <<~'STUB')
-      require "json"
-      puts JSON.generate(ARGV)
-      exit 31
-    STUB
-    code = <<~'CODE'
-      require ARGV.shift
-      ScriptCommands.main { ScriptCommands.run!("record", *ARGV) }
-    CODE
-    arguments = ["space in argument", "$(touch should-not-exist)", "; exit 0"]
-    result = run_command(RUBY, "-e", code, (REPO / "scripts/lib/commands.rb").to_s, *arguments)
-    assert_equal 31, result.exit_code, result.stderr
-    assert_equal arguments, JSON.parse(result.stdout)
+  def test_plugin_commands_preserve_literal_paths
+    directory = @root / 'data with spaces $(touch should-not-exist); literal'
+    @env["XDG_DATA_HOME"] = directory.to_s
+    plugin_fixture
+    result = run_script("update-zsh-plugins", directory: @root)
+    assert_equal 0, result.exit_code, result.stderr
+    generations = (directory / "dotfiles/sheldon").children
+    assert_equal 1, generations.length
+    assert_includes @cache.read, generations.first.to_s
+    refute (@root / "should-not-exist").exist?
   end
 end

@@ -3,7 +3,7 @@
 
 require "fileutils"
 require "shellwords"
-require_relative "lib/commands"
+require "open3"
 
 # 通常のユーザー端末で実行する。sudo/chshの入力は端末に引き継ぐ。
 class ZshSetup
@@ -15,10 +15,11 @@ class ZshSetup
     previous_shell = login_shell
 
     # 導入・適用・起動確認がすべて成功するまでログインシェルを変更しない。
-    ScriptCommands.run!("omarchy", "pkg", "add", "zsh", "sheldon")
+    system("omarchy", "pkg", "add", "zsh", "sheldon", exception: true)
     zsh = check_dependencies
     apply_configuration
-    ScriptCommands.run!(File.join(REPO, "scripts/update-zsh-plugins.rb"))
+    updater = File.join(REPO, "scripts/update-zsh-plugins.rb")
+    system([updater, updater], exception: true)
     check_startup
 
     save_previous_shell(previous_shell)
@@ -26,6 +27,12 @@ class ZshSetup
     puts "Default shell: #{zsh}"
     puts "Open a new terminal; log out and back in if necessary."
     puts "To return to the previous login shell: chsh -s #{previous_shell.shellescape}"
+  rescue SystemCallError, RuntimeError => error
+    warn error.message
+    status = $?
+    exit(status && !status.success? ? status.exitstatus || 128 + status.termsig : 1)
+  rescue Interrupt
+    exit 130
   end
 
   private
@@ -36,9 +43,11 @@ class ZshSetup
   end
 
   def login_shell
-    username = ScriptCommands.capture!("id", "-un").strip
-    entry = ScriptCommands.capture!("getent", "passwd", username).strip
-    shell = entry.split(":", -1)[6]
+    username, status = Open3.capture2("id", "-un")
+    exit(status.exitstatus || 128 + status.termsig) unless status.success?
+    entry, status = Open3.capture2("getent", "passwd", username.strip)
+    exit(status.exitstatus || 128 + status.termsig) unless status.success?
+    shell = entry.strip.split(":", -1)[6]
     raise "Could not determine the current login shell." if shell.nil? || shell.empty?
 
     shell
@@ -66,22 +75,26 @@ class ZshSetup
   end
 
   def apply_configuration
-    ScriptCommands.run!(*chezmoi("init"))
-    profile = ScriptCommands.capture!(*chezmoi("execute-template", "{{ .profile }}")).strip
-    raise "Select the omarchy environment in chezmoi init." unless profile == "omarchy"
-    zsh_enabled = ScriptCommands.capture!(*chezmoi("execute-template", "{{ .apps.zsh }}")).strip
-    raise "Enable apps.zsh in the chezmoi config first." unless zsh_enabled == "true"
+    system(*chezmoi("init"), exception: true)
+    profile, status = Open3.capture2(*chezmoi("execute-template", "{{ .profile }}"))
+    exit(status.exitstatus || 128 + status.termsig) unless status.success?
+    raise "Select the omarchy environment in chezmoi init." unless profile.strip == "omarchy"
+    zsh_enabled, status = Open3.capture2(*chezmoi("execute-template", "{{ .apps.zsh }}"))
+    exit(status.exitstatus || 128 + status.termsig) unless status.success?
+    raise "Enable apps.zsh in the chezmoi config first." unless zsh_enabled.strip == "true"
 
     %w[.zshenv .zshrc .config/dotfiles/zsh.zsh].each do |name|
-      content = ScriptCommands.capture!(*chezmoi("cat", File.join(Dir.home, name)))
-      ScriptCommands.capture!("zsh", "-n", input: content)
+      statuses = Open3.pipeline(chezmoi("cat", File.join(Dir.home, name)), ["zsh", "-n"])
+      statuses.each do |status|
+        exit(status.exitstatus || 128 + status.termsig) unless status.success?
+      end
     end
-    ScriptCommands.run!(*chezmoi("diff"))
-    ScriptCommands.run!(*chezmoi("apply"))
+    system(*chezmoi("diff"), exception: true)
+    system(*chezmoi("apply"), exception: true)
   end
 
   def check_startup
-    ScriptCommands.run!("zsh", "-lic", <<~'ZSH')
+    system("zsh", "-lic", <<~'ZSH', exception: true)
       [[ -o interactive && $EDITOR == nvim && -n $OMARCHY_PATH ]] || exit 1
       whence -p mise starship fzf zoxide sheldon eza bat >/dev/null || exit 1
       print -r -- "Zsh startup OK"
@@ -96,9 +109,9 @@ class ZshSetup
   end
 
   def change_login_shell(zsh, previous_shell)
-    ScriptCommands.run!("chsh", "-s", zsh) unless previous_shell == zsh
+    system("chsh", "-s", zsh, exception: true) unless previous_shell == zsh
     raise "Login shell change was not applied." unless login_shell == zsh
   end
 end
 
-ScriptCommands.main { ZshSetup.new.run } if $PROGRAM_NAME == __FILE__
+ZshSetup.new.run if $PROGRAM_NAME == __FILE__

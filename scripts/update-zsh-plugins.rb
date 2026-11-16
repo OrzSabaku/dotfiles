@@ -4,7 +4,6 @@
 require "fileutils"
 require "tempfile"
 require "tmpdir"
-require_relative "lib/commands"
 
 class ZshPluginUpdate
   REPO = File.expand_path("..", __dir__)
@@ -29,6 +28,12 @@ class ZshPluginUpdate
       FileUtils.remove_entry(generation) unless activated
     end
     puts "Validated Zsh plugins activated. Open a new terminal."
+  rescue SystemCallError, RuntimeError => error
+    warn error.message
+    status = $?
+    exit(status && !status.success? ? status.exitstatus || 128 + status.termsig : 1)
+  rescue Interrupt
+    exit 130
   end
 
   private
@@ -40,15 +45,15 @@ class ZshPluginUpdate
 
   def fetch_plugins(generation, source)
     File.open(source, "w") do |output|
-      ScriptCommands.run!("sheldon", "--non-interactive", "--data-dir", generation,
-        "source", "--relock", out: output)
+      system("sheldon", "--non-interactive", "--data-dir", generation,
+        "source", "--relock", out: output, exception: true)
     end
   end
 
   def validate_plugins(work, source)
-    ScriptCommands.run!("zsh", "-n", source)
+    system("zsh", "-n", source, exception: true)
     checker = File.join(REPO, "scripts/check-zsh-plugins.zsh")
-    ScriptCommands.run!({ "ZDOTDIR" => work }, "zsh", "-f", "-i", checker, source, work)
+    system({ "ZDOTDIR" => work }, "zsh", "-f", "-i", checker, source, work, exception: true)
   end
 
   def activate_plugins(source)
@@ -73,4 +78,4 @@ class ZshPluginUpdate
   end
 end
 
-ScriptCommands.main { ZshPluginUpdate.new.run } if $PROGRAM_NAME == __FILE__
+ZshPluginUpdate.new.run if $PROGRAM_NAME == __FILE__
