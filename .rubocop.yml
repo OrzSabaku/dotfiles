@@ -9,4 +9,3 @@ AllCops:
     - Rakefile
   Exclude:
     - submodules/**/*
-    - build/**/*

@@ -20,7 +20,7 @@ class ZshSetupTest < RepositoryTest
   end
 
   def test_shell_change_waits_for_configuration_plugins_and_startup
-    # この検証はクラスの依存確認だけを差し替える。AOTの公開コマンドは別テストで実行する。
+    # 実際の導入を避け、処理順だけをダミーコマンドで検証する。
     %w[none init syntax apply plugins startup].each do |failure|
       Dir.mktmpdir("setup-case.", @root) do |directory|
         case_home = Pathname.new(directory)

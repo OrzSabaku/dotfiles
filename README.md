@@ -47,6 +47,6 @@ Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから
 `home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
 `experiments/` は通常の導入には含めません。
 
-開発・テスト・任意のAOTビルドは [Rubyスクリプトの開発](docs/ruby.md)を参照してください。
+開発・テストは [Rubyスクリプトの開発](docs/ruby.md)を参照してください。
 
 補足は [Omarchy](docs/omarchy.md) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。

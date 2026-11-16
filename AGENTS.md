@@ -85,13 +85,12 @@ git diff --check
   起動確認だけのために、プラグイン取得や外部ツール導入を発生させないでください。
 - chezmoiのapplyからパッケージ導入、mise更新、ログインシェル変更を自動実行しないでください。
 
-## RubyとAOT
+## Rubyの開発
 
 Gemfile・Gemfile.lockで開発用gemを管理し、テストはMinitestで書きます。
 スクリプトの実行には追加gemを要求しないでください。
-SpinelのAOTは`bundle exec rake test:aot`で通常実行と同じフィクスチャを検証します。
-生成物は`build/`に置き、Git管理・自動インストールを行いません。詳細は`docs/ruby.md`を参照してください。
-Spinelでのコンパイル成功だけでCRubyとの互換性を判断しないでください。
+既存ツールとRuby標準ライブラリを優先し、自作の処理は必要最小限にしてください。
+開発手順は`docs/ruby.md`を参照してください。
 
 ## Gitの運用
 

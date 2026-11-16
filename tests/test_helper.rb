@@ -72,16 +72,7 @@ class RepositoryTest < Minitest::Test
     result
   end
 
-  def script_command(name, *arguments)
-    # AOT検証も通常と同じフィクスチャで行う。通常実行は常にCRuby。
-    if ENV["SCRIPT_BIN_DIR"]
-      [File.join(ENV.fetch("SCRIPT_BIN_DIR"), name), *arguments]
-    else
-      [RUBY, (REPO / "scripts" / "#{name}.rb").to_s, *arguments]
-    end
-  end
-
   def run_script(name, *arguments, **options)
-    run_command(*script_command(name, *arguments), **options)
+    run_command(RUBY, (REPO / "scripts" / "#{name}.rb").to_s, *arguments, **options)
   end
 end
