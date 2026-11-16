@@ -27,12 +27,12 @@ class ZshSetupTest < RepositoryTest
         fixture_repo = case_home / "fixture-repo"
         scripts = fixture_repo / "scripts"
         FileUtils.mkdir_p(scripts)
-        %w[id getent omarchy chezmoi zsh chsh update-zsh-plugins].each do |name|
-          tool(name, setup_stub, directory: name == "update-zsh-plugins" ? scripts : @tools)
+        %w[id getent omarchy chezmoi zsh chsh update-zsh-plugins.rb].each do |name|
+          tool(name, setup_stub, directory: name == "update-zsh-plugins.rb" ? scripts : @tools)
         end
         current_shell = write(case_home / "current-shell", "/bin/bash")
         env = @env.merge("HOME" => case_home.to_s, "FAIL_STAGE" => failure)
-        result = run_command(RUBY, "-e", setup_runner, (REPO / "scripts/setup-zsh").to_s,
+        result = run_command(RUBY, "-e", setup_runner, (REPO / "scripts/setup-zsh.rb").to_s,
           fixture_repo.to_s, env: env)
         log = case_home / "calls.jsonl"
         assert log.exist?, result.stderr
@@ -54,7 +54,7 @@ class ZshSetupTest < RepositoryTest
   def assert_successful_setup(result, calls, home)
     assert_equal 0, result.exit_code, result.stderr
     apply_at = calls.index { |call| call.first == "chezmoi" && call[3] == "apply" }
-    plugins_at = calls.index { |call| call.first == "update-zsh-plugins" }
+    plugins_at = calls.index { |call| call.first == "update-zsh-plugins.rb" }
     startup_at = calls.index { |call| call.take(2) == ["zsh", "-lic"] }
     chsh_at = calls.index { |call| call.first == "chsh" }
     assert_operator apply_at, :<, plugins_at
@@ -101,7 +101,7 @@ class ZshSetupTest < RepositoryTest
         end
       when "zsh"
         exit 23 if (ARGV.first == "-n" && failure == "syntax") || (ARGV.first == "-lic" && failure == "startup")
-      when "update-zsh-plugins"
+      when "update-zsh-plugins.rb"
         exit 23 if failure == "plugins"
       when "chsh"
         File.write(File.join(home, "current-shell"), ARGV.last)

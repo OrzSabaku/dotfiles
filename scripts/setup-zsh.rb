@@ -18,7 +18,7 @@ class ZshSetup
     ScriptCommands.run!("omarchy", "pkg", "add", "zsh", "sheldon")
     zsh = check_dependencies
     apply_configuration
-    ScriptCommands.run!(File.join(REPO, "scripts/update-zsh-plugins"))
+    ScriptCommands.run!(File.join(REPO, "scripts/update-zsh-plugins.rb"))
     check_startup
 
     save_previous_shell(previous_shell)

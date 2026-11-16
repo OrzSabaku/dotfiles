@@ -18,7 +18,7 @@ task :aot do
   mkdir_p BUILD_DIRECTORY
   SCRIPTS.each do |name|
     # __dir__で参照するリポジトリの位置を確定させるため、絶対パスでコンパイルする。
-    sh "spinel", File.join(REPOSITORY, "scripts", name), "--strict-require",
+    sh "spinel", File.join(REPOSITORY, "scripts", "#{name}.rb"), "--strict-require",
       "-o", File.join(BUILD_DIRECTORY, name)
   end
 end

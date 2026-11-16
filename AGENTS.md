@@ -33,7 +33,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
   OS別テンプレートの設定は対応する`.chezmoitemplates/<環境>/`へ反映します。
 - 環境・対象アプリの選択は非管理の`~/.config/chezmoi/chezmoi.toml`に保存します。
   対象から外す操作は既存ファイルを削除しません。OSを切り替える場合も残存ファイルを確認してください。
-- OmarchyはZshを主シェルにする構成。`scripts/setup-zsh`で導入・検証してからログインシェルを変更します。
+- OmarchyはZshを主シェルにする構成。`scripts/setup-zsh.rb`で導入・検証してからログインシェルを変更します。
   Bashの設定は復旧用に残します。実際の導入状態は`command -v zsh`と`getent passwd`で確認してください。
 - 共通の`env.sh`はBash/Zsh両方から読めるPOSIX構文。Bash固有処理は`bash.sh`、Zsh固有処理は`zsh.zsh`へ。
 - ZshとSheldonは共通管理で、両OSの入口から使用します。Omarchyでは`.zshenv`が標準のPATH設定、
@@ -41,7 +41,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
 - miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
-- 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment`で明示的に起動します。
+- 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment.rb`で明示的に起動します。
   `NVIM_APPNAME`で設定・データ・状態・キャッシュを分けますが、ファイルアクセスの隔離ではありません。
   Docker環境はまだ作っていません。旧`nvim-personal`のリンク・関数は廃止済みです。
 - 旧Vim設定と歓迎画面用Zprofileは`experiments/`に記録として残していますが、導入しません。
@@ -104,7 +104,7 @@ Zshプラグインは`home/dot_config/sheldon/plugins.toml`で管理します。
 Git・Docker・ComposeのエイリアスはOh My Zshの選択したファイルを使用し、自前の旧Git短縮形は維持しません。
 プラグインのエイリアスは上流の挙動を維持し、`gwip`などを独自に除去・改変しないでください。
 通常のコミットの自動署名は維持します。エージェント自身のコミットで署名を迂回してはいけません。
-変更後は`scripts/update-zsh-plugins`で取得・検証してから生成済みキャッシュを切り替えます。
+変更後は`scripts/update-zsh-plugins.rb`で取得・検証してから生成済みキャッシュを切り替えます。
 Zsh起動時は最後に検証したキャッシュを使用するため、TOMLの編集だけでは既存環境へ即反映されません。
 
 ## 文書の運用
@@ -116,7 +116,7 @@ Wikiへの送信・編集も、ほかのリモート送信と同様に明示的�
 
 ## Zshの初回導入
 
-通常のユーザー端末で`~/.local/share/chezmoi/scripts/setup-zsh`を実行します。
+通常のユーザー端末で`~/.local/share/chezmoi/scripts/setup-zsh.rb`を実行します。
 パッケージ導入、chezmoi初期化、生成内容の構文検証、適用、プラグイン取得、起動テストの後に`chsh`します。
 途中で失敗した場合にログインシェルを変更しない順序を維持してください。
 エージェント環境ではsudoが制限される場合があります。導入済みかは現在の実環境で確認してください。

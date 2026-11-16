@@ -35,7 +35,7 @@ SpinelではCRubyのすべてのAPIが同じように動くとは限りません
 
 `__dir__`からリポジトリ内の設定や検証スクリプトを参照するため、ビルドはソースの絶対パスを使います。
 リポジトリを移動した場合やソースを変更した場合は再ビルドしてください。
-`setup-zsh`は内部でRuby版の`scripts/update-zsh-plugins`を呼ぶため、AOT版でもその処理にはRubyが必要です。
+`setup-zsh`は内部でRuby版の`scripts/update-zsh-plugins.rb`を呼ぶため、AOT版でもその処理にはRubyが必要です。
 バイナリのインストールやchezmoiの適用時の自動ビルドは行いません。
 
 Spinelの対応範囲は[公式ドキュメント](https://github.com/matz/spinel/blob/master/docs/limitations.md)も参照してください。

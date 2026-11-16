@@ -77,7 +77,7 @@ class RepositoryTest < Minitest::Test
     if ENV["SCRIPT_BIN_DIR"]
       [File.join(ENV.fetch("SCRIPT_BIN_DIR"), name), *arguments]
     else
-      [RUBY, (REPO / "scripts" / name).to_s, *arguments]
+      [RUBY, (REPO / "scripts" / "#{name}.rb").to_s, *arguments]
     end
   end
 

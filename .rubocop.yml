@@ -7,9 +7,6 @@ AllCops:
   Include:
     - '**/*.rb'
     - Rakefile
-    - scripts/setup-zsh
-    - scripts/update-zsh-plugins
-    - scripts/nvim-experiment
   Exclude:
     - submodules/**/*
     - build/**/*
