@@ -1,0 +1,26 @@
+# Personal preferences. Keep Omarchy's theme, Nerd Font and shell integration.
+background-opacity = 0.93
+window-padding-x = 12
+window-padding-y = 10
+scrollback-limit = 10000
+cursor-style = block
+cursor-style-blink = true
+confirm-close-surface = false
+keybind = ctrl+shift+w=close_surface
+keybind = ctrl+shift+r=new_split:right
+keybind = ctrl+shift+l=new_split:left
+keybind = ctrl+shift+t=new_tab
+keybind = ctrl+shift+left=goto_split:left
+keybind = ctrl+shift+right=goto_split:right
+
+custom-shader = {{ .chezmoi.workingTree }}/submodules/ghostty-shaders/shaders/raindrop_neo.glsl
+# custom-shader = {{ .chezmoi.workingTree }}/submodules/cursor-shaders/ghostty/cursor_warp.glsl
+# custom-shader = {{ .chezmoi.workingTree }}/submodules/cursor-shaders/ghostty/ripple_cursor.glsl
+custom-shader = {{ .chezmoi.workingTree }}/submodules/hondazn-dotfiles/config/ghostty/shaders/cursor_black.glsl
+custom-shader = {{ .chezmoi.workingTree }}/submodules/hondazn-dotfiles/config/ghostty/shaders/cursor_blaze.glsl
+custom-shader = {{ .chezmoi.workingTree }}/submodules/hondazn-dotfiles/config/ghostty/shaders/cursor_lightning.glsl
+custom-shader = {{ .chezmoi.workingTree }}/submodules/hondazn-dotfiles/config/ghostty/shaders/gravity.glsl
+custom-shader = {{ .chezmoi.workingTree }}/submodules/hondazn-dotfiles/config/ghostty/shaders/slash.glsl
+custom-shader = {{ .chezmoi.workingTree }}/submodules/hondazn-dotfiles/config/ghostty/shaders/sparks.glsl
+
+custom-shader-animation = always

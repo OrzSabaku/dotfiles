@@ -1,56 +1,50 @@
 # dotfiles
 
-<!--toc:start-->
-- [dotfiles](#dotfiles)
-  - [構成](#構成)
-  - [導入](#導入)
-  - [覚えておくこと](#覚えておくこと)
-  - [メモ](#メモ)
-<!--toc:end-->
-
-FedoraとOmarchyで使う個人設定。シェルやエディタの操作を揃えています。
-
-普段はOmarchy・Zsh・Ghostty・Neovim（LazyVim）の組み合わせです。
-
-## 構成
-
-- `common/` — OSに依存しない設定
-- `omarchy/`・`fedora/` — OS固有の初期化やデスクトップ連携
-- `experiments/` — 明示的に起動する実験用設定
-- `scripts/`・`tests/` — 導入・復元と、その検証
-
-設定はホームと同じ配置で保存し、ファイル単位でリンクします。
-導入対象は[Omarchyの一覧](omarchy/files.json)と[Fedoraのスクリプト](scripts/install_fedora.py)で選びます。
+FedoraとOmarchyで使う個人設定。chezmoiで管理します。
+普段はOmarchy・Zsh・Ghostty・Neovim（LazyVim）を使います。
 
 ## 導入
 
-`~/dotfiles`に置いたリポジトリで実行します。GitとPython 3が必要です。
+Git・chezmoiが必要です。管理元は既定の `~/.local/share/chezmoi` です。
 
 ```sh
-cd ~/dotfiles
-git submodule update --init --recursive
-python3 install.py --profile omarchy --dry-run
-python3 install.py --profile omarchy --apply
+chezmoi init OrzSabaku
+chezmoi diff
+chezmoi apply --dry-run --verbose
+chezmoi apply
 ```
 
-Omarchyでは既存設定をバックアップし、内容・権限が違うファイルや無関係なリンクがあれば停止します。
-Zshの初回導入は通常の端末で `scripts/setup-zsh` を実行します。
-Fedoraは[こちら](fedora/README.md)。
+`init`で環境（`omarchy` / `fedora`）と管理するアプリを選びます。
+選択は `~/.config/chezmoi/chezmoi.toml` に保存されます。選び直す場合は `chezmoi init --prompt`。
+パッケージ導入・ツール更新・ログインシェル変更は自動実行しません。
 
-## 覚えておくこと
-
-- リンク先の編集は実環境にも反映されます。過去を見るだけなら `git show` を使います。
-- Zshプラグインの変更後は `scripts/update-zsh-plugins` を実行し、新しい端末を開きます。
-- Gitの名前・メール・署名鍵は `~/.config/git/config.private` へ。`git config --global` は共有原本を書き換えます。
-- Omarchyのバックアップは `~/.local/state/dotfiles/backups/`。復元も既定はプレビューです。
+## 普段の操作
 
 ```sh
-python3 install.py --restore <バックアップディレクトリ>
-python3 install.py --restore <バックアップディレクトリ> --apply
+chezmoi edit ~/.config/starship.toml
+chezmoi diff
+chezmoi apply
 ```
 
-## メモ
+- 原本の変更は `apply` で反映します。管理元で作業するときは `chezmoi cd`。
+- 実ファイル側の変更は差分を確認してから取り込みます。通常ファイルは `chezmoi re-add <パス>`、
+  OS別テンプレートは `home/.chezmoitemplates/<環境>/` の該当ファイルを編集します。
+- Gitの名前・メール・署名鍵は非管理の `~/.config/git/config.private` へ。
+  [記入例](examples/git/config.private.example)を参照し、権限は `600` にします。
+- Gitで原本を戻した場合も、反映前に `chezmoi diff` を確認します。リモート送信は手動です。
 
-[Omarchy](omarchy/README.md) · [Fedora](fedora/README.md) · [Neovimの実験](experiments/README.md)
+## 管理元で使うスクリプト
 
-詳しい手順は[GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。
+`chezmoi cd` で移動してから実行します。
+
+- `scripts/setup-zsh` — OmarchyでのZsh初回導入。通常の端末で実行します。
+- `scripts/update-zsh-plugins` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。
+- `scripts/nvim-experiment` — [実験用Neovim](experiments/README.md)を起動します。
+
+## 構成
+
+`home/` がchezmoiの管理対象です。共通設定は `home/dot_config/`、OS別の内容は
+`home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
+`experiments/` は通常の導入には含めません。
+
+補足は [Omarchy](docs/omarchy.md) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。

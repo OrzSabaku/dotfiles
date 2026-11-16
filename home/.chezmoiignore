@@ -1,0 +1,33 @@
+# Patterns use destination paths. Unmanaged app data stays untouched.
+{{ if not (has .profile (list "omarchy" "fedora")) }}
+{{ fail "profile must be omarchy or fedora; run chezmoi init" }}
+{{ end }}
+{{ if ne .profile "omarchy" }}
+.bash_profile
+.zshenv
+.config/alacritty
+.config/btop
+.config/fontconfig
+.config/foot
+.config/hypr
+.config/kitty
+.config/lazygit
+.config/omarchy
+.config/tmux
+.config/nvim/lua/omarchy
+{{ end }}
+{{ if not .apps.zsh }}
+.zshenv
+.zshrc
+.config/dotfiles/zsh.zsh
+.config/sheldon
+{{ end }}
+{{ if not .apps.nvim }}
+.config/nvim
+{{ end }}
+{{ if not .apps.ghostty }}
+.config/ghostty
+{{ end }}
+{{ if not .apps.fcitx5 }}
+.config/fcitx5
+{{ end }}

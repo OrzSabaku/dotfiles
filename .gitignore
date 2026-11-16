@@ -1,25 +1,21 @@
-# Configuration is added explicitly to common/, omarchy/ or fedora/.
+# chezmoi source state lives in home/. Runtime files are never imported wholesale.
 # Marksman uses the first matching rule; Git uses the last.
 # Repeat document exceptions before /* so Marksman can index linked Markdown.
 !/*.md
-!/common/
-!/omarchy/
-!/fedora/
+!/home/
+!/examples/
+!/docs/
 !/experiments/
 /*
 !/.gitignore
 !/.gitmodules
-!/Gemfile
-!/Gemfile.lock
-!/.rubocop.yml
-!/.solargraph.yml
 !/submodules/
 !/README.md
 !/AGENTS.md
-!/install.py
-!/common/
-!/omarchy/
-!/fedora/
+!/.chezmoiroot
+!/home/
+!/examples/
+!/docs/
 !/experiments/
 !/scripts/
 !/tests/
@@ -33,15 +29,19 @@
 **/id_ed25519
 **/id_rsa
 
-# Fcitx5: explicitly select preferences; keep runtime data and Mozc databases local.
-**/.config/fcitx5/**
-!**/.config/fcitx5/config
-!**/.config/fcitx5/profile
-!**/.config/fcitx5/conf/
-!**/.config/fcitx5/conf/classicui.conf
-!**/.config/fcitx5/conf/clipboard.conf
-!**/.config/fcitx5/conf/pinyin.conf
-!**/.config/fcitx5/conf/quickphrase.conf
-!**/.config/fcitx5/conf/xcb.conf
-**/.config/mozc/
-**/.local/share/fcitx5/
+# chezmoi encodes dotfiles and permission attributes in source names.
+**/private_config.private
+**/private_allowed_signers
+**/dot_git-credentials
+**/private_dot_git-credentials
+**/dot_ssh/**
+home/dot_config/mozc/
+home/dot_config/fcitx5/**
+!home/dot_config/fcitx5/private_config
+!home/dot_config/fcitx5/private_profile
+!home/dot_config/fcitx5/conf/
+!home/dot_config/fcitx5/conf/classicui.conf
+!home/dot_config/fcitx5/conf/clipboard.conf
+!home/dot_config/fcitx5/conf/pinyin.conf
+!home/dot_config/fcitx5/conf/quickphrase.conf
+!home/dot_config/fcitx5/conf/private_xcb.conf
