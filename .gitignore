@@ -4,7 +4,6 @@
 !/*.md
 !/home/
 !/examples/
-!/docs/
 !/experiments/
 /*
 !/.gitignore
@@ -20,7 +19,6 @@
 !/.chezmoiroot
 !/home/
 !/examples/
-!/docs/
 !/experiments/
 !/scripts/
 !/tests/
