@@ -1,0 +1,15 @@
+inherit_gem:
+  rubocop-shopify: rubocop.yml
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 4.0
+  Include:
+    - '**/*.rb'
+    - Rakefile
+    - scripts/setup-zsh
+    - scripts/update-zsh-plugins
+    - scripts/nvim-experiment
+  Exclude:
+    - submodules/**/*
+    - build/**/*

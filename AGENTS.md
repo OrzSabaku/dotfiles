@@ -20,7 +20,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - `home/.chezmoi.toml.tmpl`: 初期化時に環境と対象アプリを選び、ローカル設定を生成します。
 - `experiments/`: 通常の導入対象に含めない実験用設定。
 - `scripts/`: Ruby標準ライブラリで書くセットアップ・プラグイン更新・実験用ランチャー。Zshの状態検証はZshに残します。
-- `tests/`: chezmoiによる仮ホームへの配置と、シェル・Git設定の検証。
+- `tests/`: Minitestによる仮ホームへの配置と、スクリプト・シェル・Git設定の検証。
 - `examples/`・`docs/`: 記入例と個人用の補足メモ。
 
 `dot_`は先頭の`.`、`private_`は非公開権限、`executable_`は実行権限、`empty_`は空ファイルの配置を表します。
@@ -70,13 +70,13 @@ chezmoi diff
 chezmoi apply --dry-run --verbose
 chezmoi apply
 chezmoi verify
-python3 -m unittest discover -s tests -v
+bundle exec rake test
 git diff --check
 ```
 
 - chezmoi構成変更では上記テストを実行します。テストは仮ホームを使い、実環境に導入しません。
 - テンプレートはOmarchy・Fedoraの両方を検証し、権限と管理外ファイルの保持も確認します。
-- Rubyスクリプトは`ruby -c <ファイル>`と仮環境のテストで検証します。パッケージ導入や`chsh`の実行はモックに置き換えます。
+- Rubyスクリプトは`ruby -c <ファイル>`、`bundle exec rake test`、`bundle exec rubocop --cache false`で検証します。パッケージ導入や`chsh`の実行はモックに置き換えます。
 - シェル変更は構文検証と新しいシェルでの起動確認。Zsh未導入なら未検証と明示します。
 - Ghosttyは`ghostty +validate-config`で確認します。
 - Hyprland Lua変更後は`hyprctl reload`、`hyprctl configerrors`で確認します。
@@ -84,6 +84,14 @@ git diff --check
 - Neovim変更は共通設定単独とOmarchy追加設定ありの両方を確認します。
   起動確認だけのために、プラグイン取得や外部ツール導入を発生させないでください。
 - chezmoiのapplyからパッケージ導入、mise更新、ログインシェル変更を自動実行しないでください。
+
+## RubyとAOT
+
+Gemfile・Gemfile.lockで開発用gemを管理し、テストはMinitestで書きます。
+スクリプトの実行には追加gemを要求しないでください。
+SpinelのAOTは`bundle exec rake test:aot`で通常実行と同じフィクスチャを検証します。
+生成物は`build/`に置き、Git管理・自動インストールを行いません。詳細は`docs/ruby.md`を参照してください。
+Spinelでのコンパイル成功だけでCRubyとの互換性を判断しないでください。
 
 ## Gitの運用
 

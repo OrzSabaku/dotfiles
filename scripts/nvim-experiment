@@ -3,12 +3,10 @@
 
 # 設定・データ・状態・キャッシュを分ける。ホストのファイルアクセスは隔離しない。
 repo = File.expand_path("..", __dir__)
-environment = {
-  "XDG_CONFIG_HOME" => File.join(repo, "experiments"),
-  "NVIM_APPNAME" => "nvim-experiment"
-}
+ENV["XDG_CONFIG_HOME"] = File.join(repo, "experiments")
+ENV["NVIM_APPNAME"] = "nvim-experiment"
 begin
-  exec(environment, "nvim", *ARGV)
+  exec("nvim", *ARGV)
 rescue SystemCallError => error
   warn error.message
   exit(error.is_a?(Errno::ENOENT) ? 127 : 126)
