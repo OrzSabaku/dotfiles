@@ -35,11 +35,11 @@ chezmoi apply
 
 ## 管理元で使うスクリプト
 
-`chezmoi cd` で移動してから実行します。
+Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから実行します。
 
-- `scripts/setup-zsh` — OmarchyでのZsh初回導入。通常の端末で実行します。
-- `scripts/update-zsh-plugins` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。
-- `scripts/nvim-experiment` — [実験用Neovim](experiments/README.md)を起動します。
+- `scripts/setup-zsh.rb` — OmarchyでのZsh初回導入。通常の端末で実行します。
+- `scripts/update-zsh-plugins.rb` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。
+- `scripts/nvim-experiment.rb` — [実験用Neovim](experiments/README.md)を起動します。
 
 ## 構成
 
@@ -47,4 +47,6 @@ chezmoi apply
 `home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
 `experiments/` は通常の導入には含めません。
 
-補足は [Omarchy](docs/omarchy.md) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。
+開発・テストとLinux x86_64用バイナリの配布手順は [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
+
+補足は [Omarchy](https://github.com/OrzSabaku/dotfiles/wiki/Omarchy) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。

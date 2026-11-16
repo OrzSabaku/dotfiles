@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-# Separate config/data/state/cache. This does not sandbox host file access.
-set -euo pipefail
-repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-export XDG_CONFIG_HOME="$repo/experiments"
-export NVIM_APPNAME=nvim-experiment
-exec nvim "$@"

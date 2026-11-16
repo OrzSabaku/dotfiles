@@ -4,8 +4,8 @@
 普段の `nvim` は `home/dot_config/nvim/` のLazyVimです。
 
 ```sh
-~/.local/share/chezmoi/scripts/nvim-experiment
-~/.local/share/chezmoi/scripts/nvim-experiment path/to/file
+~/.local/share/chezmoi/scripts/nvim-experiment.rb
+~/.local/share/chezmoi/scripts/nvim-experiment.rb path/to/file
 ```
 
 Neovim 0.12系を想定しています。初回起動時は `vim.pack.add()` がプラグインを取得します。

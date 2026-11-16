@@ -1,0 +1,147 @@
+name: Native scripts (Linux x86_64)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/native-scripts.yml'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'Gemfile*'
+      - 'Rakefile'
+      - '.rubocop.yml'
+  push:
+    tags:
+      - 'scripts-v*'
+
+concurrency:
+  group: native-scripts-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SPINEL_REVISION: c1d162f68eb5d38fbc869f63c5615897b82b6243
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: dotfiles
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: dotfiles
+          persist-credentials: false
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '4.0'
+          bundler-cache: true
+          working-directory: dotfiles
+
+      - uses: jdx/mise-action@v3
+        with:
+          working_directory: dotfiles
+          tool_versions: |
+            chezmoi 2.74.1
+            sheldon 0.8.5
+
+      - name: Install test dependencies
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Check Ruby sources
+        run: |
+          bundle exec rake test
+          bundle exec rubocop --cache false
+
+      - name: Identify the C compiler
+        id: compiler
+        run: echo "version=$(cc -dumpfullversion)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the Spinel toolchain
+        id: spinel-cache
+        uses: actions/cache/restore@v4
+        with:
+          key: spinel-v1-ubuntu-24.04-${{ runner.arch }}-gcc-${{ steps.compiler.outputs.version }}-${{ env.SPINEL_REVISION }}
+          path: |
+            spinel/bin/spinel
+            spinel/lib
+            spinel/builtins
+            spinel/packages
+
+      - name: Check out the tested Spinel revision
+        if: steps.spinel-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v6
+        with:
+          repository: matz/spinel
+          ref: ${{ env.SPINEL_REVISION }}
+          path: spinel
+          persist-credentials: false
+
+      - name: Build only the required Spinel components
+        if: steps.spinel-cache.outputs.cache-hit != 'true'
+        working-directory: spinel
+        run: |
+          make deps lib/spinel_rt_responds_generated.h
+          make -j"$(nproc)" bin/spinel lib/libspinel_rt.a packages/tmpdir/sp_tmpdir.o
+
+      - name: Save the Spinel toolchain before application checks
+        if: steps.spinel-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          key: ${{ steps.spinel-cache.outputs.cache-primary-key }}
+          path: |
+            spinel/bin/spinel
+            spinel/lib
+            spinel/builtins
+            spinel/packages
+
+      - name: Check the compiler version
+        run: ../spinel/bin/spinel --version
+
+      - name: Compile the three commands
+        run: |
+          mkdir -p dist/bin
+          for name in setup-zsh update-zsh-plugins nvim-experiment; do
+            ../spinel/bin/spinel "$PWD/scripts/$name.rb" --strict-require -o "dist/bin/$name"
+          done
+
+      - name: Check native commands
+        run: bundle exec ruby -Itests tests/native_test.rb
+
+      - name: Package the Linux x86_64 binaries
+        run: |
+          tar -C dist/bin -czf dist/dotfiles-scripts-linux-x86_64.tar.gz setup-zsh update-zsh-plugins nvim-experiment
+          cd dist
+          sha256sum dotfiles-scripts-linux-x86_64.tar.gz > dotfiles-scripts-linux-x86_64.tar.gz.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dotfiles-scripts-linux-x86_64
+          path: |
+            dotfiles/dist/*.tar.gz
+            dotfiles/dist/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/scripts-v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dotfiles-scripts-linux-x86_64
+          path: dist
+      - name: Publish tagged binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.tar.gz dist/*.sha256 \
+            --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes

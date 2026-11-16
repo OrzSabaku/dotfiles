@@ -7,6 +7,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 単なる移行の経緯を理由に設定を分けたり、同じ値を複製したりしないでください。
 ユーザーは復旧の手間と既存環境との競合を懸念しています。動作を保ち、戻せる変更を優先します。
 説明や作業報告は日本語を基本とします。
+読みやすさを常に優先し、目的が分かる名前・短いメソッド・追いやすい実行順を意識してください。
 
 ## 構成
 
@@ -18,9 +19,9 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - `home/.chezmoiignore`: 環境・アプリによる対象選択。共通設定をOS別に複製しないでください。
 - `home/.chezmoi.toml.tmpl`: 初期化時に環境と対象アプリを選び、ローカル設定を生成します。
 - `experiments/`: 通常の導入対象に含めない実験用設定。
-- `scripts/`: 明示的なセットアップ、プラグイン更新・検証、実験用ランチャー。
-- `tests/`: chezmoiによる仮ホームへの配置と、シェル・Git設定の検証。
-- `examples/`・`docs/`: 記入例と個人用の補足メモ。
+- `scripts/`: Ruby標準ライブラリで書くセットアップ・プラグイン更新・実験用ランチャー。Zshの状態検証はZshに残します。
+- `tests/`: Minitestによる仮ホームへの配置と、スクリプト・シェル・Git設定の検証。
+- `examples/`: 設定の記入例。詳しい手順や補足メモはGitHub Wikiで管理します。
 
 `dot_`は先頭の`.`、`private_`は非公開権限、`executable_`は実行権限、`empty_`は空ファイルの配置を表します。
 `exact_`や`.chezmoiremove`で管理外ファイルを消す構成は使わないでください。
@@ -32,7 +33,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
   OS別テンプレートの設定は対応する`.chezmoitemplates/<環境>/`へ反映します。
 - 環境・対象アプリの選択は非管理の`~/.config/chezmoi/chezmoi.toml`に保存します。
   対象から外す操作は既存ファイルを削除しません。OSを切り替える場合も残存ファイルを確認してください。
-- OmarchyはZshを主シェルにする構成。`scripts/setup-zsh`で導入・検証してからログインシェルを変更します。
+- OmarchyはZshを主シェルにする構成。`scripts/setup-zsh.rb`で導入・検証してからログインシェルを変更します。
   Bashの設定は復旧用に残します。実際の導入状態は`command -v zsh`と`getent passwd`で確認してください。
 - 共通の`env.sh`はBash/Zsh両方から読めるPOSIX構文。Bash固有処理は`bash.sh`、Zsh固有処理は`zsh.zsh`へ。
 - ZshとSheldonは共通管理で、両OSの入口から使用します。Omarchyでは`.zshenv`が標準のPATH設定、
@@ -40,7 +41,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
 - miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
-- 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment`で明示的に起動します。
+- 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment.rb`で明示的に起動します。
   `NVIM_APPNAME`で設定・データ・状態・キャッシュを分けますが、ファイルアクセスの隔離ではありません。
   Docker環境はまだ作っていません。旧`nvim-personal`のリンク・関数は廃止済みです。
 - 旧Vim設定と歓迎画面用Zprofileは`experiments/`に記録として残していますが、導入しません。
@@ -69,12 +70,13 @@ chezmoi diff
 chezmoi apply --dry-run --verbose
 chezmoi apply
 chezmoi verify
-python3 -m unittest discover -s tests -v
+bundle exec rake test
 git diff --check
 ```
 
 - chezmoi構成変更では上記テストを実行します。テストは仮ホームを使い、実環境に導入しません。
 - テンプレートはOmarchy・Fedoraの両方を検証し、権限と管理外ファイルの保持も確認します。
+- Rubyスクリプトは`ruby -c <ファイル>`、`bundle exec rake test`、`bundle exec rubocop --cache false`で検証します。パッケージ導入や`chsh`の実行はモックに置き換えます。
 - シェル変更は構文検証と新しいシェルでの起動確認。Zsh未導入なら未検証と明示します。
 - Ghosttyは`ghostty +validate-config`で確認します。
 - Hyprland Lua変更後は`hyprctl reload`、`hyprctl configerrors`で確認します。
@@ -82,6 +84,16 @@ git diff --check
 - Neovim変更は共通設定単独とOmarchy追加設定ありの両方を確認します。
   起動確認だけのために、プラグイン取得や外部ツール導入を発生させないでください。
 - chezmoiのapplyからパッケージ導入、mise更新、ログインシェル変更を自動実行しないでください。
+
+## Rubyの開発
+
+Gemfile・Gemfile.lockで開発用gemを管理し、テストはMinitestで書きます。
+スクリプトの実行には追加gemを要求しないでください。
+既存ツールとRuby標準ライブラリを優先し、自作の処理は必要最小限にしてください。
+Linux x86_64用バイナリは`.github/workflows/native-scripts.yml`でビルドします。
+ローカル用のビルドタスクや実行モード切り替えは追加しないでください。
+ネイティブ版の検証はCIのビルド後に`bundle exec ruby -Itests tests/native_test.rb`を明示的に実行します。
+開発手順は[WikiのRubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 
 ## Gitの運用
 
@@ -94,19 +106,20 @@ Zshプラグインは`home/dot_config/sheldon/plugins.toml`で管理します。
 Git・Docker・ComposeのエイリアスはOh My Zshの選択したファイルを使用し、自前の旧Git短縮形は維持しません。
 プラグインのエイリアスは上流の挙動を維持し、`gwip`などを独自に除去・改変しないでください。
 通常のコミットの自動署名は維持します。エージェント自身のコミットで署名を迂回してはいけません。
-変更後は`scripts/update-zsh-plugins`で取得・検証してから生成済みキャッシュを切り替えます。
+変更後は`scripts/update-zsh-plugins.rb`で取得・検証してから生成済みキャッシュを切り替えます。
 Zsh起動時は最後に検証したキャッシュを使用するため、TOMLの編集だけでは既存環境へ即反映されません。
 
 ## 文書の運用
 
 READMEは個人用の短いメモです。構成・よく使うコマンド・忘れると困る注意に絞ってください。
-詳しい手順はGitHub Wiki、値や処理を選んだ理由は設定コメント、通常の変更経緯はGit履歴に残します。
+詳しい手順や補足メモはGitHub Wikiを正本とし、今後もWikiへまとめます。`docs/`などに同じ文書を複製しないでください。
+値や処理を選んだ理由は設定コメント、通常の変更経緯はGit履歴に残します。
 設定変更で操作が変わったら該当するメモも直し、重複説明や完了した作業の報告を増やさないでください。
 Wikiへの送信・編集も、ほかのリモート送信と同様に明示的な依頼がある場合だけ行います。
 
 ## Zshの初回導入
 
-通常のユーザー端末で`~/.local/share/chezmoi/scripts/setup-zsh`を実行します。
+通常のユーザー端末で`~/.local/share/chezmoi/scripts/setup-zsh.rb`を実行します。
 パッケージ導入、chezmoi初期化、生成内容の構文検証、適用、プラグイン取得、起動テストの後に`chsh`します。
 途中で失敗した場合にログインシェルを変更しない順序を維持してください。
 エージェント環境ではsudoが制限される場合があります。導入済みかは現在の実環境で確認してください。
