@@ -1,7 +1,15 @@
-#!/usr/bin/env bash
-# Separate config/data/state/cache. This does not sandbox host file access.
-set -euo pipefail
-repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-export XDG_CONFIG_HOME="$repo/experiments"
-export NVIM_APPNAME=nvim-experiment
-exec nvim "$@"
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# 設定・データ・状態・キャッシュを分ける。ホストのファイルアクセスは隔離しない。
+repo = File.expand_path("..", __dir__)
+environment = {
+  "XDG_CONFIG_HOME" => File.join(repo, "experiments"),
+  "NVIM_APPNAME" => "nvim-experiment"
+}
+begin
+  exec(environment, "nvim", *ARGV)
+rescue SystemCallError => error
+  warn error.message
+  exit(error.is_a?(Errno::ENOENT) ? 127 : 126)
+end

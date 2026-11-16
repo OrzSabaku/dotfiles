@@ -35,7 +35,7 @@ chezmoi apply
 
 ## 管理元で使うスクリプト
 
-`chezmoi cd` で移動してから実行します。
+Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから実行します。
 
 - `scripts/setup-zsh` — OmarchyでのZsh初回導入。通常の端末で実行します。
 - `scripts/update-zsh-plugins` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。

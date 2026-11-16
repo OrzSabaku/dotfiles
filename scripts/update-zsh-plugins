@@ -1,34 +1,76 @@
-#!/usr/bin/env bash
-# Fetch/render/test before replacing the plugin source used by interactive shells.
-set -euo pipefail
-repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-work=$(mktemp -d)
-# Each generation owns its repositories: Sheldon may prune unused sources.
-# Never relock the data directory referenced by a working cached source.
-generations="${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/sheldon"
-mkdir -p "$generations"
-generation=$(mktemp -d "$generations/generation.XXXXXX")
-activated=false
-cleanup() {
-  rm -rf -- "$work"
-  rm -f -- "${next:-}"
-  if [[ "$activated" != true ]]; then rm -rf -- "$generation"; fi
-}
-trap cleanup EXIT
-sheldon --non-interactive --data-dir "$generation" source --relock > "$work/sheldon.zsh"
-zsh -n "$work/sheldon.zsh"
-ZDOTDIR="$work" zsh -f -i "$repo/scripts/check-zsh-plugins.zsh" "$work/sheldon.zsh" "$work"
-cache="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles"
-mkdir -p "$cache"
-if [[ -f "$cache/sheldon.zsh" ]]; then
-  backup="$HOME/.local/state/dotfiles/backups/zsh-plugins-$(date +%Y%m%d-%H%M%S)"
-  mkdir -m 700 -p "$backup"
-  cp "$cache/sheldon.zsh" "$backup/sheldon.zsh"
-fi
-# Rename on the same filesystem so terminals never read half a generated file.
-next=$(mktemp "$cache/.sheldon.XXXXXX")
-cat "$work/sheldon.zsh" > "$next"
-chmod 600 "$next"
-mv -f -- "$next" "$cache/sheldon.zsh"
-activated=true
-echo 'Validated Zsh plugins activated. Open a new terminal.'
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+require "tempfile"
+require "tmpdir"
+require_relative "lib/commands"
+
+class ZshPluginUpdate
+  REPO = File.expand_path("..", __dir__)
+
+  def run
+    generations = File.join(xdg_directory("XDG_DATA_HOME", ".local/share"), "dotfiles/sheldon")
+    FileUtils.mkdir_p(generations)
+    generation = Dir.mktmpdir("generation.", generations)
+    activated = false
+
+    begin
+      Dir.mktmpdir("zsh-plugins.") do |work|
+        source = File.join(work, "sheldon.zsh")
+        fetch_plugins(generation, source)
+        validate_plugins(work, source)
+        activate_plugins(source)
+        activated = true
+      end
+    ensure
+      # Sheldonは未使用の取得先を削除するため、現在のキャッシュとは別の世代で検証する。
+      # 成功した世代はキャッシュから参照されるので残し、失敗した世代だけ削除する。
+      FileUtils.remove_entry(generation) unless activated
+    end
+    puts "Validated Zsh plugins activated. Open a new terminal."
+  end
+
+  private
+
+  def xdg_directory(variable, fallback)
+    value = ENV[variable]
+    value.nil? || value.empty? ? File.join(Dir.home, fallback) : value
+  end
+
+  def fetch_plugins(generation, source)
+    File.open(source, "w") do |output|
+      ScriptCommands.run!("sheldon", "--non-interactive", "--data-dir", generation,
+        "source", "--relock", out: output)
+    end
+  end
+
+  def validate_plugins(work, source)
+    ScriptCommands.run!("zsh", "-n", source)
+    checker = File.join(REPO, "scripts/check-zsh-plugins.zsh")
+    ScriptCommands.run!({ "ZDOTDIR" => work }, "zsh", "-f", "-i", checker, source, work)
+  end
+
+  def activate_plugins(source)
+    cache = File.join(xdg_directory("XDG_CACHE_HOME", ".cache"), "dotfiles")
+    FileUtils.mkdir_p(cache)
+    current = File.join(cache, "sheldon.zsh")
+    backup_cache(current) if File.file?(current)
+
+    # 同じディレクトリでrenameし、新しい端末が書き込み途中のキャッシュを読まないようにする。
+    Tempfile.create([".sheldon.", ".zsh"], cache) do |pending|
+      FileUtils.copy_file(source, pending.path)
+      File.chmod(0o600, pending.path)
+      File.rename(pending.path, current)
+    end
+  end
+
+  def backup_cache(current)
+    backup = File.join(Dir.home, ".local/state/dotfiles/backups",
+      "zsh-plugins-#{Time.now.strftime('%Y%m%d-%H%M%S')}")
+    FileUtils.mkdir_p(backup, mode: 0o700)
+    FileUtils.cp(current, File.join(backup, "sheldon.zsh"))
+  end
+end
+
+ScriptCommands.main { ZshPluginUpdate.new.run } if $PROGRAM_NAME == __FILE__

@@ -1,59 +1,104 @@
-#!/usr/bin/env bash
-# Run in a regular user terminal; sudo/chsh may prompt for the user's password.
-set -euo pipefail
-repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-if (( EUID == 0 )); then
-  echo 'Run this script as your normal desktop user, without sudo.' >&2
-  exit 1
-fi
-if ! grep -qx 'ID=omarchy' /etc/os-release; then
-  echo 'This setup is for Omarchy.' >&2
-  exit 1
-fi
-old_shell=$(getent passwd "$(id -un)" | cut -d: -f7)
-if [[ -z "$old_shell" ]]; then
-  echo 'Could not determine the current login shell.' >&2
-  exit 1
-fi
+#!/usr/bin/env ruby
+# frozen_string_literal: true
 
-# Complete privileged work first. A failure here leaves the configuration alone.
-omarchy pkg add zsh sheldon
-for tool in zsh sheldon starship mise fzf zoxide eza bat chezmoi; do
-  command -v "$tool" >/dev/null || { echo "Missing dependency: $tool" >&2; exit 1; }
-done
-zsh_bin=$(command -v zsh)
-if ! grep -Fxq "$zsh_bin" /etc/shells; then
-  echo "The installed shell is not registered in /etc/shells: $zsh_bin" >&2
-  exit 1
-fi
+require "fileutils"
+require "shellwords"
+require_relative "lib/commands"
 
-# Render and validate the selected configuration before applying it.
-chezmoi --source "$repo" init
-[[ $(chezmoi --source "$repo" execute-template '{{ .profile }}') == omarchy ]] || {
-  echo 'Select the omarchy environment in chezmoi init.' >&2; exit 1;
-}
-[[ $(chezmoi --source "$repo" execute-template '{{ .apps.zsh }}') == true ]] || {
-  echo 'Enable apps.zsh in the chezmoi config first.' >&2; exit 1;
-}
-for config in "$HOME/.zshenv" "$HOME/.zshrc" "$HOME/.config/dotfiles/zsh.zsh"; do
-  chezmoi --source "$repo" cat "$config" | zsh -n
-done
-chezmoi --source "$repo" diff
-chezmoi --source "$repo" apply
-# Fetch plugins explicitly, so the first interactive startup is already ready.
-"$repo/scripts/update-zsh-plugins"
-zsh -lic '[[ -o interactive && $EDITOR == nvim && -n $OMARCHY_PATH ]] || exit 1
-  whence -p mise starship fzf zoxide sheldon eza bat >/dev/null || exit 1
-  print -r -- "Zsh startup OK"'
+# 通常のユーザー端末で実行する。sudo/chshの入力は端末に引き継ぐ。
+class ZshSetup
+  REPO = File.expand_path("..", __dir__)
+  DEPENDENCIES = %w[zsh sheldon starship mise fzf zoxide eza bat chezmoi].freeze
 
-# Preserve an audit trail before changing the account's shell.
-state_dir="$HOME/.local/state/dotfiles"
-mkdir -p "$state_dir"
-(umask 077; printf '%s\n' "$old_shell" > "$state_dir/shell-before-zsh-$(date +%Y%m%d-%H%M%S).txt")
-if [[ "$old_shell" != "$zsh_bin" ]]; then
-  chsh -s "$zsh_bin"
-fi
-current_shell=$(getent passwd "$(id -un)" | cut -d: -f7)
-[[ "$current_shell" == "$zsh_bin" ]] || { echo 'Login shell change was not applied.' >&2; exit 1; }
-printf 'Default shell: %s\nOpen a new terminal; log out and back in if necessary.\n' "$current_shell"
-printf 'To return to the previous login shell: chsh -s %q\n' "$old_shell"
+  def run
+    check_environment
+    previous_shell = login_shell
+
+    # 導入・適用・起動確認がすべて成功するまでログインシェルを変更しない。
+    ScriptCommands.run!("omarchy", "pkg", "add", "zsh", "sheldon")
+    zsh = check_dependencies
+    apply_configuration
+    ScriptCommands.run!(File.join(REPO, "scripts/update-zsh-plugins"))
+    check_startup
+
+    save_previous_shell(previous_shell)
+    change_login_shell(zsh, previous_shell)
+    puts "Default shell: #{zsh}"
+    puts "Open a new terminal; log out and back in if necessary."
+    puts "To return to the previous login shell: chsh -s #{previous_shell.shellescape}"
+  end
+
+  private
+
+  def check_environment
+    raise "Run this script as your normal desktop user, without sudo." if Process.euid.zero?
+    raise "This setup is for Omarchy." unless File.readlines("/etc/os-release", chomp: true).include?("ID=omarchy")
+  end
+
+  def login_shell
+    username = ScriptCommands.capture!("id", "-un").strip
+    entry = ScriptCommands.capture!("getent", "passwd", username).strip
+    shell = entry.split(":", -1)[6]
+    raise "Could not determine the current login shell." if shell.nil? || shell.empty?
+
+    shell
+  end
+
+  def executable(name)
+    ENV.fetch("PATH").split(File::PATH_SEPARATOR).map { |directory| File.join(directory, name) }
+      .find { |path| File.file?(path) && File.executable?(path) }
+  end
+
+  def check_dependencies
+    DEPENDENCIES.each do |name|
+      raise "Missing dependency: #{name}" unless executable(name)
+    end
+    zsh = executable("zsh")
+    unless File.readlines("/etc/shells", chomp: true).include?(zsh)
+      raise "The installed shell is not registered in /etc/shells: #{zsh}"
+    end
+
+    zsh
+  end
+
+  def chezmoi(*arguments)
+    ["chezmoi", "--source", REPO, *arguments]
+  end
+
+  def apply_configuration
+    ScriptCommands.run!(*chezmoi("init"))
+    profile = ScriptCommands.capture!(*chezmoi("execute-template", "{{ .profile }}")).strip
+    raise "Select the omarchy environment in chezmoi init." unless profile == "omarchy"
+    zsh_enabled = ScriptCommands.capture!(*chezmoi("execute-template", "{{ .apps.zsh }}")).strip
+    raise "Enable apps.zsh in the chezmoi config first." unless zsh_enabled == "true"
+
+    %w[.zshenv .zshrc .config/dotfiles/zsh.zsh].each do |name|
+      content = ScriptCommands.capture!(*chezmoi("cat", File.join(Dir.home, name)))
+      ScriptCommands.capture!("zsh", "-n", input: content)
+    end
+    ScriptCommands.run!(*chezmoi("diff"))
+    ScriptCommands.run!(*chezmoi("apply"))
+  end
+
+  def check_startup
+    ScriptCommands.run!("zsh", "-lic", <<~'ZSH')
+      [[ -o interactive && $EDITOR == nvim && -n $OMARCHY_PATH ]] || exit 1
+      whence -p mise starship fzf zoxide sheldon eza bat >/dev/null || exit 1
+      print -r -- "Zsh startup OK"
+    ZSH
+  end
+
+  def save_previous_shell(shell)
+    directory = File.join(Dir.home, ".local/state/dotfiles")
+    FileUtils.mkdir_p(directory)
+    path = File.join(directory, "shell-before-zsh-#{Time.now.strftime('%Y%m%d-%H%M%S')}.txt")
+    File.write(path, "#{shell}\n", perm: 0o600)
+  end
+
+  def change_login_shell(zsh, previous_shell)
+    ScriptCommands.run!("chsh", "-s", zsh) unless previous_shell == zsh
+    raise "Login shell change was not applied." unless login_shell == zsh
+  end
+end
+
+ScriptCommands.main { ZshSetup.new.run } if $PROGRAM_NAME == __FILE__

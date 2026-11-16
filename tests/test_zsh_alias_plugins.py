@@ -1,3 +1,4 @@
+from ruby_runtime import RUBY
 import json
 import os
 from pathlib import Path
@@ -10,7 +11,7 @@ import unittest
 REPO = Path(__file__).resolve().parents[1]
 
 
-@unittest.skipUnless(shutil.which('zsh') and shutil.which('sheldon'), 'Zsh and Sheldon are required')
+@unittest.skipUnless(RUBY and shutil.which('zsh') and shutil.which('sheldon'), 'Ruby, Zsh and Sheldon are required')
 class ZshAliasPluginTests(unittest.TestCase):
     def test_real_sheldon_template_preserves_upstream_aliases(self):
         config = tomllib.loads((REPO / 'home/dot_config/sheldon/plugins.toml').read_text())
@@ -102,7 +103,7 @@ fpath+=(/fixture/zsh-completions/src)
             cache.write_text('# working configuration\n')
             env = os.environ.copy()
             env.update(HOME=str(root), XDG_CACHE_HOME=str(root / 'cache'), XDG_DATA_HOME=str(root / 'data'), PATH=str(tools) + ':' + env['PATH'])
-            result = subprocess.run(['bash', str(REPO / 'scripts/update-zsh-plugins')], env=env, capture_output=True, text=True)
+            result = subprocess.run([RUBY, str(REPO / 'scripts/update-zsh-plugins')], env=env, capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(cache.read_text(), '# working configuration\n')
 
