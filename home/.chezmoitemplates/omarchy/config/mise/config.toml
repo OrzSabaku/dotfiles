@@ -7,6 +7,8 @@ node = "latest"
 ruby = "latest"
 "pipx:online-judge-tools-ng" = "latest"
 chezmoi = "latest"
+actionlint = "latest"
+bitwarden = "latest"
 
 [settings.upgrade]
 auto_prune = false
