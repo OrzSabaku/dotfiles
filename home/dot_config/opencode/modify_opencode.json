@@ -1,0 +1,15 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* 設定項目だけを更新し、認証情報・信頼設定・生成された連携情報は保持する。 */ -}}
+{{- $original := (.chezmoi.stdin | default "{}" | fromJson) -}}
+{{- $config := deepCopy $original -}}
+{{- $config = setValueAtPath (list "$schema") "https://opencode.ai/config.json" $config -}}
+{{- $config = setValueAtPath (list "theme") "system" $config -}}
+{{- $config = setValueAtPath (list "autoupdate") false $config -}}
+{{- $config = setValueAtPath (list "mcp" "atuin" "type") "local" $config -}}
+{{- $config = setValueAtPath (list "mcp" "atuin" "command") (list (joinPath .chezmoi.homeDir ".atuin/bin/atuin") "mcp") $config -}}
+{{- $config = setValueAtPath (list "mcp" "atuin" "enabled") true $config -}}
+{{- if eq ($config | toJson) ($original | toJson) -}}
+{{ .chezmoi.stdin }}
+{{- else -}}
+{{ $config | toPrettyJson }}
+{{- end -}}

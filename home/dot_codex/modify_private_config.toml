@@ -1,0 +1,24 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* 設定項目だけを更新し、認証情報・信頼設定・生成された連携情報は保持する。 */ -}}
+{{- $original := (.chezmoi.stdin | fromToml) -}}
+{{- $config := deepCopy $original -}}
+{{- $config = setValueAtPath (list "model") "gpt-6.1-sol" $config -}}
+{{- $config = setValueAtPath (list "model_reasoning_effort") "medium" $config -}}
+{{- $config = setValueAtPath (list "tui" "theme") "two-dark" $config -}}
+{{- $config = setValueAtPath (list "desktop" "followUpQueueMode") "steer" $config -}}
+{{- $config = setValueAtPath (list "desktop" "conversationDetailMode") "STEPS_PROSE" $config -}}
+{{- $config = setValueAtPath (list "desktop" "toys-confetti-enabled") true $config -}}
+{{- $config = setValueAtPath (list "desktop" "git-commit-instructions") "意味的に細かく分割してコミットしてください．" $config -}}
+{{- $config = setValueAtPath (list "desktop" "agent-usage-reset-enabled") true $config -}}
+{{- $config = setValueAtPath (list "features" "hooks") true $config -}}
+{{- $config = setValueAtPath (list "features" "memories") true $config -}}
+{{- $config = setValueAtPath (list "memories" "generate_memories") true $config -}}
+{{- $config = setValueAtPath (list "memories" "use_memories") true $config -}}
+{{- $config = setValueAtPath (list "mcp_servers" "atuin" "command") (joinPath .chezmoi.homeDir ".atuin/bin/atuin") $config -}}
+{{- $config = setValueAtPath (list "mcp_servers" "atuin" "args") ("[\"mcp\"]" | fromJson) $config -}}
+{{- $config = setValueAtPath (list "notice" "hide_rate_limit_model_nudge") true $config -}}
+{{- if eq ($config | toJson) ($original | toJson) -}}
+{{ .chezmoi.stdin }}
+{{- else -}}
+{{ $config | toToml }}
+{{- end -}}

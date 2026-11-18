@@ -1,0 +1,18 @@
+# dconf load / < ~/.config/dotfiles/desktop.dconf
+# テーマはOmarchyが管理するため、生成されたテーマ名や色設定は含めない。
+[org/gnome/desktop/interface]
+cursor-size=24
+gtk-enable-primary-paste=true
+text-scaling-factor=0.90910000000000002
+
+[org/gnome/evince/default]
+continuous=true
+dual-page=false
+dual-page-odd-left=false
+enable-spellchecking=true
+fullscreen=false
+inverted-colors=false
+show-sidebar=true
+sidebar-page='links'
+sidebar-size=148
+sizing-mode='automatic'

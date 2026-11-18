@@ -1,0 +1,9 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* 個人の入力マクロを保存せず、Omarchyの標準定義への参照だけを管理する。 */ -}}
+{{- $include := "include \"/usr/share/omarchy/default/xcompose\"" -}}
+{{- if contains $include .chezmoi.stdin -}}
+{{ .chezmoi.stdin }}
+{{- else -}}
+{{ $include }}
+{{ .chezmoi.stdin }}
+{{- end -}}

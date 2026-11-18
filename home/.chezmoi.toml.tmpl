@@ -7,6 +7,7 @@
 {{- $nvim := promptBoolOnce . "apps.nvim" "Manage Neovim configuration" true -}}
 {{- $ghostty := promptBoolOnce . "apps.ghostty" "Manage Ghostty configuration" true -}}
 {{- $fcitx5 := promptBoolOnce . "apps.fcitx5" "Manage Fcitx5 preferences" true -}}
+{{- $ai := promptBoolOnce . "apps.ai" "Manage AI tool preferences" true -}}
 [data]
     profile = {{ $profile | quote }}
 [data.apps]
@@ -14,3 +15,4 @@
     nvim = {{ $nvim }}
     ghostty = {{ $ghostty }}
     fcitx5 = {{ $fcitx5 }}
+    ai = {{ $ai }}

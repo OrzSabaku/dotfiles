@@ -49,3 +49,17 @@ home/dot_config/fcitx5/**
 !home/dot_config/fcitx5/conf/pinyin.conf
 !home/dot_config/fcitx5/conf/quickphrase.conf
 !home/dot_config/fcitx5/conf/private_xcb.conf
+
+# Mixed AI settings are updated by allowlisted modify templates only.
+home/dot_codex/**
+!home/dot_codex/modify_private_config.toml
+home/dot_config/private_amp/**
+!home/dot_config/private_amp/modify_private_settings.json
+home/dot_config/opencode/**
+!home/dot_config/opencode/modify_opencode.json
+!home/dot_config/opencode/modify_private_cli.json
+home/dot_pi/**
+!home/dot_pi/agent/
+!home/dot_pi/agent/modify_private_mcp.json
+home/dot_config/private_gh/**
+!home/dot_config/private_gh/private_config.yml
