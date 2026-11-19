@@ -7,6 +7,7 @@ class ChezmoiTest < RepositoryTest
     super
     skip "chezmoi is required" unless CHEZMOI
     @config = @root / "chezmoi.toml"
+    tool("dconf", 'File.write(File.join(ENV.fetch("HOME"), "gnome-import"), STDIN.read)')
   end
 
   def chezmoi(*arguments, check: true)
@@ -31,7 +32,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 75, "fedora" => 39 }.each do |profile, count|
+    { "omarchy" => 77, "fedora" => 46 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -107,6 +108,25 @@ class ChezmoiTest < RepositoryTest
     refute target.symlink?
     assert_equal data, target.binread
     assert_equal data, source.binread
+  end
+
+  def test_gnome_preferences_only_run_on_fedora_and_when_changed
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      chezmoi("apply")
+      imported = @home / "gnome-import"
+      assert_equal profile == "fedora", imported.exist?
+      assert_equal profile == "fedora", (@home / ".config/autostart/waywallen.desktop").exist?
+      if profile == "fedora"
+        assert_includes imported.read, "color-scheme='prefer-dark'"
+        refute_includes imported.read, "preferred-monitor"
+        refute_includes imported.read, "mru-sources"
+        imported.unlink
+        chezmoi("apply")
+        refute imported.exist?, "unchanged preferences should not be loaded again"
+      end
+      reset_home
+    end
   end
 
   def test_invalid_profile_is_rejected

@@ -45,7 +45,10 @@ Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから
 
 `home/` がchezmoiの管理対象です。共通設定は `home/dot_config/`、OS別の内容は
 `home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
-`experiments/` は通常の導入には含めません。
+FedoraではGNOMEの操作・見た目、自動起動、既定アプリも保存します。
+GNOMEの保存値は `home/.chezmoitemplates/fedora/gnome.ini`。変更時の `chezmoi apply` で
+記載したキーだけをdconfへ反映します。拡張機能やアプリ本体の導入は別途必要です。
+VS Codeとhtopの設定はOS共通です。`experiments/` は通常の導入には含めません。
 
 開発・テストとLinux x86_64用バイナリの配布手順は [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 

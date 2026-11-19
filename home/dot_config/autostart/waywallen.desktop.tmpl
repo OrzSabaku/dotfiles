@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Waywallen
+Comment=Start animated wallpapers when logging in
+Exec=/usr/bin/env APPIMAGE_EXTRACT_AND_RUN=1 {{ .chezmoi.homeDir }}/.local/bin/waywallen.AppImage
+TryExec={{ .chezmoi.homeDir }}/.local/bin/waywallen.AppImage
+Terminal=false
+OnlyShowIn=GNOME;
+X-GNOME-Autostart-enabled=true

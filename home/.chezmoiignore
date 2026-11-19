@@ -31,3 +31,8 @@
 {{ if not .apps.fcitx5 }}
 .config/fcitx5
 {{ end }}
+
+{{ if ne .profile "fedora" }}
+.config/autostart
+.config/mimeapps.list
+{{ end }}
