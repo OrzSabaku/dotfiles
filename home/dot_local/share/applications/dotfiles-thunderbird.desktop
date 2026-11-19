@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Thunderbird
+Exec=thunderbird %u
+NoDisplay=true
+Terminal=false

@@ -4,6 +4,7 @@
 {{ end }}
 {{ if ne .profile "omarchy" }}
 .bash_profile
+.XCompose
 .zshenv
 .config/alacritty
 .config/btop
@@ -15,6 +16,20 @@
 .config/omarchy
 .config/tmux
 .config/nvim/lua/omarchy
+.config/autostart/limine-snapper-notify.desktop
+.config/autostart/org.fcitx.Fcitx5.desktop
+.config/autostart/print-applet.desktop
+.config/chromium-flags.conf
+.config/environment.d/omarchy-firefox-wayland.conf
+.config/hyprland-mimeapps.list
+.config/hyprland-preview-share-picker
+.config/imv
+.config/obsidian/user-flags.conf
+.config/systemd/user/voxtype.service
+.config/voxtype
+.config/xdg-desktop-portal/hyprland-portals.conf
+.local/share/applications/omarchy-browser.desktop
+.local/share/dbus-1/services/org.fcitx.Fcitx5.service
 {{ end }}
 {{ if not .apps.zsh }}
 .zshenv
@@ -31,9 +46,19 @@
 {{ end }}
 {{ if not .apps.fcitx5 }}
 .config/fcitx5
+.config/autostart/org.fcitx.Fcitx5.desktop
+.local/share/dbus-1/services/org.fcitx.Fcitx5.service
+{{ end }}
+{{ if and (hasKey .apps "ai") (not .apps.ai) }}
+.codex
+.config/amp
+.config/opencode
+.pi
+{{ end }}
+{{ if not .apps.ghostty }}
+.config/xdg-terminals.list
 {{ end }}
 
 {{ if ne .profile "fedora" }}
-.config/autostart
-.config/mimeapps.list
+.config/autostart/com.mitchellh.ghostty.desktop
 {{ end }}

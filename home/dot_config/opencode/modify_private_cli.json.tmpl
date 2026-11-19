@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+{{ include ".chezmoitemplates/shared/jsonc-preferences.rb" }}
+
+preferences = JsoncPreferences.new($stdin.read)
+preferences.set(["theme", "name"], "system")
+$stdout.write(preferences.to_s)

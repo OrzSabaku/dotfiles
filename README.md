@@ -29,6 +29,10 @@ chezmoi apply
 - 原本の変更は `apply` で反映します。管理元で作業するときは `chezmoi cd`。
 - 実ファイル側の変更は差分を確認してから取り込みます。通常ファイルは `chezmoi re-add <パス>`、
   OS別テンプレートは `home/.chezmoitemplates/<環境>/` の該当ファイルを編集します。
+- Codex・Amp・OpenCode・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
+  これらは `re-add` せず原本を編集します。認証情報・信頼設定・ウィンドウ状態は実ファイルに残します。
+  AI設定の対象選択は `apps.ai`。Herdr・Atuinが生成する連携コードは各ツールで導入します。
+  OpenCodeの部分更新にはRubyを使い、JSONCのコメントと管理外の設定を保持します。
 - Gitの名前・メール・署名鍵は非管理の `~/.config/git/config.private` へ。
   [記入例](examples/git/config.private.example)を参照し、権限は `600` にします。
 - Gitで原本を戻した場合も、反映前に `chezmoi diff` を確認します。リモート送信は手動です。
@@ -60,6 +64,12 @@ ruby /tmp/setup-packages.rb --apply  # DNFの確認を経て導入
 
 既存のベンダーリポジトリは上書きしません。署名鍵の取得方法が未確定なリポジトリは、
 公式手順で鍵を用意してから導入します。`chezmoi apply`からは実行しません。
+
+既定アプリとランチャー、ユーザーフォルダー、音声、GUIアプリの設定も管理します。
+自動起動の抑制・Wayland連携・音声入力のサービス定義はOmarchyだけに配置します。
+サービスの有効化や起動は自動実行しません。
+GTKの文字倍率・Evinceの表示設定は `dconf load / < ~/.config/dotfiles/desktop.dconf` で別途反映します。
+個人用Composeマクロ、各アプリの履歴・認証情報、生成テーマ、`/etc` のシステム設定は保存しません。
 
 開発・テストとLinux x86_64用バイナリの配布手順は [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 
