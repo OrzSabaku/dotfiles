@@ -32,6 +32,7 @@ chezmoi apply
 - Codex・Amp・OpenCode・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
   これらは `re-add` せず原本を編集します。認証情報・信頼設定・ウィンドウ状態は実ファイルに残します。
   AI設定の対象選択は `apps.ai`。Herdr・Atuinが生成する連携コードは各ツールで導入します。
+  OpenCodeの部分更新にはRubyを使い、JSONCのコメントと管理外の設定を保持します。
 - Gitの名前・メール・署名鍵は非管理の `~/.config/git/config.private` へ。
   [記入例](examples/git/config.private.example)を参照し、権限は `600` にします。
 - Gitで原本を戻した場合も、反映前に `chezmoi diff` を確認します。リモート送信は手動です。

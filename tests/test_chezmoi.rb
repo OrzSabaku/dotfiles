@@ -156,6 +156,57 @@ class ChezmoiTest < RepositoryTest
     assert_empty chezmoi("diff").stdout
   end
 
+  def test_opencode_updates_jsonc_without_losing_comments
+    initialize_profile("omarchy")
+    server = write(@home / ".config/opencode/opencode.json", <<~JSONC)
+      {
+        // server preference
+        "model": "local/model",
+        "mcp": { "atuin": { "command": ["old", /* keep command note */ "mcp"], }, },
+      }
+    JSONC
+    cli_content = <<~JSONC
+      {
+        // "plugins": ["disabled-plugin"],
+        "plugins": ["./generated-plugin",],
+        "theme": { /* theme note */ "name": "dark", "mode": "light", },
+      }
+    JSONC
+    cli = write(@home / ".config/opencode/cli.json", cli_content)
+    chezmoi("apply")
+    assert_equal cli_content.sub('"name": "dark"', '"name": "system"'), cli.read
+    assert_includes server.read, "// server preference"
+    assert_includes server.read, "/* keep command note */"
+    data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
+      "{{ .chezmoi.stdin | fromJsonc | toJson }}", input: server.read).stdout)
+    assert_equal "local/model", data.fetch("model")
+    assert_equal "system", data.fetch("theme")
+    assert_equal false, data.fetch("autoupdate")
+    assert_equal [(@home / ".atuin/bin/atuin").to_s, "mcp"], data.dig("mcp", "atuin", "command")
+    first_server = server.binread
+    first_cli = cli.binread
+    chezmoi("apply")
+    assert_equal first_server, server.binread
+    assert_equal first_cli, cli.binread
+    assert_empty chezmoi("diff").stdout
+  end
+
+  def test_xcompose_requires_an_active_include_and_preserves_local_macros
+    initialize_profile("omarchy")
+    target = @home / ".XCompose"
+    directive = 'include "/usr/share/omarchy/default/xcompose"'
+    macro = '<Multi_key> <a> <b> : "private-text"'
+    write(target, "# #{directive}\n#{macro}\n")
+    chezmoi("apply", target.to_s)
+    assert_equal "#{directive}\n# #{directive}\n#{macro}\n", target.read
+    active = "\tinclude  \"/usr/share/omarchy/default/xcompose\" # active\n#{macro}\n"
+    target.write(active)
+    chezmoi("apply", target.to_s)
+    assert_equal active, target.read
+    chezmoi("apply", target.to_s)
+    assert_equal active, target.read
+  end
+
   def test_invalid_profile_is_rejected
     initialize_profile("omarchy")
     @config.write(@config.read.sub('profile = "omarchy"', 'profile = "other"'))
