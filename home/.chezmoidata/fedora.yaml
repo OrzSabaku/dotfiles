@@ -1,0 +1,81 @@
+# Fedora用セットアップの入力データ。setup-packages.rb.tmplから参照する。
+# 標準リポジトリはOSに任せる。URL内の $releasever / $basearch はDNFが展開する。
+fedora:
+  repositories:
+    rpmfusion:
+      free: true
+      nonfree: true
+      # free/nonfree本体とupdates以外に有効化しているリポジトリ。
+      additional_enabled:
+        - rpmfusion-nonfree-nvidia-driver
+        - rpmfusion-nonfree-steam
+    copr:
+      - phracek/PyCharm
+      - scottames/ghostty
+    vendors:
+      charm:
+        baseurl: https://repo.charm.sh/yum/
+        gpgkey: https://repo.charm.sh/yum/gpg.key
+      openai-chatgpt:
+        baseurl: https://persistent.oaistatic.com/codex-app-prod/linux/rpm/$basearch
+        # アプリ導入時に配置された鍵。別端末では公式の導入手順で取得する。
+        gpgkey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-chatgpt-3BFA0E4AE8B8CC16A2D9BA684A3B4A566C4660E4.asc
+        repo_gpgcheck: true
+      gh-cli:
+        baseurl: https://cli.github.com/packages/rpm
+        gpgkey: https://cli.github.com/packages/githubcli-archive-keyring.asc
+      google-chrome:
+        baseurl: https://dl.google.com/linux/chrome/rpm/stable/x86_64
+        gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+      google-chrome-canary:
+        baseurl: https://dl.google.com/linux/chrome/rpm/stable/x86_64
+        gpgkey: https://dl.google.com/linux/linux_signing_key.pub
+      teams-for-linux:
+        baseurl: https://repo.teamsforlinux.de/rpm/
+        # 現在の.repoにgpgkey指定はない。導入処理を作る前に鍵の取得方法を確認する。
+      unityhub:
+        baseurl: https://hub.unity3d.com/linux/repos/rpm/stable
+        gpgkey: https://hub.unity3d.com/linux/repos/rpm/stable/repodata/repomd.xml.key
+        repo_gpgcheck: true
+      code:
+        baseurl: https://packages.microsoft.com/yumrepos/vscode
+        gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    # 上記vendorはすべて現在enabled=1、gpgcheck=1。
+
+  # 再導入したいパッケージの初期リスト。インストール済み全件のスナップショットではない。
+  # miseのツール一覧は .chezmoitemplates/fedora/config/mise/config.toml に集約する。
+  packages:
+    desktop:
+      - dconf
+      - gnome-tweaks
+      - ibus-mozc
+      - ibm-plex-mono-fonts
+      - cascadia-code-fonts
+      - jetbrains-mono-fonts-all
+    applications:
+      - audacity
+      - blender
+      - chatgpt
+      - code
+      - discord
+      - firefox
+      - ghostty
+      - gimp
+      - google-chrome-canary
+      - mpv
+      - steam
+      - teams-for-linux
+      - thunderbird
+      - unityhub
+    command_line:
+      - btop
+      - fastfetch
+      - gh
+      - git
+      - git-lfs
+      - htop
+      - podman
+      - podman-compose
+      - rclone
+      - toilet
+      - zsh

@@ -7,6 +7,7 @@ class ChezmoiTest < RepositoryTest
     super
     skip "chezmoi is required" unless CHEZMOI
     @config = @root / "chezmoi.toml"
+    tool("dconf", 'File.write(File.join(ENV.fetch("HOME"), "gnome-import"), STDIN.read)')
   end
 
   def chezmoi(*arguments, check: true)
@@ -31,7 +32,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 75, "fedora" => 39 }.each do |profile, count|
+    { "omarchy" => 77, "fedora" => 43 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -107,6 +108,48 @@ class ChezmoiTest < RepositoryTest
     refute target.symlink?
     assert_equal data, target.binread
     assert_equal data, source.binread
+  end
+
+  def test_gnome_preferences_only_run_on_fedora_and_when_changed
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      chezmoi("apply")
+      imported = @home / "gnome-import"
+      assert_equal profile == "fedora", imported.exist?
+      if profile == "fedora"
+        assert_includes imported.read, "color-scheme='prefer-dark'"
+        refute_includes imported.read, "preferred-monitor"
+        refute_includes imported.read, "mru-sources"
+        imported.unlink
+        chezmoi("apply")
+        refute imported.exist?, "unchanged preferences should not be loaded again"
+      end
+      reset_home
+    end
+  end
+
+  def test_fedora_package_template_previews_and_checks_keys_before_changes
+    initialize_profile("fedora")
+    template = (REPO / "home/.chezmoitemplates/fedora/setup-packages.rb.tmpl").read
+    rendered = chezmoi("execute-template", template).stdout
+    # The test must not depend on signing keys installed on the CI host.
+    rendered = rendered.gsub(%r{file://[^"\s]+}, "file:///missing-dotfiles-test-key")
+    script = write(@root / "setup-packages.rb", rendered)
+    tool("rpm", 'puts "44"')
+    tool("dnf", 'puts "repo id  repo name"')
+    tool("sudo", 'File.write(File.join(ENV.fetch("HOME"), "sudo-called"), ARGV.inspect)')
+
+    preview = run_command(RUBY, script.to_s)
+    assert_equal 0, preview.exit_code, preview.stderr
+    assert_includes preview.stdout, "rpmfusion-free-release-44.noarch.rpm"
+    assert_includes preview.stdout, "dnf copr enable scottames/ghostty"
+    assert_includes preview.stdout, "Preview only"
+    refute (@home / "sudo-called").exist?
+
+    result = run_command(RUBY, script.to_s, "--apply")
+    refute_equal 0, result.exit_code
+    assert_includes result.stderr, "signing keys are incomplete"
+    refute (@home / "sudo-called").exist?
   end
 
   def test_invalid_profile_is_rejected

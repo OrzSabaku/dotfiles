@@ -1,0 +1,9 @@
+{{ if eq .profile "fedora" -}}
+#!/bin/sh
+set -eu
+# Load only saved keys; other GNOME preferences remain local.
+command -v dconf >/dev/null || { echo 'GNOME settings require dconf' >&2; exit 1; }
+dconf load / <<'DOTFILES_GNOME'
+{{ include ".chezmoitemplates/fedora/gnome.ini" }}
+DOTFILES_GNOME
+{{ end -}}
