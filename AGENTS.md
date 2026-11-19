@@ -19,7 +19,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - `home/.chezmoiignore`: 環境・アプリによる対象選択。共通設定をOS別に複製しないでください。
 - `home/.chezmoi.toml.tmpl`: 初期化時に環境と対象アプリを選び、ローカル設定を生成します。
 - `experiments/`: 通常の導入対象に含めない実験用設定。
-- `scripts/`: Ruby標準ライブラリで書くセットアップ・プラグイン更新・実験用ランチャー。Zshの状態検証はZshに残します。
+- `scripts/`: Ruby標準ライブラリで書くセットアップ・プラグイン更新。Zshの状態検証はZshに残します。
 - `tests/`: Minitestによる仮ホームへの配置と、スクリプト・シェル・Git設定の検証。
 - `examples/`: 設定の記入例。詳しい手順や補足メモはGitHub Wikiで管理します。
 
@@ -41,7 +41,8 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
 - miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
-- 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment.rb`で明示的に起動します。
+- 自作Neovim設定は`experiments/nvim-experiment/`。`mise run --skip-tools nvim-experiment`で明示的に起動します。
+  タスクは`home/dot_config/mise/conf.d/nvim-experiment.toml.tmpl`で共通管理し、呼び出し元のディレクトリを維持します。
   `NVIM_APPNAME`で設定・データ・状態・キャッシュを分けますが、ファイルアクセスの隔離ではありません。
   Docker環境はまだ作っていません。旧`nvim-personal`のリンク・関数は廃止済みです。
 - 旧Vim設定と歓迎画面用Zprofileは`experiments/`に記録として残していますが、導入しません。

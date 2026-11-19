@@ -48,23 +48,6 @@ class ScriptsTest < RepositoryTest
     refute (@home / ".local/state/dotfiles/backups").exist?
   end
 
-  def test_neovim_launcher_passes_environment_arguments_and_exit_code
-    tool("nvim", <<~'STUB')
-      require "json"
-      puts JSON.generate(config: ENV.fetch("XDG_CONFIG_HOME"), app: ENV.fetch("NVIM_APPNAME"), args: ARGV)
-      exit 17
-    STUB
-    arguments = ["file with spaces.txt", "$(touch should-not-exist)", "--", "-literal"]
-    # __dir__は呼び出し元の作業ディレクトリに依存しない必要がある。
-    result = run_script("nvim-experiment", *arguments, directory: @root)
-    assert_equal 17, result.exit_code, result.stderr
-    data = JSON.parse(result.stdout)
-    assert_equal arguments, data.fetch("args")
-    assert_equal (REPO / "experiments").to_s, data.fetch("config")
-    assert_equal "nvim-experiment", data.fetch("app")
-    refute (@root / "should-not-exist").exist?
-  end
-
   def test_plugin_commands_preserve_literal_paths
     directory = @root / 'data with spaces $(touch should-not-exist); literal'
     @env["XDG_DATA_HOME"] = directory.to_s

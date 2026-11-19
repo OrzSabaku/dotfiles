@@ -32,7 +32,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 113, "fedora" => 62 }.each do |profile, count|
+    { "omarchy" => 115, "fedora" => 64 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -85,11 +85,41 @@ class ChezmoiTest < RepositoryTest
     chezmoi("apply")
     %w[.zshrc .zshenv .config/sheldon .config/dotfiles/zsh.zsh .config/nvim .config/ghostty .config/fcitx5
       .config/autostart/org.fcitx.Fcitx5.desktop .local/share/dbus-1/services/org.fcitx.Fcitx5.service
-      .config/xdg-terminals.list .codex .config/amp .config/opencode .pi].each do |name|
+      .config/xdg-terminals.list .config/mise/conf.d/nvim-experiment.toml
+      .codex .config/amp .config/opencode .pi].each do |name|
       refute (@home / name).exist?, name
     end
     assert (@home / ".config/dotfiles/env.sh").file?
     assert (@home / ".config/git/config").file?
+  end
+
+  def test_neovim_task_preserves_environment_arguments_directory_and_exit_code
+    skip "mise is required" unless MISE
+    initialize_profile("omarchy")
+    # タスクだけを配置し、テスト中に[tools]の導入を発生させない。
+    (@home / ".config/mise/conf.d").mkpath
+    chezmoi("apply", (@home / ".config/mise/conf.d/nvim-experiment.toml").to_s)
+    tool("nvim", <<~'STUB')
+      require "json"
+      puts JSON.generate(config: ENV.fetch("XDG_CONFIG_HOME"), app: ENV.fetch("NVIM_APPNAME", "nvim"),
+        args: ARGV, directory: Dir.pwd)
+      exit 17
+    STUB
+    @env["MISE_AUTO_INSTALL"] = "0"
+    @env["MISE_OFFLINE"] = "1"
+    arguments = ["file with spaces.txt", "$(touch should-not-exist)", "--help", "--", "-literal"]
+    result = run_command(MISE, "run", "--skip-tools", "nvim-experiment", "--", *arguments, directory: @root)
+    assert_equal 17, result.exit_code, result.stderr
+    data = JSON.parse(result.stdout)
+    assert_equal arguments, data.fetch("args")
+    assert_equal (REPO / "experiments").to_s, data.fetch("config")
+    assert_equal "nvim-experiment", data.fetch("app")
+    assert_equal @root.to_s, data.fetch("directory")
+    refute (@root / "should-not-exist").exist?
+    normal = run_command("nvim", directory: @root)
+    normal_data = JSON.parse(normal.stdout)
+    assert_equal (@home / ".config").to_s, normal_data.fetch("config")
+    refute_equal "nvim-experiment", normal_data.fetch("app")
   end
 
   def test_private_and_unmanaged_app_data_survive

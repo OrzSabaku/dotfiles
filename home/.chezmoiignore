@@ -39,6 +39,7 @@
 {{ end }}
 {{ if not .apps.nvim }}
 .config/nvim
+.config/mise/conf.d/nvim-experiment.toml
 {{ end }}
 {{ if not .apps.ghostty }}
 .config/ghostty
