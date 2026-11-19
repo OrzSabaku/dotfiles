@@ -16,7 +16,9 @@
 .config/omarchy
 .config/tmux
 .config/nvim/lua/omarchy
-.config/autostart
+.config/autostart/limine-snapper-notify.desktop
+.config/autostart/org.fcitx.Fcitx5.desktop
+.config/autostart/print-applet.desktop
 .config/chromium-flags.conf
 .config/environment.d/omarchy-firefox-wayland.conf
 .config/hyprland-mimeapps.list
@@ -58,6 +60,5 @@
 {{ end }}
 
 {{ if ne .profile "fedora" }}
-.config/autostart
-.config/mimeapps.list
+.config/autostart/com.mitchellh.ghostty.desktop
 {{ end }}

@@ -32,7 +32,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 111, "fedora" => 59 }.each do |profile, count|
+    { "omarchy" => 113, "fedora" => 62 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -206,6 +206,8 @@ class ChezmoiTest < RepositoryTest
     assert_equal active, target.read
     chezmoi("apply", target.to_s)
     assert_equal active, target.read
+  end
+
   def test_gnome_preferences_only_run_on_fedora_and_when_changed
     %w[omarchy fedora].each do |profile|
       initialize_profile(profile)
