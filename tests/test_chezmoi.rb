@@ -128,6 +128,30 @@ class ChezmoiTest < RepositoryTest
     end
   end
 
+  def test_fedora_package_template_previews_and_checks_keys_before_changes
+    initialize_profile("fedora")
+    template = (REPO / "home/.chezmoitemplates/fedora/setup-packages.rb.tmpl").read
+    rendered = chezmoi("execute-template", template).stdout
+    # The test must not depend on signing keys installed on the CI host.
+    rendered = rendered.gsub(%r{file://[^"\s]+}, "file:///missing-dotfiles-test-key")
+    script = write(@root / "setup-packages.rb", rendered)
+    tool("rpm", 'puts "44"')
+    tool("dnf", 'puts "repo id  repo name"')
+    tool("sudo", 'File.write(File.join(ENV.fetch("HOME"), "sudo-called"), ARGV.inspect)')
+
+    preview = run_command(RUBY, script.to_s)
+    assert_equal 0, preview.exit_code, preview.stderr
+    assert_includes preview.stdout, "rpmfusion-free-release-44.noarch.rpm"
+    assert_includes preview.stdout, "dnf copr enable scottames/ghostty"
+    assert_includes preview.stdout, "Preview only"
+    refute (@home / "sudo-called").exist?
+
+    result = run_command(RUBY, script.to_s, "--apply")
+    refute_equal 0, result.exit_code
+    assert_includes result.stderr, "signing keys are incomplete"
+    refute (@home / "sudo-called").exist?
+  end
+
   def test_invalid_profile_is_rejected
     initialize_profile("omarchy")
     @config.write(@config.read.sub('profile = "omarchy"', 'profile = "other"'))

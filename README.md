@@ -49,6 +49,17 @@ FedoraではGNOMEの操作・見た目、自動起動、既定アプリも保存
 GNOMEの保存値は `home/.chezmoitemplates/fedora/gnome.ini`。変更時の `chezmoi apply` で
 記載したキーだけをdconfへ反映します。拡張機能やアプリ本体の導入は別途必要です。
 VS Codeとhtopの設定はOS共通です。`experiments/` は通常の導入には含めません。
+Fedoraの追加RPMリポジトリとパッケージ一覧は `home/.chezmoidata/fedora.yaml` に記録します。
+導入テンプレートは明示的に生成・実行します（DNF5とそのconfig-manager・COPRプラグインが必要）。
+
+```sh
+chezmoi execute-template < home/.chezmoitemplates/fedora/setup-packages.rb.tmpl > /tmp/setup-packages.rb
+ruby /tmp/setup-packages.rb          # コマンドのプレビュー
+ruby /tmp/setup-packages.rb --apply  # DNFの確認を経て導入
+```
+
+既存のベンダーリポジトリは上書きしません。署名鍵の取得方法が未確定なリポジトリは、
+公式手順で鍵を用意してから導入します。`chezmoi apply`からは実行しません。
 
 開発・テストとLinux x86_64用バイナリの配布手順は [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 

@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+# Render with chezmoi execute-template, then run with Ruby. Preview by default.
+require "json"
+require "open3"
+require "shellwords"
+
+abort "This setup requires the Fedora profile." unless {{ eq .profile "fedora" }}
+abort "Usage: ruby setup-packages.rb [--apply]" unless ARGV.empty? || ARGV == ["--apply"]
+apply = ARGV == ["--apply"]
+settings = JSON.parse(<<~'JSON')
+{{ .fedora | toPrettyJson }}
+JSON
+
+# Arguments stay separate: DNF, not a shell, expands $releasever and $basearch.
+commands = []
+repositories = settings.fetch("repositories")
+release, status = Open3.capture2("rpm", "-E", "%fedora")
+abort "Could not determine the Fedora release." unless status.success? && release.strip.match?(/\A\d+\z/)
+repo_list, status = Open3.capture2("dnf", "repo", "list", "--all")
+abort "Could not list repositories." unless status.success?
+existing = repo_list.lines.map { |line| line.split.first }
+
+%w[free nonfree].each do |kind|
+  next unless repositories.fetch("rpmfusion").fetch(kind)
+  next if existing.include?("rpmfusion-#{kind}")
+
+  url = "https://mirrors.rpmfusion.org/#{kind}/fedora/rpmfusion-#{kind}-release-#{release.strip}.noarch.rpm"
+  commands << ["sudo", "dnf", "install", url]
+end
+repositories.fetch("copr").each do |project|
+  commands << ["sudo", "dnf", "copr", "enable", project]
+end
+repositories.fetch("vendors").each do |id, repository|
+  next if existing.include?(id)
+
+  # Do not create an unverifiable repository or silently disable signature checks.
+  key = repository["gpgkey"]
+  if key.nil? || (key.start_with?("file://") && !File.file?(key.delete_prefix("file://")))
+    warn "#{id}: install its signing key using the vendor's instructions before adding this repository."
+    abort "No changes made: repository signing keys are incomplete." if apply
+    next
+  end
+  command = ["sudo", "dnf", "config-manager", "addrepo", "--id=#{id}",
+    "--set=baseurl=#{repository.fetch('baseurl')}", "--set=enabled=1",
+    "--set=gpgcheck=1", "--set=gpgkey=#{key}"]
+  command << "--set=repo_gpgcheck=1" if repository.fetch("repo_gpgcheck", false)
+  commands << command
+end
+additional = repositories.fetch("rpmfusion").fetch("additional_enabled")
+commands << ["sudo", "dnf", "config-manager", "enable", *additional] unless additional.empty?
+settings.fetch("packages").each_value do |packages|
+  commands << ["sudo", "dnf", "install", *packages] unless packages.empty?
+end
+
+commands.each do |command|
+  puts Shellwords.join(command)
+  next unless apply
+
+  system(*command)
+  abort "Command failed; stopping setup." unless $?.success?
+end
+puts "Preview only. Add --apply to execute; DNF will ask for confirmation." unless apply
