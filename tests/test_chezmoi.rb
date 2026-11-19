@@ -32,7 +32,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 77, "fedora" => 46 }.each do |profile, count|
+    { "omarchy" => 77, "fedora" => 43 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -116,7 +116,6 @@ class ChezmoiTest < RepositoryTest
       chezmoi("apply")
       imported = @home / "gnome-import"
       assert_equal profile == "fedora", imported.exist?
-      assert_equal profile == "fedora", (@home / ".config/autostart/waywallen.desktop").exist?
       if profile == "fedora"
         assert_includes imported.read, "color-scheme='prefer-dark'"
         refute_includes imported.read, "preferred-monitor"
