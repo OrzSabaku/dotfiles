@@ -250,6 +250,41 @@ class ChezmoiTest < RepositoryTest
     refute (@home / "sudo-called").exist?
   end
 
+  def test_neovim_detects_modify_templates_before_json_and_toml
+    nvim = resolve_command("nvim")
+    skip "Neovim is required" unless nvim
+
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      chezmoi("apply")
+      plain = write(@root / "modify_plain.toml", "enabled = true\n")
+      cases = [
+        [REPO / "home/dot_codex/modify_private_config.toml", "template"],
+        [REPO / "home/dot_config/private_amp/modify_private_settings.json", "template"],
+        [@home / ".codex/config.toml", "toml"],
+        [@home / ".config/amp/settings.json", "json"],
+        [plain, "toml"]
+      ].map { |path, type| "{ #{path.to_s.to_json}, #{type.to_json} }" }.join(",\n")
+      script = write(@root / "filetypes.lua", <<~LUA)
+        vim.opt.rtp:prepend(#{(@home / ".config/nvim").to_s.to_json})
+        dofile(#{(@home / ".config/nvim/lua/config/options.lua").to_s.to_json})
+        local events = {}
+        vim.api.nvim_create_autocmd("FileType", {
+          callback = function(event) table.insert(events, event.match) end,
+        })
+        for _, case in ipairs({ #{cases} }) do
+          events = {}
+          vim.cmd("edit " .. vim.fn.fnameescape(case[1]))
+          assert(vim.bo.filetype == case[2], vim.inspect({ case, vim.bo.filetype }))
+          assert(vim.deep_equal(events, { case[2] }), vim.inspect(events))
+        end
+        vim.cmd("qa!")
+      LUA
+      checked_command(nvim, "--clean", "--headless", "-i", "NONE", "-l", script.to_s)
+      reset_home
+    end
+  end
+
   def test_invalid_profile_is_rejected
     initialize_profile("omarchy")
     @config.write(@config.read.sub('profile = "omarchy"', 'profile = "other"'))
