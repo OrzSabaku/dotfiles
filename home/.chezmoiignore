@@ -27,6 +27,7 @@
 {{ end }}
 {{ if not .apps.ghostty }}
 .config/ghostty
+.config/autostart/com.mitchellh.ghostty.desktop
 {{ end }}
 {{ if not .apps.fcitx5 }}
 .config/fcitx5
