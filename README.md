@@ -49,7 +49,21 @@ Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから
 
 `home/` がchezmoiの管理対象です。共通設定は `home/dot_config/`、OS別の内容は
 `home/.chezmoitemplates/` に保存し、`home/.chezmoiignore` で配置対象を選びます。
-`experiments/` は通常の導入には含めません。
+FedoraではGNOMEの操作・見た目、自動起動、既定アプリも保存します。
+GNOMEの保存値は `home/.chezmoitemplates/fedora/gnome.ini`。変更時の `chezmoi apply` で
+記載したキーだけをdconfへ反映します。拡張機能やアプリ本体の導入は別途必要です。
+VS Codeとhtopの設定はOS共通です。`experiments/` は通常の導入には含めません。
+Fedoraの追加RPMリポジトリとパッケージ一覧は `home/.chezmoidata/fedora.yaml` に記録します。
+導入テンプレートは明示的に生成・実行します（DNF5とそのconfig-manager・COPRプラグインが必要）。
+
+```sh
+chezmoi execute-template < home/.chezmoitemplates/fedora/setup-packages.rb.tmpl > /tmp/setup-packages.rb
+ruby /tmp/setup-packages.rb          # コマンドのプレビュー
+ruby /tmp/setup-packages.rb --apply  # DNFの確認を経て導入
+```
+
+既存のベンダーリポジトリは上書きしません。署名鍵の取得方法が未確定なリポジトリは、
+公式手順で鍵を用意してから導入します。`chezmoi apply`からは実行しません。
 
 既定アプリとランチャー、ユーザーフォルダー、音声、GUIアプリの設定も管理します。
 自動起動の抑制・Wayland連携・音声入力のサービス定義はOmarchyだけに配置します。

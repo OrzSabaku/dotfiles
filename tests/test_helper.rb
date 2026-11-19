@@ -50,6 +50,12 @@ class RepositoryTest < Minitest::Test
     FileUtils.remove_entry(@root) if @root&.exist?
   end
 
+  # ファイルを作成して書き込む
+  #
+  # @param path [String] ファイルへのパス
+  # @param content [String] 内容
+  # @param mode [Numeric] モード
+  # @return [Pathname] 作成したファイルへのパス
   def write(path, content, mode: nil)
     path = Pathname.new(path)
     FileUtils.mkdir_p(path.dirname)

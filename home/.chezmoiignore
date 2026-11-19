@@ -40,6 +40,7 @@
 {{ end }}
 {{ if not .apps.ghostty }}
 .config/ghostty
+.config/autostart/com.mitchellh.ghostty.desktop
 {{ end }}
 {{ if not .apps.fcitx5 }}
 .config/fcitx5
@@ -54,4 +55,9 @@
 {{ end }}
 {{ if not .apps.ghostty }}
 .config/xdg-terminals.list
+{{ end }}
+
+{{ if ne .profile "fedora" }}
+.config/autostart
+.config/mimeapps.list
 {{ end }}
