@@ -40,6 +40,10 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
   `.zshrc`が標準環境・エイリアスと共通Zsh設定を読み込みます。Bash固有のrc・関数群はZshへ読み込みません。
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
 - miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
+- OpenCodeの`cli.json`はmiseの`merge`で`theme.name`だけを更新します。
+  原本は`home/dot_config/mise/dotfiles/opencode-cli.json`、ルールは`home/dot_config/mise/conf.d/opencode-cli.toml.tmpl`です。
+  chezmoiは原本とルールを配置し、対象の`cli.json`には書き込みません。反映は`mise dot diff`→`mise dot apply`で明示的に行います。
+  `apps.ai = false`ではルールを空にします。`opencode.json`の部分更新は引き続きRubyで行います。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
 - 自作Neovim設定は`experiments/nvim-experiment/`。`mise run --skip-tools nvim-experiment`で明示的に起動します。
   タスクは`home/dot_config/mise/conf.d/nvim-experiment.toml.tmpl`で共通管理し、呼び出し元のディレクトリを維持します。

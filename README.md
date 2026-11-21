@@ -29,10 +29,14 @@ chezmoi apply
 - 原本の変更は `apply` で反映します。管理元で作業するときは `chezmoi cd`。
 - 実ファイル側の変更は差分を確認してから取り込みます。通常ファイルは `chezmoi re-add <パス>`、
   OS別テンプレートは `home/.chezmoitemplates/<環境>/` の該当ファイルを編集します。
-- Codex・Amp・OpenCode・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
+- Codex・Amp・OpenCodeの `opencode.json`・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
   これらは `re-add` せず原本を編集します。認証情報・信頼設定・ウィンドウ状態は実ファイルに残します。
   AI設定の対象選択は `apps.ai`。Herdr・Atuinが生成する連携コードは各ツールで導入します。
-  OpenCodeの部分更新にはRubyを使い、JSONCのコメントと管理外の設定を保持します。
+  OpenCodeの `opencode.json` の部分更新にはRubyを使い、JSONCのコメントと管理外の設定を保持します。
+- OpenCodeの `cli.json` はmiseの `merge` でテーマ名だけ更新します。
+  原本は `home/dot_config/mise/dotfiles/opencode-cli.json`。chezmoiで原本と適用ルールを配置してから、
+  `mise dot diff ~/.config/opencode/cli.json` → `mise dot apply ~/.config/opencode/cli.json` で反映します。
+  コメント・プラグイン・管理外の項目は保持します。`apps.ai` を外してchezmoiを適用すると、このルールも無効になります。
 - Gitの名前・メール・署名鍵は非管理の `~/.config/git/config.private` へ。
   [記入例](examples/git/config.private.example)を参照し、権限は `600` にします。
 - Gitで原本を戻した場合も、反映前に `chezmoi diff` を確認します。リモート送信は手動です。

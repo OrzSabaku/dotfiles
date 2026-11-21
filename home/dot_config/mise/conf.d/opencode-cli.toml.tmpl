@@ -1,0 +1,5 @@
+# cli.json全体はOpenCodeが管理し、テーマ名だけをmiseで更新する。
+[dotfiles]
+{{ if or (not (hasKey .apps "ai")) .apps.ai -}}
+"~/.config/opencode/cli.json/preferences" = { source = "../dotfiles/opencode-cli.json", merge = true, format = "jsonc", permissions = "0600" }
+{{ end -}}

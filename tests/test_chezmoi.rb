@@ -32,7 +32,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 115, "fedora" => 64 }.each do |profile, count|
+    { "omarchy" => 116, "fedora" => 65 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -196,16 +196,7 @@ class ChezmoiTest < RepositoryTest
         "mcp": { "atuin": { "command": ["old", /* keep command note */ "mcp"], }, },
       }
     JSONC
-    cli_content = <<~JSONC
-      {
-        // "plugins": ["disabled-plugin"],
-        "plugins": ["./generated-plugin",],
-        "theme": { /* theme note */ "name": "dark", "mode": "light", },
-      }
-    JSONC
-    cli = write(@home / ".config/opencode/cli.json", cli_content)
     chezmoi("apply")
-    assert_equal cli_content.sub('"name": "dark"', '"name": "system"'), cli.read
     assert_includes server.read, "// server preference"
     assert_includes server.read, "/* keep command note */"
     data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
@@ -215,11 +206,89 @@ class ChezmoiTest < RepositoryTest
     assert_equal false, data.fetch("autoupdate")
     assert_equal [(@home / ".atuin/bin/atuin").to_s, "mcp"], data.dig("mcp", "atuin", "command")
     first_server = server.binread
-    first_cli = cli.binread
     chezmoi("apply")
     assert_equal first_server, server.binread
-    assert_equal first_cli, cli.binread
     assert_empty chezmoi("diff").stdout
+  end
+
+  def mise_dotfiles(*arguments, check: true)
+    skip "mise is required" unless MISE
+    # 実機のシステム設定・ネットワーク・ツール導入から切り離して検証する。
+    env = @env.merge("MISE_SYSTEM_CONFIG_FILE" => (@root / "absent.toml").to_s,
+      "MISE_SYSTEM_CONFIG_DIR" => (@root / "absent").to_s,
+      "MISE_OFFLINE" => "1", "MISE_AUTO_INSTALL" => "0")
+    command = [MISE, "dotfiles", *arguments]
+    check ? checked_command(*command, env: env, directory: @root) : run_command(*command, env: env, directory: @root)
+  end
+
+  def test_mise_merges_opencode_cli_without_changing_comments_or_unmanaged_settings
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      content = <<~JSONC
+        {
+          // "plugins": ["disabled-plugin"],
+          "plugins": ["./generated-plugin",],
+          "theme": { /* theme note */ "name": "dark", "mode": "light", },
+          "credential": "local-secret",
+        }
+      JSONC
+      cli = write(@home / ".config/opencode/cli.json", content, mode: 0o600)
+      chezmoi("apply")
+      assert_equal content, cli.read, "chezmoi must leave the mise-managed target alone"
+      refute_includes chezmoi("managed", "--include", "files").stdout.lines(chomp: true), ".config/opencode/cli.json"
+      mise_dotfiles("apply", "--dry-run")
+      assert_equal content, cli.read
+      mise_dotfiles("apply")
+      expected = content.sub('"name": "dark"', '"name": "system"')
+      assert_equal expected, cli.read
+      assert_equal 0o600, cli.stat.mode & 0o777
+      mise_dotfiles("apply")
+      assert_equal expected, cli.read
+      refute_includes mise_dotfiles("diff").stdout, "edit differs:"
+      reset_home
+    end
+  end
+
+  def test_mise_creates_private_opencode_cli_and_adds_missing_nested_theme
+    initialize_profile("omarchy")
+    chezmoi("apply")
+    cli = @home / ".config/opencode/cli.json"
+    refute cli.exist?
+    mise_dotfiles("apply")
+    assert_equal({ "theme" => { "name" => "system" } }, JSON.parse(cli.read))
+    assert_equal 0o600, cli.stat.mode & 0o777
+    cli.write("{\"plugins\": [\"local\"] // keep plugin comment\n}\n")
+    mise_dotfiles("apply")
+    assert_includes cli.read, '// keep plugin comment'
+    data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
+      "{{ .chezmoi.stdin | fromJsonc | toJson }}", input: cli.read).stdout)
+    assert_equal ["local"], data.fetch("plugins")
+    assert_equal "system", data.dig("theme", "name")
+  end
+
+  def test_mise_refuses_invalid_opencode_cli_without_changing_it
+    initialize_profile("omarchy")
+    chezmoi("apply")
+    cli = @home / ".config/opencode/cli.json"
+    ['{"theme":', '{"theme": invalid}', '{"theme": {"name": "dark"}} trailing'].each do |content|
+      write(cli, content, mode: 0o600)
+      refute_equal 0, mise_dotfiles("apply", check: false).exit_code
+      assert_equal content, cli.read
+      assert_equal 0o600, cli.stat.mode & 0o777
+    end
+  end
+
+  def test_mise_stops_managing_opencode_cli_when_ai_is_unselected
+    initialize_profile("omarchy")
+    chezmoi("apply")
+    mise_dotfiles("apply")
+    cli = @home / ".config/opencode/cli.json"
+    content = '{"theme":{"name":"local"},"plugins":["local"]}'
+    cli.write(content)
+    @config.write(@config.read.sub("ai = true", "ai = false"))
+    chezmoi("apply")
+    mise_dotfiles("apply")
+    assert_equal content, cli.read
   end
 
   def test_xcompose_requires_an_active_include_and_preserves_local_macros

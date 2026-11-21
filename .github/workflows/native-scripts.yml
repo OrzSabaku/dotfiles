@@ -10,7 +10,7 @@ on:
       - 'Gemfile*'
       - 'Rakefile'
       - '.rubocop.yml'
-      - 'home/dot_config/mise/conf.d/**'
+      - 'home/dot_config/mise/**'
   push:
     tags:
       - 'scripts-v*'
