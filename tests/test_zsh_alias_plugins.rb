@@ -37,7 +37,7 @@ class ZshAliasPluginsTest < RepositoryTest
     config = write(@root / "config/plugins.toml", configuration)
     rendered = checked_command(SHELDON, "--config-dir", config.dirname.to_s,
       "--data-dir", (@root / "data").to_s, "source")
-    generated = write(@root / "generated.zsh", rendered.stdout)
+    generated = write(@root / "generated.zsh", rendered)
     tool("docker", "exit 0\n")
     checked_command("zsh", "-f", "-c", <<~'ZSH', "test", generated.to_s)
       alias gcm='git commit -m'
@@ -71,26 +71,31 @@ class ZshAliasPluginsTest < RepositoryTest
     command = ["zsh", "-f", "-i", "-c", preflight, "test", source.to_s, @root.to_s]
     checked_command(*command, env: env)
     source.write(source.read.sub("fzf-tab-complete() { :; }", ""))
-    result = run_command(*command, env: env)
-    refute_equal 0, result.exit_code
-    assert_includes result.stderr, "Missing plugin function: fzf-tab-complete"
+    _, stderr, status = Open3.capture3(env, *command)
+
+    refute_predicate status, :success?
+    assert_includes stderr, "Missing plugin function: fzf-tab-complete"
   end
 
   def assert_failed_update_preserves_cache(body)
     tool("sheldon", body)
     cache = write(@root / "cache/dotfiles/sheldon.zsh", "# working configuration\n")
-    result = run_script("update-zsh-plugins")
-    refute_equal 0, result.exit_code
+    _, stderr, status = run_script("update-zsh-plugins")
+
+    refute_predicate status, :success?, stderr
     assert_equal "# working configuration\n", cache.read
   end
 
   def test_update_uses_isolated_generation
+    # 取得処理が取得先を掃除しても、稼働中のプラグインを壊さないこと。
+    state = write(@root / "data/dotfiles/sheldon/active/plugin-state", "working plugins")
+
     assert_failed_update_preserves_cache(<<~'STUB')
-      index = ARGV.index("--data-dir")
-      exit 23 if index && ARGV.fetch(index + 1).include?("generation.")
-      File.write(File.join(ENV.fetch("XDG_CACHE_HOME"), "dotfiles/sheldon.zsh"), "damaged")
-      exit 24
+      location = ARGV.fetch(ARGV.index("--data-dir") + 1)
+      Dir.glob(File.join(location, "**/plugin-state")).each { |path| File.write(path, "damaged") }
+      exit 23
     STUB
+    assert_equal "working plugins", state.read
   end
 
   def test_failed_download_keeps_last_working_plugins

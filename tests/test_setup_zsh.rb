@@ -13,9 +13,10 @@ class ZshSetupTest < RepositoryTest
     marker = @root / "chsh-called"
     tool("omarchy", "exit 23\n")
     tool("chsh", "File.write(#{marker.to_s.inspect}, 'called')\n")
-    result = run_script("setup-zsh")
-    assert_equal 23, result.exit_code, result.stderr
-    refute marker.exist?
+    _, stderr, status = run_script("setup-zsh")
+
+    assert_equal 23, status.exitstatus, stderr
+    refute_predicate marker, :exist?
     assert_empty @home.children
   end
 
@@ -32,18 +33,18 @@ class ZshSetupTest < RepositoryTest
         end
         current_shell = write(case_home / "current-shell", "/bin/bash")
         env = @env.merge("HOME" => case_home.to_s, "FAIL_STAGE" => failure, "TEST_REPO" => fixture_repo.to_s)
-        result = run_command(RUBY, "-e", setup_runner, (REPO / "scripts/setup-zsh.rb").to_s,
-          env: env)
+        _, stderr, status = Open3.capture3(env, RUBY, "-e", setup_runner, (REPO / "scripts/setup-zsh.rb").to_s)
         log = case_home / "calls.jsonl"
-        assert log.exist?, result.stderr
+
+        assert_predicate log, :exist?, stderr
         calls = log.readlines.map { |line| JSON.parse(line) }
         if failure == "none"
-          assert_successful_setup(result, calls, case_home)
+          assert_successful_setup(status, stderr, calls, case_home)
         else
-          assert_equal 23, result.exit_code, "#{failure}: #{result.stderr}"
+          assert_equal 23, status.exitstatus, "#{failure}: #{stderr}"
           assert_empty calls.select { |call| call.first == "chsh" }
           assert_equal "/bin/bash", current_shell.read
-          refute (case_home / ".local/state/dotfiles").exist?
+          refute_predicate (case_home / ".local/state/dotfiles"), :exist?
         end
       end
     end
@@ -51,16 +52,18 @@ class ZshSetupTest < RepositoryTest
 
   private
 
-  def assert_successful_setup(result, calls, home)
-    assert_equal 0, result.exit_code, result.stderr
+  def assert_successful_setup(status, stderr, calls, home)
+    assert_equal 0, status.exitstatus, stderr
     apply_at = calls.index { |call| call.first == "chezmoi" && call[3] == "apply" }
     plugins_at = calls.index { |call| call.first == "update-zsh-plugins.rb" }
     startup_at = calls.index { |call| call.take(2) == ["zsh", "-lic"] }
     chsh_at = calls.index { |call| call.first == "chsh" }
+
     assert_operator apply_at, :<, plugins_at
     assert_operator plugins_at, :<, startup_at
     assert_operator startup_at, :<, chsh_at
     audit = (home / ".local/state/dotfiles").children.fetch(0)
+
     assert_equal "/bin/bash\n", audit.read
     assert_equal 0o600, audit.stat.mode & 0o777
   end

@@ -25,11 +25,6 @@ end
 CHEZMOI = resolve_command("chezmoi")
 SHELDON = resolve_command("sheldon")
 MISE = resolve_command("mise")
-CommandResult = Struct.new(:stdout, :stderr, :status) do
-  def exit_code
-    status.exitstatus || 128 + status.termsig
-  end
-end
 
 class RepositoryTest < Minitest::Test
   def setup
@@ -51,12 +46,6 @@ class RepositoryTest < Minitest::Test
     FileUtils.remove_entry(@root) if @root&.exist?
   end
 
-  # ファイルを作成して書き込む
-  #
-  # @param path [String] ファイルへのパス
-  # @param content [String] 内容
-  # @param mode [Numeric] モード
-  # @return [Pathname] 作成したファイルへのパス
   def write(path, content, mode: nil)
     path = Pathname.new(path)
     FileUtils.mkdir_p(path.dirname)
@@ -69,18 +58,16 @@ class RepositoryTest < Minitest::Test
     write(directory / name, "#!#{RUBY}\n#{body}", mode: 0o755)
   end
 
-  def run_command(*arguments, env: @env, input: "", directory: REPO)
+  # 成功を前提とするコマンドだけ、診断とassertを共通化する。
+  # 失敗を検証するテストではOpen3.capture3の戻り値を直接使う。
+  def checked_command(*arguments, env: @env, input: "", directory: REPO)
     stdout, stderr, status = Open3.capture3(env, *arguments, stdin_data: input, chdir: directory)
-    CommandResult.new(stdout, stderr, status)
+
+    assert_predicate status, :success?, stdout + stderr
+    stdout
   end
 
-  def checked_command(*arguments, **options)
-    result = run_command(*arguments, **options)
-    assert_equal 0, result.exit_code, result.stdout + result.stderr
-    result
-  end
-
-  def run_script(name, *arguments, **options)
-    run_command(RUBY, (REPO / "scripts" / "#{name}.rb").to_s, *arguments, **options)
+  def run_script(name, *arguments, directory: REPO)
+    Open3.capture3(@env, RUBY, (REPO / "scripts" / "#{name}.rb").to_s, *arguments, chdir: directory)
   end
 end
