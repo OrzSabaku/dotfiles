@@ -43,7 +43,9 @@ Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから
 
 - `scripts/setup-zsh.rb` — OmarchyでのZsh初回導入。通常の端末で実行します。
 - `scripts/update-zsh-plugins.rb` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。
-- `scripts/nvim-experiment.rb` — [実験用Neovim](experiments/README.md)を起動します。
+
+実験用Neovimは `mise run --skip-tools nvim-experiment`（ファイル指定は `mise run --skip-tools nvim-experiment -- <ファイル>`）で起動します。
+chezmoiで配置するグローバルタスクです。[実験用設定](experiments/README.md)を参照。
 
 ## 構成
 
@@ -74,3 +76,16 @@ GTKの文字倍率・Evinceの表示設定は `dconf load / < ~/.config/dotfiles
 開発・テストとLinux x86_64用バイナリの配布手順は [Rubyスクリプトの開発](https://github.com/OrzSabaku/dotfiles/wiki/Ruby-Development)を参照してください。
 
 補足は [Omarchy](https://github.com/OrzSabaku/dotfiles/wiki/Omarchy) と [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)へ。
+
+miseのツール一覧・共通設定は `home/.chezmoitemplates/common/config/mise/config.toml`、
+両OSで共用します。反映後、必要なツールを `mise install <ツール名>` で導入します。
+Omarchy標準のCLIは `[bootstrap.packages]` にpacman管理として出力します。
+確認は `mise bootstrap packages status`、導入前の確認は `mise bootstrap packages apply --dry-run`。
+導入は `mise bootstrap packages apply` で明示的に行い、更新はOmarchyに任せます。
+共通一覧の `[tools]` はOmarchy標準一覧と同名ならOS版を使い、`[runtimes]` は常にmiseで管理します。
+仮想パッケージ名（`nvim`など）は、標準の `expac` でローカルのpacman情報を読み、実名へ解決します。
+
+`gh`・`chezmoi`は動作確認したバージョンに固定し、Renovateの更新PRを確認して更新します（自動マージなし）。
+初回は [Renovate App](https://github.com/apps/renovate) でこのリポジトリを許可し、
+`.github/renovate.json` を既定ブランチへ反映します。マージ後は `chezmoi diff` → `chezmoi apply`、
+`mise install gh chezmoi` で反映します。

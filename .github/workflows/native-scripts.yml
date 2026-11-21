@@ -10,6 +10,8 @@ on:
       - 'Gemfile*'
       - 'Rakefile'
       - '.rubocop.yml'
+      - 'home/dot_config/mise/**'
+      - 'home/.chezmoitemplates/common/config/mise/**'
   push:
     tags:
       - 'scripts-v*'
@@ -103,10 +105,10 @@ jobs:
       - name: Check the compiler version
         run: ../spinel/bin/spinel --version
 
-      - name: Compile the three commands
+      - name: Compile the two commands
         run: |
           mkdir -p dist/bin
-          for name in setup-zsh update-zsh-plugins nvim-experiment; do
+          for name in setup-zsh update-zsh-plugins; do
             ../spinel/bin/spinel "$PWD/scripts/$name.rb" --strict-require -o "dist/bin/$name"
           done
 
@@ -115,7 +117,7 @@ jobs:
 
       - name: Package the Linux x86_64 binaries
         run: |
-          tar -C dist/bin -czf dist/dotfiles-scripts-linux-x86_64.tar.gz setup-zsh update-zsh-plugins nvim-experiment
+          tar -C dist/bin -czf dist/dotfiles-scripts-linux-x86_64.tar.gz setup-zsh update-zsh-plugins
           cd dist
           sha256sum dotfiles-scripts-linux-x86_64.tar.gz > dotfiles-scripts-linux-x86_64.tar.gz.sha256
 

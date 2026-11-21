@@ -19,7 +19,7 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - `home/.chezmoiignore`: 環境・アプリによる対象選択。共通設定をOS別に複製しないでください。
 - `home/.chezmoi.toml.tmpl`: 初期化時に環境と対象アプリを選び、ローカル設定を生成します。
 - `experiments/`: 通常の導入対象に含めない実験用設定。
-- `scripts/`: Ruby標準ライブラリで書くセットアップ・プラグイン更新・実験用ランチャー。Zshの状態検証はZshに残します。
+- `scripts/`: Ruby標準ライブラリで書くセットアップ・プラグイン更新。Zshの状態検証はZshに残します。
 - `tests/`: Minitestによる仮ホームへの配置と、スクリプト・シェル・Git設定の検証。
 - `examples/`: 設定の記入例。詳しい手順や補足メモはGitHub Wikiで管理します。
 
@@ -39,9 +39,20 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - ZshとSheldonは共通管理で、両OSの入口から使用します。Omarchyでは`.zshenv`が標準のPATH設定、
   `.zshrc`が標準環境・エイリアスと共通Zsh設定を読み込みます。Bash固有のrc・関数群はZshへ読み込みません。
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
-- miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
+- miseのツール一覧・設定は`.chezmoitemplates/common/config/mise/config.toml`に集約し、OS別の断片は持ちません。
+  Omarchy標準のCLIは`[tools]`から`[bootstrap.packages]`の`pacman:`宣言へ振り分けます。
+  標準一覧を読み取り、仮想パッケージ名は`expac`のローカルProvides情報で解決します。手書きの除外一覧は持ちません。
+  `[runtimes]`は常にmise管理です。chezmoi apply・mise installからOSパッケージを導入しません。
+  状態確認は`mise bootstrap packages status`、導入はdry-run後に`mise bootstrap packages apply`で明示的に行います。
+  パッケージ更新はOmarchyに任せます。
+- `gh`・`chezmoi`は検証済みのバージョンに固定し、`.github/renovate.json`で更新PRの対象にします。
+  自動マージはしません。試行対象外のツール・`[runtimes]`・OSパッケージへ対象を広げないでください。
+- 設定ファイルの配置・部分更新・OS差分はchezmoiで管理します。miseにはツール・環境変数・タスク・パッケージ導入の宣言を任せます。
+- OpenCodeの`cli.json`・`opencode.json`はchezmoiの`modify_`テンプレートと共通のRuby処理で部分更新します。
+  コメント・管理外の設定を保持し、反映はほかの設定と同じく`chezmoi diff`→`chezmoi apply`で行います。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
-- 自作Neovim設定は`experiments/nvim-experiment/`。`scripts/nvim-experiment.rb`で明示的に起動します。
+- 自作Neovim設定は`experiments/nvim-experiment/`。`mise run --skip-tools nvim-experiment`で明示的に起動します。
+  タスクは`home/dot_config/mise/conf.d/nvim-experiment.toml.tmpl`で共通管理し、呼び出し元のディレクトリを維持します。
   `NVIM_APPNAME`で設定・データ・状態・キャッシュを分けますが、ファイルアクセスの隔離ではありません。
   Docker環境はまだ作っていません。旧`nvim-personal`のリンク・関数は廃止済みです。
 - 旧Vim設定と歓迎画面用Zprofileは`experiments/`に記録として残していますが、導入しません。

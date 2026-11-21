@@ -7,6 +7,9 @@ class ChezmoiTest < RepositoryTest
     super
     skip "chezmoi is required" unless CHEZMOI
     @config = @root / "chezmoi.toml"
+    # Omarchyの外部一覧は固定データで検証し、ホストOSには依存しない。
+    tool("cat", 'puts %w[bat eza fd fzf ripgrep starship zoxide ruby nvim]')
+    tool("expac", 'puts "neovim nvim=0.12.6 vim-plugin-runtime"')
     tool("dconf", 'File.write(File.join(ENV.fetch("HOME"), "gnome-import"), STDIN.read)')
   end
 
@@ -32,7 +35,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 113, "fedora" => 62 }.each do |profile, count|
+    { "omarchy" => 115, "fedora" => 64 }.each do |profile, count|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
       assert_empty @home.children
@@ -57,8 +60,7 @@ class ChezmoiTest < RepositoryTest
       initialize_profile(profile)
       chezmoi("apply")
       { ".zshrc" => "zshrc", ".bashrc" => "bashrc",
-       ".config/ghostty/config" => "config/ghostty/config",
-       ".config/mise/config.toml" => "config/mise/config.toml" }.each do |target, fragment|
+       ".config/ghostty/config" => "config/ghostty/config" }.each do |target, fragment|
         expected = REPO / "home/.chezmoitemplates" / profile / fragment
         assert_equal expected.binread, (@home / target).binread
       end
@@ -80,16 +82,88 @@ class ChezmoiTest < RepositoryTest
     end
   end
 
+  def parse_toml(content)
+    JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
+      "{{ .chezmoi.stdin | fromToml | toJson }}", input: content).stdout)
+  end
+
+  def test_mise_common_tools_and_settings_on_both_profiles
+    common = parse_toml((REPO / "home/.chezmoitemplates/common/config/mise/config.toml").read)
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      content = chezmoi("cat", (@home / ".config/mise/config.toml").to_s).stdout
+      config = parse_toml(content)
+      expected = common.fetch("tools").merge(common.fetch("runtimes"))
+      expected = expected.reject { |name, _| %w[bat eza fd fzf ripgrep starship zoxide neovim].include?(name) } if profile == "omarchy"
+      assert_equal expected, config.fetch("tools")
+      if profile == "omarchy"
+        packages = %w[bat eza fd fzf ripgrep starship zoxide nvim].to_h { |name| ["pacman:#{name}", "latest"] }
+        assert_equal packages, config.dig("bootstrap", "packages")
+        refute config.dig("bootstrap", "packages").key?("pacman:ruby")
+      else
+        refute config.key?("bootstrap")
+      end
+      assert_equal common.fetch("settings"), config.fetch("settings")
+      assert_equal({ "version" => "latest", "rename_exe" => "yt-dlp" }, config.dig("tools", "yt-dlp"))
+      assert_equal "latest", config.dig("tools", "github:anomalyco/opencode")
+      assert_equal "latest", config.dig("tools", "ruby")
+      assert_equal profile == "fedora", config.fetch("tools").key?("neovim")
+      reset_home
+    end
+  end
+
+  def test_mise_keeps_tools_missing_from_omarchy_defaults
+    tool("cat", 'puts %w[bat eza fzf ripgrep starship zoxide]')
+    initialize_profile("omarchy")
+    content = chezmoi("cat", (@home / ".config/mise/config.toml").to_s).stdout
+    tools = parse_toml(content).fetch("tools")
+    assert_equal "latest", tools.fetch("fd")
+    refute tools.key?("bat")
+    packages = parse_toml(content).dig("bootstrap", "packages")
+    assert_equal "latest", packages.fetch("pacman:bat")
+    refute packages.key?("pacman:fd")
+  end
+
   def test_unselected_apps_are_not_created
     initialize_profile("omarchy", apps: false)
     chezmoi("apply")
     %w[.zshrc .zshenv .config/sheldon .config/dotfiles/zsh.zsh .config/nvim .config/ghostty .config/fcitx5
       .config/autostart/org.fcitx.Fcitx5.desktop .local/share/dbus-1/services/org.fcitx.Fcitx5.service
-      .config/xdg-terminals.list .codex .config/amp .config/opencode .pi].each do |name|
+      .config/xdg-terminals.list .config/mise/conf.d/nvim-experiment.toml
+      .codex .config/amp .config/opencode .pi].each do |name|
       refute (@home / name).exist?, name
     end
     assert (@home / ".config/dotfiles/env.sh").file?
     assert (@home / ".config/git/config").file?
+  end
+
+  def test_neovim_task_preserves_environment_arguments_directory_and_exit_code
+    skip "mise is required" unless MISE
+    initialize_profile("omarchy")
+    # タスクだけを配置し、テスト中に[tools]の導入を発生させない。
+    (@home / ".config/mise/conf.d").mkpath
+    chezmoi("apply", (@home / ".config/mise/conf.d/nvim-experiment.toml").to_s)
+    tool("nvim", <<~'STUB')
+      require "json"
+      puts JSON.generate(config: ENV.fetch("XDG_CONFIG_HOME"), app: ENV.fetch("NVIM_APPNAME", "nvim"),
+        args: ARGV, directory: Dir.pwd)
+      exit 17
+    STUB
+    @env["MISE_AUTO_INSTALL"] = "0"
+    @env["MISE_OFFLINE"] = "1"
+    arguments = ["file with spaces.txt", "$(touch should-not-exist)", "--help", "--", "-literal"]
+    result = run_command(MISE, "run", "--skip-tools", "nvim-experiment", "--", *arguments, directory: @root)
+    assert_equal 17, result.exit_code, result.stderr
+    data = JSON.parse(result.stdout)
+    assert_equal arguments, data.fetch("args")
+    assert_equal (REPO / "experiments").to_s, data.fetch("config")
+    assert_equal "nvim-experiment", data.fetch("app")
+    assert_equal @root.to_s, data.fetch("directory")
+    refute (@root / "should-not-exist").exist?
+    normal = run_command("nvim", directory: @root)
+    normal_data = JSON.parse(normal.stdout)
+    assert_equal (@home / ".config").to_s, normal_data.fetch("config")
+    refute_equal "nvim-experiment", normal_data.fetch("app")
   end
 
   def test_private_and_unmanaged_app_data_survive
@@ -185,11 +259,23 @@ class ChezmoiTest < RepositoryTest
     assert_equal false, data.fetch("autoupdate")
     assert_equal [(@home / ".atuin/bin/atuin").to_s, "mcp"], data.dig("mcp", "atuin", "command")
     first_server = server.binread
+    assert_equal 0o600, cli.stat.mode & 0o777
     first_cli = cli.binread
     chezmoi("apply")
     assert_equal first_server, server.binread
     assert_equal first_cli, cli.binread
     assert_empty chezmoi("diff").stdout
+  end
+
+  def test_opencode_cli_refuses_invalid_jsonc_without_changing_it
+    initialize_profile("omarchy")
+    cli = @home / ".config/opencode/cli.json"
+    ['{"theme":', '{"theme": invalid}', '{"theme": {"name": "dark"}} trailing'].each do |content|
+      write(cli, content, mode: 0o600)
+      refute_equal 0, chezmoi("apply", cli.to_s, check: false).exit_code
+      assert_equal content, cli.read
+      assert_equal 0o600, cli.stat.mode & 0o777
+    end
   end
 
   def test_xcompose_requires_an_active_include_and_preserves_local_macros
@@ -248,6 +334,41 @@ class ChezmoiTest < RepositoryTest
     refute_equal 0, result.exit_code
     assert_includes result.stderr, "signing keys are incomplete"
     refute (@home / "sudo-called").exist?
+  end
+
+  def test_neovim_detects_modify_templates_before_json_and_toml
+    nvim = resolve_command("nvim")
+    skip "Neovim is required" unless nvim
+
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      chezmoi("apply")
+      plain = write(@root / "modify_plain.toml", "enabled = true\n")
+      cases = [
+        [REPO / "home/dot_codex/modify_private_config.toml", "template"],
+        [REPO / "home/dot_config/private_amp/modify_private_settings.json", "template"],
+        [@home / ".codex/config.toml", "toml"],
+        [@home / ".config/amp/settings.json", "json"],
+        [plain, "toml"]
+      ].map { |path, type| "{ #{path.to_s.to_json}, #{type.to_json} }" }.join(",\n")
+      script = write(@root / "filetypes.lua", <<~LUA)
+        vim.opt.rtp:prepend(#{(@home / ".config/nvim").to_s.to_json})
+        dofile(#{(@home / ".config/nvim/lua/config/options.lua").to_s.to_json})
+        local events = {}
+        vim.api.nvim_create_autocmd("FileType", {
+          callback = function(event) table.insert(events, event.match) end,
+        })
+        for _, case in ipairs({ #{cases} }) do
+          events = {}
+          vim.cmd("edit " .. vim.fn.fnameescape(case[1]))
+          assert(vim.bo.filetype == case[2], vim.inspect({ case, vim.bo.filetype }))
+          assert(vim.deep_equal(events, { case[2] }), vim.inspect(events))
+        end
+        vim.cmd("qa!")
+      LUA
+      checked_command(nvim, "--clean", "--headless", "-i", "NONE", "-l", script.to_s)
+      reset_home
+    end
   end
 
   def test_invalid_profile_is_rejected

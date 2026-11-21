@@ -77,6 +77,7 @@ if command -v gh >/dev/null 2>&1; then eval "$(gh completion -s zsh)"; fi
 [[ -r "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
 if command -v atuin >/dev/null 2>&1; then eval "$(atuin init zsh)"; fi
 
+if command -v chezmoi >/dev/null 2>&1; then eval "$(chezmoi completion zsh)"; fi
 # ツールがPATHを追加した後で、重複を取り除く。
 typeset -U path fpath
 

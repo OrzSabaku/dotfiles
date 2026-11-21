@@ -1,0 +1,42 @@
+# 両OSで使うツールの正本。CLIはOmarchy標準一覧に同名のパッケージがあればOS版を使う。
+[tools]
+bat = "latest"
+eza = "latest"
+fd = "latest"
+fzf = "latest"
+ripgrep = "latest"
+starship = "latest"
+zoxide = "latest"
+"aqua:maaslalani/slides" = "latest"
+buf = "latest"
+bun = "latest"
+clang = "latest"
+"github:anomalyco/opencode" = "latest"
+harper-cli = "latest"
+jq = "latest"
+lazygit = "latest"
+neovim = "latest"
+protobuf = "latest"
+python = "latest"
+rust = "latest"
+sheldon = "latest"
+uv = "latest"
+yazi = "latest"
+yt-dlp = { version = "latest", rename_exe = "yt-dlp" }
+codex = "latest"
+gh = "2.105.0"
+"npm:@indxjp/jevlint" = "latest"
+"pipx:online-judge-tools-ng" = "latest"
+chezmoi = "2.74.1"
+actionlint = "latest"
+bitwarden = "latest"
+
+
+# ランタイムはOSの提供状況に関わらずmiseでバージョン管理する。
+[runtimes]
+go = "latest"
+node = "latest"
+ruby = "latest"
+
+[settings.upgrade]
+auto_prune = false

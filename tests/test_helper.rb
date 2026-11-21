@@ -24,6 +24,7 @@ end
 
 CHEZMOI = resolve_command("chezmoi")
 SHELDON = resolve_command("sheldon")
+MISE = resolve_command("mise")
 CommandResult = Struct.new(:stdout, :stderr, :status) do
   def exit_code
     status.exitstatus || 128 + status.termsig
