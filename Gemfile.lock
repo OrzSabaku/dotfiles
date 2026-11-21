@@ -84,6 +84,10 @@ GEM
     rubocop-ast (1.51.0)
       parser (>= 3.3.7.2)
       prism (>= 1.7)
+    rubocop-minitest (0.41.0)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.89.0, < 2.0)
+      rubocop-ast (>= 1.38.0, < 2.0)
     rubocop-shopify (3.1.0)
       lint_roller
       rubocop (~> 1.89)
@@ -148,6 +152,7 @@ DEPENDENCIES
   minitest (~> 6.1)
   rake (~> 13.4)
   rubocop (~> 1.92)
+  rubocop-minitest
   rubocop-shopify (~> 3.1)
   solargraph (~> 0.62.1)
 
@@ -195,6 +200,7 @@ CHECKSUMS
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
   rubocop (1.92.2) sha256=14fb31eed143a0dc6f78186c550c1715e81cd38f59d05d1165050e445c1f5382
   rubocop-ast (1.51.0) sha256=0ec311e36b191b3872d909078a35274e962ae97dbce64be6812d145ca59acfcb
+  rubocop-minitest (0.41.0) sha256=c15bfe00134a30c8a00ce670b07ecc80440455ba277b8682cf0d515c98ee7426
   rubocop-shopify (3.1.0) sha256=0345309997d5d9b544c13b967ca64e51437bd573bdc79a30f1e0e72956d85c29
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   solargraph (0.62.1) sha256=c48525b3ba7ec2f5d34cae3e85aa080f3313b80e1daa544a1fb32ee66ee23976
@@ -211,4 +217,4 @@ CHECKSUMS
   yard-solargraph (0.1.0) sha256=a19a4619c942181a618fb9458970a9d2534cf7fda69fc43949629a7948a5930e
 
 BUNDLED WITH
-  4.0.24
+  4.0.20
