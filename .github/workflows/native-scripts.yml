@@ -11,6 +11,7 @@ on:
       - 'Rakefile'
       - '.rubocop.yml'
       - 'home/dot_config/mise/**'
+      - 'home/.chezmoitemplates/common/config/mise/**'
   push:
     tags:
       - 'scripts-v*'
