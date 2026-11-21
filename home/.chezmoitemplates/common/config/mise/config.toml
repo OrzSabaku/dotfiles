@@ -24,10 +24,10 @@ uv = "latest"
 yazi = "latest"
 yt-dlp = { version = "latest", rename_exe = "yt-dlp" }
 codex = "latest"
-gh = "latest"
+gh = "2.105.0"
 "npm:@indxjp/jevlint" = "latest"
 "pipx:online-judge-tools-ng" = "latest"
-chezmoi = "latest"
+chezmoi = "2.74.1"
 actionlint = "latest"
 bitwarden = "latest"
 

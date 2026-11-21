@@ -45,10 +45,11 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
   `[runtimes]`は常にmise管理です。chezmoi apply・mise installからOSパッケージを導入しません。
   状態確認は`mise bootstrap packages status`、導入はdry-run後に`mise bootstrap packages apply`で明示的に行います。
   パッケージ更新はOmarchyに任せます。
-- OpenCodeの`cli.json`はmiseの`merge`で`theme.name`だけを更新します。
-  原本は`home/dot_config/mise/dotfiles/opencode-cli.json`、ルールは`home/dot_config/mise/conf.d/opencode-cli.toml.tmpl`です。
-  chezmoiは原本とルールを配置し、対象の`cli.json`には書き込みません。反映は`mise dot diff`→`mise dot apply`で明示的に行います。
-  `apps.ai = false`ではルールを空にします。`opencode.json`の部分更新は引き続きRubyで行います。
+- `gh`・`chezmoi`は検証済みのバージョンに固定し、`.github/renovate.json`で更新PRの対象にします。
+  自動マージはしません。試行対象外のツール・`[runtimes]`・OSパッケージへ対象を広げないでください。
+- 設定ファイルの配置・部分更新・OS差分はchezmoiで管理します。miseにはツール・環境変数・タスク・パッケージ導入の宣言を任せます。
+- OpenCodeの`cli.json`・`opencode.json`はchezmoiの`modify_`テンプレートと共通のRuby処理で部分更新します。
+  コメント・管理外の設定を保持し、反映はほかの設定と同じく`chezmoi diff`→`chezmoi apply`で行います。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
 - 自作Neovim設定は`experiments/nvim-experiment/`。`mise run --skip-tools nvim-experiment`で明示的に起動します。
   タスクは`home/dot_config/mise/conf.d/nvim-experiment.toml.tmpl`で共通管理し、呼び出し元のディレクトリを維持します。
