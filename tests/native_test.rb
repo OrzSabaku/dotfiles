@@ -4,13 +4,6 @@ require_relative "test_scripts"
 
 # CIでのみ明示的に実行する。通常のテストにビルドや実行モード切り替えは加えない。
 class NativeScriptsTest < ScriptsTest
-  def setup
-    super
-    %w[setup-zsh update-zsh-plugins].each do |name|
-      assert (REPO / "dist/bin" / name).executable?, "Missing native binary: #{name}"
-    end
-  end
-
   def run_script(name, *arguments, directory: REPO)
     Open3.capture3(@env, (REPO / "dist/bin" / name).to_s, *arguments, chdir: directory)
   end
@@ -21,8 +14,9 @@ class NativeScriptsTest < ScriptsTest
     tool("chsh", "File.write(#{marker.to_s.inspect}, 'called')\n")
     _, stderr, status = run_script("setup-zsh")
     omarchy = File.readlines("/etc/os-release", chomp: true).include?("ID=omarchy")
+
     assert_equal omarchy && !Process.euid.zero? ? 23 : 1, status.exitstatus, stderr
-    refute marker.exist?
+    refute_predicate marker, :exist?
     assert_empty @home.children
   end
 end

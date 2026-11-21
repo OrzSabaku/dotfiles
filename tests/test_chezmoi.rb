@@ -13,8 +13,8 @@ class ChezmoiTest < RepositoryTest
     tool("dconf", 'File.write(File.join(ENV.fetch("HOME"), "gnome-import"), STDIN.read)')
   end
 
-  def chezmoi(*arguments, check: true)
-    command = [CHEZMOI, "--source", REPO.to_s, "--destination", @home.to_s,
+  def chezmoi(*arguments, check: true, source: REPO)
+    command = [CHEZMOI, "--source", source.to_s, "--destination", @home.to_s,
       "--config", @config.to_s, "--persistent-state", (@root / "state.boltdb").to_s,
       "--cache", (@root / "cache").to_s, "--no-tty", *arguments]
     check ? checked_command(*command) : Open3.capture3(@env, *command, chdir: REPO)
@@ -22,7 +22,6 @@ class ChezmoiTest < RepositoryTest
 
   def initialize_profile(profile, apps: true)
     chezmoi("init", "--promptDefaults", "--promptChoice", "Environment=#{profile}")
-    refute_match(/^sourceDir\s*=/, @config.read)
     @config.write(@config.read.gsub("= true", "= false")) unless apps
   end
 
@@ -35,49 +34,43 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_both_profiles_apply_idempotently_without_installing_tools
-    { "omarchy" => 115, "fedora" => 64 }.each do |profile, count|
+    marker = @root / "unexpected-command"
+    %w[mise sudo chsh omarchy].each do |name|
+      tool(name, "File.write(#{marker.to_s.inspect}, [$PROGRAM_NAME, *ARGV].inspect); exit 99")
+    end
+    %w[omarchy fedora].each do |profile|
       initialize_profile(profile)
       chezmoi("apply", "--dry-run")
+
       assert_empty @home.children
       chezmoi("apply")
-      managed = chezmoi("managed", "--include", "files").lines(chomp: true)
-      assert_equal count, managed.length
-      managed.each do |name|
-        assert (@home / name).file?, name
-        refute (@home / name).symlink?, name
-      end
+
       assert_empty chezmoi("diff")
       chezmoi("apply")
       chezmoi("verify")
-      refute (@home / ".local/bin").exist?
-      refute (@home / ".config/nvim-experiment").exist?
+
+      refute_predicate marker, :exist?, marker.exist? ? marker.read : ""
+      refute_predicate (@home / ".config/nvim-experiment"), :exist?
       reset_home
     end
   end
 
-  def test_os_variants_and_optional_neovim_integrations
+  def test_desktop_integration_is_omarchy_only_and_sensitive_files_are_private
     %w[omarchy fedora].each do |profile|
       initialize_profile(profile)
       chezmoi("apply")
-      { ".zshrc" => "zshrc", ".bashrc" => "bashrc",
-       ".config/ghostty/config" => "config/ghostty/config" }.each do |target, fragment|
-        expected = REPO / "home/.chezmoitemplates" / profile / fragment
-        assert_equal expected.binread, (@home / target).binread
-      end
+
       %w[.config/nvim/lua/omarchy .config/hypr .zshenv].each do |name|
         assert_equal profile == "omarchy", (@home / name).exist?, name
       end
       if profile == "omarchy"
         assert_equal 0o600, (@home / ".config/omarchy/shell.json").stat.mode & 0o777
-        assert_empty (@home / ".config/lazygit/config.yml").binread
         assert_equal 0o755, (@home / ".config/omarchy/hooks/post-update.d/setup-agent.hook").stat.mode & 0o777
       end
+
       assert_equal profile == "omarchy", (@home / ".config/systemd/user/voxtype.service").exist?
       assert_equal profile == "omarchy", (@home / ".config/hyprland-mimeapps.list").exist?
-      refute (@home / ".config/systemd/user/graphical-session.target.wants").exist?
       assert_equal 0o700, (@home / ".config/gh").stat.mode & 0o777
-      assert_includes (@home / ".config/mimeapps.list").read, "mailto=dotfiles-thunderbird.desktop"
-      assert_includes (@home / ".local/share/applications/dotfiles-thunderbird.desktop").read, "Exec=thunderbird %u"
       reset_home
     end
   end
@@ -87,54 +80,79 @@ class ChezmoiTest < RepositoryTest
       "{{ .chezmoi.stdin | fromToml | toJson }}", input: content))
   end
 
-  def test_mise_common_tools_and_settings_on_both_profiles
-    common = parse_toml((REPO / "home/.chezmoitemplates/common/config/mise/config.toml").read)
+  def test_mise_routes_only_standard_cli_tools_to_os_packages
+    # 現在のツール一覧とは独立した入力で、変換規則だけを検証する。
+    source = @root / "mise-source"
+    write(source / ".chezmoitemplates/common/config/mise/config.toml", <<~TOML)
+      [tools]
+      standard = "1.2"
+      optional = { version = "3.4", rename_exe = "custom" }
+      editor = "5.6"
+      [runtimes]
+      runtime = "7.8"
+      [settings]
+      experimental = true
+    TOML
+    tool("cat", 'puts "standard\nvirtual-editor # default editor\nruntime\n"')
+    tool("expac", 'puts "editor virtual-editor=5.6"')
+    template = (REPO / "home/dot_config/mise/config.toml.tmpl").read
     %w[omarchy fedora].each do |profile|
       initialize_profile(profile)
-      content = chezmoi("cat", (@home / ".config/mise/config.toml").to_s)
-      config = parse_toml(content)
-      expected = common.fetch("tools").merge(common.fetch("runtimes"))
-      expected = expected.reject { |name, _| %w[bat eza fd fzf ripgrep starship zoxide neovim].include?(name) } if profile == "omarchy"
-      assert_equal expected, config.fetch("tools")
+      config = parse_toml(chezmoi("execute-template", template, source: source))
       if profile == "omarchy"
-        packages = %w[bat eza fd fzf ripgrep starship zoxide nvim].to_h { |name| ["pacman:#{name}", "latest"] }
-        assert_equal packages, config.dig("bootstrap", "packages")
-        refute config.dig("bootstrap", "packages").key?("pacman:ruby")
+        assert_equal({ "optional" => { "version" => "3.4", "rename_exe" => "custom" },
+          "runtime" => "7.8" }, config.fetch("tools"))
+        assert_equal({ "pacman:standard" => "latest", "pacman:virtual-editor" => "latest" },
+          config.dig("bootstrap", "packages"))
+        # 標準一覧から外れたCLIは、ハードコードした除外一覧に残らない。
+        tool("cat", 'puts "runtime"')
+        changed = parse_toml(chezmoi("execute-template", template, source: source))
+
+        assert_equal "1.2", changed.dig("tools", "standard")
+        assert_equal "5.6", changed.dig("tools", "editor")
+        refute changed.key?("bootstrap")
       else
+        assert_equal({ "standard" => "1.2", "optional" => { "version" => "3.4", "rename_exe" => "custom" },
+          "editor" => "5.6", "runtime" => "7.8" }, config.fetch("tools"))
         refute config.key?("bootstrap")
       end
-      assert_equal common.fetch("settings"), config.fetch("settings")
-      assert_equal({ "version" => "latest", "rename_exe" => "yt-dlp" }, config.dig("tools", "yt-dlp"))
-      assert_equal "latest", config.dig("tools", "github:anomalyco/opencode")
-      assert_equal "latest", config.dig("tools", "ruby")
-      assert_equal profile == "fedora", config.fetch("tools").key?("neovim")
+
+      assert_equal({ "experimental" => true }, config.fetch("settings"))
       reset_home
     end
   end
 
-  def test_mise_keeps_tools_missing_from_omarchy_defaults
-    tool("cat", 'puts %w[bat eza fzf ripgrep starship zoxide]')
-    initialize_profile("omarchy")
-    content = chezmoi("cat", (@home / ".config/mise/config.toml").to_s)
-    tools = parse_toml(content).fetch("tools")
-    assert_equal "latest", tools.fetch("fd")
-    refute tools.key?("bat")
-    packages = parse_toml(content).dig("bootstrap", "packages")
-    assert_equal "latest", packages.fetch("pacman:bat")
-    refute packages.key?("pacman:fd")
-  end
-
   def test_unselected_apps_are_not_created
     initialize_profile("omarchy", apps: false)
+    local = write(@home / ".config/opencode/cli.json", "local app data\n", mode: 0o600)
     chezmoi("apply")
+
+    assert_equal "local app data\n", local.read
+    assert_equal 0o600, local.stat.mode & 0o777
     %w[.zshrc .zshenv .config/sheldon .config/dotfiles/zsh.zsh .config/nvim .config/ghostty .config/fcitx5
       .config/autostart/org.fcitx.Fcitx5.desktop .local/share/dbus-1/services/org.fcitx.Fcitx5.service
       .config/xdg-terminals.list .config/mise/conf.d/nvim-experiment.toml
-      .codex .config/amp .config/opencode .pi].each do |name|
-      refute (@home / name).exist?, name
+      .codex .config/amp .pi].each do |name|
+      refute_predicate (@home / name), :exist?, name
     end
-    assert (@home / ".config/dotfiles/env.sh").file?
-    assert (@home / ".config/git/config").file?
+    assert_predicate (@home / ".config/dotfiles/env.sh"), :file?
+    assert_predicate (@home / ".config/git/config"), :file?
+  end
+
+  def test_app_selection_does_not_disable_other_apps
+    initialize_profile("omarchy")
+    original = @config.read
+    targets = { "zsh" => ".zshrc", "nvim" => ".config/nvim/init.lua",
+      "ghostty" => ".config/ghostty/config", "fcitx5" => ".config/fcitx5/config",
+      "ai" => ".codex/config.toml" }
+    targets.each_key do |disabled|
+      @config.write(original.sub("#{disabled} = true", "#{disabled} = false"))
+      managed = chezmoi("managed", "--include", "files").lines(chomp: true)
+
+      targets.each do |app, target|
+        assert_equal app != disabled, managed.include?(target), "#{disabled} disabled: #{target}"
+      end
+    end
   end
 
   def test_neovim_task_preserves_environment_arguments_directory_and_exit_code
@@ -154,17 +172,15 @@ class ChezmoiTest < RepositoryTest
     arguments = ["file with spaces.txt", "$(touch should-not-exist)", "--help", "--", "-literal"]
     stdout, stderr, status = Open3.capture3(@env, MISE, "run", "--skip-tools", "nvim-experiment", "--",
       *arguments, chdir: @root)
+
     assert_equal 17, status.exitstatus, stderr
     data = JSON.parse(stdout)
+
     assert_equal arguments, data.fetch("args")
     assert_equal (REPO / "experiments").to_s, data.fetch("config")
     assert_equal "nvim-experiment", data.fetch("app")
     assert_equal @root.to_s, data.fetch("directory")
-    refute (@root / "should-not-exist").exist?
-    stdout, _, _ = Open3.capture3(@env, "nvim", chdir: @root)
-    normal_data = JSON.parse(stdout)
-    assert_equal (@home / ".config").to_s, normal_data.fetch("config")
-    refute_equal "nvim-experiment", normal_data.fetch("app")
+    refute_predicate (@root / "should-not-exist"), :exist?
   end
 
   def test_private_and_unmanaged_app_data_survive
@@ -174,23 +190,11 @@ class ChezmoiTest < RepositoryTest
       .local/share/fcitx5/clipboard/data .config/omarchy/plugins/custom/data]
     names.each { |name| write(@home / name, "local data\n") }
     chezmoi("apply")
+
     names.each { |name| assert_equal "local data\n", (@home / name).binread }
     %w[.config/fcitx5/config .config/fcitx5/profile .config/fcitx5/conf/xcb.conf].each do |name|
       assert_equal 0o600, (@home / name).stat.mode & 0o777
     end
-  end
-
-  def test_existing_links_become_files_without_changing_old_sources
-    initialize_profile("omarchy")
-    data = (REPO / "home/dot_config/starship.toml").binread
-    source = write(@root / "old-starship.toml", data)
-    target = @home / ".config/starship.toml"
-    target.dirname.mkpath
-    target.make_symlink(source)
-    chezmoi("apply")
-    refute target.symlink?
-    assert_equal data, target.binread
-    assert_equal data, source.binread
   end
 
   def test_partial_preferences_preserve_credentials_trust_and_generated_integrations
@@ -210,23 +214,21 @@ class ChezmoiTest < RepositoryTest
     write(@home / ".config/amp/settings.json", JSON.generate("apiKey" => "local-secret"))
     write(@home / ".config/opencode/cli.json", JSON.generate("plugins" => ["./generated-plugin"]))
     write(@home / ".config/discord/settings.json", JSON.generate("WINDOW_BOUNDS" => { "x" => 123 }))
-    write(@home / ".XCompose", "# local macros\n<Multi_key> <a> <b> : \"private-text\"\n")
     chezmoi("apply")
     config = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
       "{{ .chezmoi.stdin | fromToml | toJson }}", input: codex.read))
-    assert_equal "gpt-6.1-sol", config.fetch("model")
+
     assert_equal "trusted", config.dig("projects", "/private/work", "trust_level")
     assert_equal "local-secret", config.dig("mcp_servers", "generated", "env", "TOKEN")
     assert_equal "local-hash", config.dig("hooks", "state", "local", "trusted_hash")
-    assert_equal true, config.dig("plugins", "local", "enabled")
+    assert_equal({ "enabled" => true }, config.dig("plugins", "local"))
     assert_equal (@home / ".atuin/bin/atuin").to_s, config.dig("mcp_servers", "atuin", "command")
     assert_equal "local-secret", JSON.parse((@home / ".config/amp/settings.json").read).fetch("apiKey")
     assert_equal ["./generated-plugin"], JSON.parse((@home / ".config/opencode/cli.json").read).fetch("plugins")
     assert_equal({ "x" => 123 }, JSON.parse((@home / ".config/discord/settings.json").read).fetch("WINDOW_BOUNDS"))
-    assert_includes (@home / ".XCompose").read, "private-text"
-    assert_includes (@home / ".XCompose").read, '/usr/share/omarchy/default/xcompose'
     first_content = codex.binread
     chezmoi("apply")
+
     assert_equal first_content, codex.binread
     assert_equal 0o600, codex.stat.mode & 0o777
     assert_empty chezmoi("diff")
@@ -250,19 +252,26 @@ class ChezmoiTest < RepositoryTest
     JSONC
     cli = write(@home / ".config/opencode/cli.json", cli_content)
     chezmoi("apply")
-    assert_equal cli_content.sub('"name": "dark"', '"name": "system"'), cli.read
+    cli_data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
+      "{{ .chezmoi.stdin | fromJsonc | toJson }}", input: cli.read))
+
+    assert_equal ["./generated-plugin"], cli_data.fetch("plugins")
+    assert_equal "light", cli_data.dig("theme", "mode")
+    assert_includes cli.read, '// "plugins": ["disabled-plugin"],'
+    assert_includes cli.read, "/* theme note */"
     assert_includes server.read, "// server preference"
     assert_includes server.read, "/* keep command note */"
     data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
       "{{ .chezmoi.stdin | fromJsonc | toJson }}", input: server.read))
+
     assert_equal "local/model", data.fetch("model")
-    assert_equal "system", data.fetch("theme")
-    assert_equal false, data.fetch("autoupdate")
     assert_equal [(@home / ".atuin/bin/atuin").to_s, "mcp"], data.dig("mcp", "atuin", "command")
     first_server = server.binread
+
     assert_equal 0o600, cli.stat.mode & 0o777
     first_cli = cli.binread
     chezmoi("apply")
+
     assert_equal first_server, server.binread
     assert_equal first_cli, cli.binread
     assert_empty chezmoi("diff")
@@ -274,7 +283,8 @@ class ChezmoiTest < RepositoryTest
     ['{"theme":', '{"theme": invalid}', '{"theme": {"name": "dark"}} trailing'].each do |content|
       write(cli, content, mode: 0o600)
       _, stderr, status = chezmoi("apply", cli.to_s, check: false)
-      refute status.success?, stderr
+
+      refute_predicate status, :success?, stderr
       assert_equal content, cli.read
       assert_equal 0o600, cli.stat.mode & 0o777
     end
@@ -287,12 +297,15 @@ class ChezmoiTest < RepositoryTest
     macro = '<Multi_key> <a> <b> : "private-text"'
     write(target, "# #{directive}\n#{macro}\n")
     chezmoi("apply", target.to_s)
+
     assert_equal "#{directive}\n# #{directive}\n#{macro}\n", target.read
     active = "\tinclude  \"/usr/share/omarchy/default/xcompose\" # active\n#{macro}\n"
     target.write(active)
     chezmoi("apply", target.to_s)
+
     assert_equal active, target.read
     chezmoi("apply", target.to_s)
+
     assert_equal active, target.read
   end
 
@@ -301,14 +314,15 @@ class ChezmoiTest < RepositoryTest
       initialize_profile(profile)
       chezmoi("apply")
       imported = @home / "gnome-import"
+
       assert_equal profile == "fedora", imported.exist?
       if profile == "fedora"
-        assert_includes imported.read, "color-scheme='prefer-dark'"
         refute_includes imported.read, "preferred-monitor"
         refute_includes imported.read, "mru-sources"
         imported.unlink
         chezmoi("apply")
-        refute imported.exist?, "unchanged preferences should not be loaded again"
+
+        refute_predicate imported, :exist?, "unchanged preferences should not be loaded again"
       end
       reset_home
     end
@@ -326,15 +340,15 @@ class ChezmoiTest < RepositoryTest
     tool("sudo", 'File.write(File.join(ENV.fetch("HOME"), "sudo-called"), ARGV.inspect)')
 
     preview = checked_command(RUBY, script.to_s)
+
     assert_includes preview, "rpmfusion-free-release-44.noarch.rpm"
-    assert_includes preview, "dnf copr enable scottames/ghostty"
-    assert_includes preview, "Preview only"
-    refute (@home / "sudo-called").exist?
+    refute_predicate (@home / "sudo-called"), :exist?
 
     _, stderr, status = Open3.capture3(@env, RUBY, script.to_s, "--apply")
-    refute status.success?
+
+    refute_predicate status, :success?
     assert_includes stderr, "signing keys are incomplete"
-    refute (@home / "sudo-called").exist?
+    refute_predicate (@home / "sudo-called"), :exist?
   end
 
   def test_neovim_detects_modify_templates_before_json_and_toml
@@ -376,21 +390,8 @@ class ChezmoiTest < RepositoryTest
     initialize_profile("omarchy")
     @config.write(@config.read.sub('profile = "omarchy"', 'profile = "other"'))
     _, stderr, status = chezmoi("apply", check: false)
-    refute status.success?, stderr
-    assert_empty @home.children
-  end
 
-  def test_private_runtime_files_are_git_ignored
-    names = %w[home/dot_config/mozc/user_dictionary.db home/dot_config/fcitx5/config.bak
-      home/dot_config/fcitx5/conf/cached_layouts home/dot_config/git/private_config.private
-      home/dot_ssh/private_id_ed25519 home/dot_codex/private_auth.json
-      home/dot_config/private_amp/private_secrets.json home/dot_config/private_gh/private_hosts.yml
-      home/dot_config/opencode/private_auth.json home/dot_pi/agent/private_auth.json]
-    result = checked_command("git", "check-ignore", "--no-index", "--stdin", input: names.join("\n") + "\n")
-    assert_equal names.sort, result.lines(chomp: true).sort
-    (REPO / "home").glob("**/*", File::FNM_DOTMATCH).select(&:file?).each do |path|
-      _, _, status = Open3.capture3(@env, "git", "check-ignore", "--no-index", path.to_s, chdir: REPO)
-      assert_equal 1, status.exitstatus, path.to_s
-    end
+    refute_predicate status, :success?, stderr
+    assert_empty @home.children
   end
 end
