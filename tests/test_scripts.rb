@@ -25,8 +25,8 @@ class ScriptsTest < RepositoryTest
 
   def test_successful_plugin_update_keeps_generation_and_private_backup
     plugin_fixture
-    result = run_script("update-zsh-plugins")
-    assert_equal 0, result.exit_code, result.stderr
+    _, stderr, status = run_script("update-zsh-plugins")
+    assert_equal 0, status.exitstatus, stderr
     generations = (@root / "data/dotfiles/sheldon").children
     assert_equal 1, generations.length
     assert_includes @cache.read, generations.first.to_s
@@ -41,8 +41,8 @@ class ScriptsTest < RepositoryTest
 
   def test_plugin_validation_failure_removes_only_failed_generation
     plugin_fixture(validation_status: 29)
-    result = run_script("update-zsh-plugins")
-    assert_equal 29, result.exit_code, result.stderr
+    _, stderr, status = run_script("update-zsh-plugins")
+    assert_equal 29, status.exitstatus, stderr
     assert_equal "# previous plugins\n", @cache.read
     assert_empty (@root / "data/dotfiles/sheldon").children
     refute (@home / ".local/state/dotfiles/backups").exist?
@@ -52,8 +52,8 @@ class ScriptsTest < RepositoryTest
     directory = @root / 'data with spaces $(touch should-not-exist); literal'
     @env["XDG_DATA_HOME"] = directory.to_s
     plugin_fixture
-    result = run_script("update-zsh-plugins", directory: @root)
-    assert_equal 0, result.exit_code, result.stderr
+    _, stderr, status = run_script("update-zsh-plugins", directory: @root)
+    assert_equal 0, status.exitstatus, stderr
     generations = (directory / "dotfiles/sheldon").children
     assert_equal 1, generations.length
     assert_includes @cache.read, generations.first.to_s

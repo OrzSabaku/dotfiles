@@ -37,7 +37,7 @@ class ZshAliasPluginsTest < RepositoryTest
     config = write(@root / "config/plugins.toml", configuration)
     rendered = checked_command(SHELDON, "--config-dir", config.dirname.to_s,
       "--data-dir", (@root / "data").to_s, "source")
-    generated = write(@root / "generated.zsh", rendered.stdout)
+    generated = write(@root / "generated.zsh", rendered)
     tool("docker", "exit 0\n")
     checked_command("zsh", "-f", "-c", <<~'ZSH', "test", generated.to_s)
       alias gcm='git commit -m'
@@ -71,16 +71,16 @@ class ZshAliasPluginsTest < RepositoryTest
     command = ["zsh", "-f", "-i", "-c", preflight, "test", source.to_s, @root.to_s]
     checked_command(*command, env: env)
     source.write(source.read.sub("fzf-tab-complete() { :; }", ""))
-    result = run_command(*command, env: env)
-    refute_equal 0, result.exit_code
-    assert_includes result.stderr, "Missing plugin function: fzf-tab-complete"
+    _, stderr, status = Open3.capture3(env, *command)
+    refute status.success?
+    assert_includes stderr, "Missing plugin function: fzf-tab-complete"
   end
 
   def assert_failed_update_preserves_cache(body)
     tool("sheldon", body)
     cache = write(@root / "cache/dotfiles/sheldon.zsh", "# working configuration\n")
-    result = run_script("update-zsh-plugins")
-    refute_equal 0, result.exit_code
+    _, stderr, status = run_script("update-zsh-plugins")
+    refute status.success?, stderr
     assert_equal "# working configuration\n", cache.read
   end
 

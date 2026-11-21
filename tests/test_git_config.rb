@@ -5,7 +5,7 @@ require_relative "test_helper"
 class GitConfigTest < RepositoryTest
   def git_config(*arguments)
     checked_command("git", "config", "--file", (REPO / "home/dot_config/git/config").to_s,
-      "--no-includes", *arguments).stdout.strip
+      "--no-includes", *arguments).strip
   end
 
   def test_public_config_enables_signing_without_identity_or_key
