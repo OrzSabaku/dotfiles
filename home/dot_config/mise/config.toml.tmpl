@@ -1,1 +1,40 @@
-{{ include (printf ".chezmoitemplates/%s/config/mise/config.toml" .profile) }}
+{{- $common := include ".chezmoitemplates/common/config/mise/config.toml" | fromToml -}}
+{{- $packages := dict -}}
+{{- if eq .profile "omarchy" -}}
+{{- /* Omarchy所有の一覧は管理・変更せず、生成時に読む。取得できなければ生成を止める。 */ -}}
+{{- range output "cat" "/usr/share/omarchy/install/omarchy-base.packages" | splitList "\n" -}}
+{{- $package := regexReplaceAll "#.*$" . "" | trim -}}
+{{- if $package -}}
+{{- $_ := set $packages $package $package -}}
+{{- end -}}
+{{- end -}}
+{{- /* expacでpacmanのProvidesを読む。標準一覧の仮想名（nvim等）を実パッケージ名へ解決する。 */ -}}
+{{- $standard := deepCopy $packages -}}
+{{- range output "expac" "-Q" "%n %P" | splitList "\n" -}}
+{{- $fields := splitList " " . | compact -}}
+{{- if $fields -}}
+{{- $name := first $fields -}}
+{{- range rest $fields -}}
+{{- $provided := regexReplaceAll "[<>=].*$" . "" -}}
+{{- if hasKey $standard $provided -}}
+{{- $_ := set $packages $name $provided -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- $tools := dict -}}
+{{- $systemPackages := dict -}}
+{{- range $name, $version := merge $common.tools $common.runtimes -}}
+{{- if and (not (hasKey $common.runtimes $name)) (hasKey $packages $name) -}}
+{{- $_ := set $systemPackages (printf "pacman:%s" (index $packages $name)) "latest" -}}
+{{- else -}}
+{{- $_ := set $tools $name $version -}}
+{{- end -}}
+{{- end -}}
+{{- $config := dict "tools" $tools "settings" $common.settings -}}
+{{- if $systemPackages -}}
+{{- $_ := set $config "bootstrap" (dict "packages" $systemPackages) -}}
+{{- end -}}
+# 共通一覧から生成。Omarchy標準のCLIはbootstrap.packagesで宣言する。
+{{ $config | toToml }}

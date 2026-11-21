@@ -7,6 +7,9 @@ class ChezmoiTest < RepositoryTest
     super
     skip "chezmoi is required" unless CHEZMOI
     @config = @root / "chezmoi.toml"
+    # Omarchyの外部一覧は固定データで検証し、ホストOSには依存しない。
+    tool("cat", 'puts %w[bat eza fd fzf ripgrep starship zoxide ruby nvim]')
+    tool("expac", 'puts "neovim nvim=0.12.6 vim-plugin-runtime"')
     tool("dconf", 'File.write(File.join(ENV.fetch("HOME"), "gnome-import"), STDIN.read)')
   end
 
@@ -57,8 +60,7 @@ class ChezmoiTest < RepositoryTest
       initialize_profile(profile)
       chezmoi("apply")
       { ".zshrc" => "zshrc", ".bashrc" => "bashrc",
-       ".config/ghostty/config" => "config/ghostty/config",
-       ".config/mise/config.toml" => "config/mise/config.toml" }.each do |target, fragment|
+       ".config/ghostty/config" => "config/ghostty/config" }.each do |target, fragment|
         expected = REPO / "home/.chezmoitemplates" / profile / fragment
         assert_equal expected.binread, (@home / target).binread
       end
@@ -78,6 +80,48 @@ class ChezmoiTest < RepositoryTest
       assert_includes (@home / ".local/share/applications/dotfiles-thunderbird.desktop").read, "Exec=thunderbird %u"
       reset_home
     end
+  end
+
+  def parse_toml(content)
+    JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
+      "{{ .chezmoi.stdin | fromToml | toJson }}", input: content).stdout)
+  end
+
+  def test_mise_common_tools_and_settings_on_both_profiles
+    common = parse_toml((REPO / "home/.chezmoitemplates/common/config/mise/config.toml").read)
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      content = chezmoi("cat", (@home / ".config/mise/config.toml").to_s).stdout
+      config = parse_toml(content)
+      expected = common.fetch("tools").merge(common.fetch("runtimes"))
+      expected = expected.reject { |name, _| %w[bat eza fd fzf ripgrep starship zoxide neovim].include?(name) } if profile == "omarchy"
+      assert_equal expected, config.fetch("tools")
+      if profile == "omarchy"
+        packages = %w[bat eza fd fzf ripgrep starship zoxide nvim].to_h { |name| ["pacman:#{name}", "latest"] }
+        assert_equal packages, config.dig("bootstrap", "packages")
+        refute config.dig("bootstrap", "packages").key?("pacman:ruby")
+      else
+        refute config.key?("bootstrap")
+      end
+      assert_equal common.fetch("settings"), config.fetch("settings")
+      assert_equal({ "version" => "latest", "rename_exe" => "yt-dlp" }, config.dig("tools", "yt-dlp"))
+      assert_equal "latest", config.dig("tools", "github:anomalyco/opencode")
+      assert_equal "latest", config.dig("tools", "ruby")
+      assert_equal profile == "fedora", config.fetch("tools").key?("neovim")
+      reset_home
+    end
+  end
+
+  def test_mise_keeps_tools_missing_from_omarchy_defaults
+    tool("cat", 'puts %w[bat eza fzf ripgrep starship zoxide]')
+    initialize_profile("omarchy")
+    content = chezmoi("cat", (@home / ".config/mise/config.toml").to_s).stdout
+    tools = parse_toml(content).fetch("tools")
+    assert_equal "latest", tools.fetch("fd")
+    refute tools.key?("bat")
+    packages = parse_toml(content).dig("bootstrap", "packages")
+    assert_equal "latest", packages.fetch("pacman:bat")
+    refute packages.key?("pacman:fd")
   end
 
   def test_unselected_apps_are_not_created

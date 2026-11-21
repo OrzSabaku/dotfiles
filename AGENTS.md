@@ -39,7 +39,12 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - ZshとSheldonは共通管理で、両OSの入口から使用します。Omarchyでは`.zshenv`が標準のPATH設定、
   `.zshrc`が標準環境・エイリアスと共通Zsh設定を読み込みます。Bash固有のrc・関数群はZshへ読み込みません。
 - Ghosttyの透過・余白・カーソル・分割キーは共通。テーマ・フォント・OS連携は環境側に残します。
-- miseのツール一覧はOS別です。共通化のためにツールを一括インストール・更新しないでください。
+- miseのツール一覧・設定は`.chezmoitemplates/common/config/mise/config.toml`に集約し、OS別の断片は持ちません。
+  Omarchy標準のCLIは`[tools]`から`[bootstrap.packages]`の`pacman:`宣言へ振り分けます。
+  標準一覧を読み取り、仮想パッケージ名は`expac`のローカルProvides情報で解決します。手書きの除外一覧は持ちません。
+  `[runtimes]`は常にmise管理です。chezmoi apply・mise installからOSパッケージを導入しません。
+  状態確認は`mise bootstrap packages status`、導入はdry-run後に`mise bootstrap packages apply`で明示的に行います。
+  パッケージ更新はOmarchyに任せます。
 - OpenCodeの`cli.json`はmiseの`merge`で`theme.name`だけを更新します。
   原本は`home/dot_config/mise/dotfiles/opencode-cli.json`、ルールは`home/dot_config/mise/conf.d/opencode-cli.toml.tmpl`です。
   chezmoiは原本とルールを配置し、対象の`cli.json`には書き込みません。反映は`mise dot diff`→`mise dot apply`で明示的に行います。
