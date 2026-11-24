@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  "mcp": {
+    "atuin": {
+      "type": "local",
+      "command": [{{ joinPath .chezmoi.homeDir ".atuin/bin/atuin" | toJson }}, "mcp"],
+      "enabled": true
+    }
+  }
+}

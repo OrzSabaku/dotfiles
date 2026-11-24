@@ -29,10 +29,12 @@ chezmoi apply
 - 原本の変更は `apply` で反映します。管理元で作業するときは `chezmoi cd`。
 - 実ファイル側の変更は差分を確認してから取り込みます。通常ファイルは `chezmoi re-add <パス>`、
   OS別テンプレートは `home/.chezmoitemplates/<環境>/` の該当ファイルを編集します。
-- Codex・Amp・OpenCode・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
+- Codex・Amp・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
   これらは `re-add` せず原本を編集します。認証情報・信頼設定・ウィンドウ状態は実ファイルに残します。
   AI設定の対象選択は `apps.ai`。Herdr・Atuinが生成する連携コードは各ツールで導入します。
-  OpenCodeの部分更新にはRubyを使い、JSONCのコメントと管理外の設定を保持します。
+- OpenCode 1.xは `~/.config/dotfiles/opencode/` の設定を標準マージします。既存設定は編集しません。
+  miseが `OPENCODE_CONFIG`・`OPENCODE_TUI_CONFIG` を設定するため、新しい端末から起動します。
+  管理設定はグローバル設定より優先され、プロジェクト設定で上書きできます。
 - Gitの名前・メール・署名鍵は非管理の `~/.config/git/config.private` へ。
   [記入例](examples/git/config.private.example)を参照し、権限は `600` にします。
 - Gitで原本を戻した場合も、反映前に `chezmoi diff` を確認します。リモート送信は手動です。

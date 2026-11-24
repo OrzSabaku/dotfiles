@@ -16,8 +16,6 @@ vim.filetype.add({
     [".*/%.chezmoiexternal%.[^/]+"] = "template",
     [".*/%.chezmoiexternals/.*"] = "template",
     [".*/%.chezmoitemplates/.*"] = "template",
-    -- includeで生のRubyとして取り込む共通処理はテンプレートではない。
-    [".*/%.chezmoitemplates/shared/.*%.rb"] = { "ruby", { priority = 1 } },
     [".*/symlink_[^/]+"] = function(path)
       return path:match("%.tmpl$") and "template" or "text"
     end,

@@ -6,8 +6,6 @@ symlink_* linguist-language=Text
 .chezmoiexternal.* linguist-language=Go-Template
 **/.chezmoiexternals/** linguist-language=Go-Template
 **/.chezmoitemplates/** linguist-language=Go-Template
-# includeで生のRubyとして取り込む共通処理。
-home/.chezmoitemplates/shared/*.rb linguist-language=Ruby
 
 # Git属性は内容のマーカーを判定できないため、modify-templateだけを列挙する。
 home/dot_codex/modify_private_config.toml linguist-language=Go-Template

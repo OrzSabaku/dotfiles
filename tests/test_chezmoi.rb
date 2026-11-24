@@ -132,6 +132,7 @@ class ChezmoiTest < RepositoryTest
     %w[.zshrc .zshenv .config/sheldon .config/dotfiles/zsh.zsh .config/nvim .config/ghostty .config/fcitx5
       .config/autostart/org.fcitx.Fcitx5.desktop .local/share/dbus-1/services/org.fcitx.Fcitx5.service
       .config/xdg-terminals.list .config/mise/conf.d/nvim-experiment.toml
+      .config/dotfiles/opencode .config/mise/conf.d/opencode.toml
       .codex .config/amp .pi].each do |name|
       refute_predicate (@home / name), :exist?, name
     end
@@ -234,59 +235,35 @@ class ChezmoiTest < RepositoryTest
     assert_empty chezmoi("diff")
   end
 
-  def test_opencode_updates_jsonc_without_losing_comments
-    initialize_profile("omarchy")
-    server = write(@home / ".config/opencode/opencode.json", <<~JSONC)
-      {
-        // server preference
-        "model": "local/model",
-        "mcp": { "atuin": { "command": ["old", /* keep command note */ "mcp"], }, },
+  def test_opencode_overlays_preserve_local_files_and_resolve_from_mise
+    %w[omarchy fedora].each do |profile|
+      initialize_profile(profile)
+      originals = {
+        "opencode.json" => "{\n// local model\n\"model\": \"local/model\",\n}\n",
+        "tui.json" => '{"theme":"local-theme","keybinds":{"leader":"ctrl+x"}}',
+        "cli.json" => '{"plugins":["./generated-plugin"]}',
+        "auth.json" => '{"token":"private-token"}',
+        "opencode.jsonc" => '{invalid local JSONC'
       }
-    JSONC
-    cli_content = <<~JSONC
-      {
-        // "plugins": ["disabled-plugin"],
-        "plugins": ["./generated-plugin",],
-        "theme": { /* theme note */ "name": "dark", "mode": "light", },
-      }
-    JSONC
-    cli = write(@home / ".config/opencode/cli.json", cli_content)
-    chezmoi("apply")
-    cli_data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
-      "{{ .chezmoi.stdin | fromJsonc | toJson }}", input: cli.read))
+      originals.each { |name, content| write(@home / ".config/opencode" / name, content, mode: 0o600) }
+      chezmoi("apply")
+      chezmoi("apply")
 
-    assert_equal ["./generated-plugin"], cli_data.fetch("plugins")
-    assert_equal "light", cli_data.dig("theme", "mode")
-    assert_includes cli.read, '// "plugins": ["disabled-plugin"],'
-    assert_includes cli.read, "/* theme note */"
-    assert_includes server.read, "// server preference"
-    assert_includes server.read, "/* keep command note */"
-    data = JSON.parse(checked_command(CHEZMOI, "execute-template", "--with-stdin",
-      "{{ .chezmoi.stdin | fromJsonc | toJson }}", input: server.read))
+      originals.each do |name, content|
+        file = @home / ".config/opencode" / name
 
-    assert_equal "local/model", data.fetch("model")
-    assert_equal [(@home / ".atuin/bin/atuin").to_s, "mcp"], data.dig("mcp", "atuin", "command")
-    first_server = server.binread
+        assert_equal content, file.read
+        assert_equal 0o600, file.stat.mode & 0o777
+      end
+      env = parse_toml((@home / ".config/mise/conf.d/opencode.toml").read).fetch("env")
+      %w[OPENCODE_CONFIG OPENCODE_TUI_CONFIG].each do |key|
+        file = Pathname.new(env.fetch(key))
 
-    assert_equal 0o600, cli.stat.mode & 0o777
-    first_cli = cli.binread
-    chezmoi("apply")
-
-    assert_equal first_server, server.binread
-    assert_equal first_cli, cli.binread
-    assert_empty chezmoi("diff")
-  end
-
-  def test_opencode_cli_refuses_invalid_jsonc_without_changing_it
-    initialize_profile("omarchy")
-    cli = @home / ".config/opencode/cli.json"
-    ['{"theme":', '{"theme": invalid}', '{"theme": {"name": "dark"}} trailing'].each do |content|
-      write(cli, content, mode: 0o600)
-      _, stderr, status = chezmoi("apply", cli.to_s, check: false)
-
-      refute_predicate status, :success?, stderr
-      assert_equal content, cli.read
-      assert_equal 0o600, cli.stat.mode & 0o777
+        assert file.to_s.start_with?((@home / ".config/dotfiles/opencode/").to_s)
+        assert_kind_of Hash, JSON.parse(file.read)
+      end
+      assert_empty chezmoi("diff")
+      reset_home
     end
   end
 
@@ -368,10 +345,9 @@ class ChezmoiTest < RepositoryTest
         [REPO / "home/dot_codex/modify_private_config.toml", "template"],
         [REPO / "home/dot_config/private_amp/modify_private_settings.json", "template"],
         [REPO / "home/dot_config/discord/modify_settings.json", "template"],
-        [REPO / "home/dot_config/opencode/modify_opencode.json.tmpl", "template"],
+        [REPO / "home/dot_config/dotfiles/opencode/opencode.json.tmpl", "template"],
         [REPO / "home/.chezmoiignore", "template"],
         [REPO / "home/.chezmoitemplates/common/config/mise/config.toml", "template"],
-        [REPO / "home/.chezmoitemplates/shared/jsonc-preferences.rb", "ruby"],
         [external, "template"],
         [externals, "template"],
         [remove, "template"],
