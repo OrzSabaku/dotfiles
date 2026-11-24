@@ -1,7 +1,27 @@
 # Run with zsh -f -i; caller isolates ZDOTDIR and supplies a temporary directory.
 setopt ERR_EXIT
 work=$2
-source "$1"
+# zsh.zshと同じ関数スコープで読み、typesetによるローカル化も検証する。
+() {
+  local plugin_source=$(<"$1")
+  eval "$plugin_source"
+} "$1"
+# 生成済みの補完がcompinitより前に登録されたことを、実際の対応表で確認する。
+if [[ -n ${DOTFILES_ZSH_COMPLETIONS:-} ]]; then
+  for completion_file in "$DOTFILES_ZSH_COMPLETIONS"/_*(N); do
+    completion_name=${completion_file:t}
+    command_name=${completion_name#_}
+    [[ ${_comps[$command_name]:-} == "$completion_name" ]] || {
+      print -u2 -- "Missing generated completion: $command_name"; exit 1
+    }
+  done
+  for completion_file in "$DOTFILES_ZSH_COMPLETIONS"/*.zsh(N); do
+    command_name=${${completion_file:t}%.zsh}
+    [[ -n ${_comps[$command_name]:-} ]] || {
+      print -u2 -- "Missing sourced completion: $command_name"; exit 1
+    }
+  done
+fi
 # Check upstream's actual widget function, not the nonexistent _fzf_tab.
 for required in compdef fzf-tab-complete globalias _zsh_highlight; do
   (( ${+functions[$required]} )) || {

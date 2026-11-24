@@ -2,7 +2,6 @@
 
 # 個人用コマンドの検索パスはここで管理する。
 path=("$HOME/.local/bin" $path)
-fpath+=("${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions")
 
 # History
 HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
@@ -54,7 +53,6 @@ WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 if command -v mise >/dev/null 2>&1; then eval "$(mise activate zsh)"; fi
 if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
-if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
 # Use the last validated source. Plugin downloads/updates are explicit so a
 # network or upstream failure cannot break every newly opened terminal.
 () {
@@ -65,21 +63,10 @@ if command -v zoxide >/dev/null 2>&1; then eval "$(zoxide init zsh)"; fi
   elif command -v sheldon >/dev/null 2>&1; then
     plugin_source=$(sheldon source) || plugin_source=''
   fi
-  # 旧キャッシュも、現在と同じ補完初期化を一度だけ実行する。
-  if [[ "$plugin_source" != *'# dotfiles: managed-compinit'* ]]; then
-    source "$HOME/.config/sheldon/completion-init.zsh"
-  fi
   eval "$plugin_source"
 }
-if command -v gh >/dev/null 2>&1; then eval "$(gh completion -s zsh)"; fi
-
-# Atuinはfzfなどの履歴キーバインドを初期化した後に読み込む。
-[[ -r "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
-if command -v atuin >/dev/null 2>&1; then eval "$(atuin init zsh)"; fi
-
-if command -v chezmoi >/dev/null 2>&1; then eval "$(chezmoi completion zsh)"; fi
 # ツールがPATHを追加した後で、重複を取り除く。
-typeset -U path fpath
+typeset -U path
 
 # コマンドを実行する前に、インストール済みか確認する。
 exists() {

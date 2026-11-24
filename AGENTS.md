@@ -123,6 +123,11 @@ Linux x86_64用バイナリは`.github/workflows/native-scripts.yml`でビルド
 既存タグは保持します。リモートへの送信は明示的な依頼がある場合だけ行います。
 
 Zshプラグインは`home/dot_config/sheldon/plugins.toml`で管理します。
+補完の検索先・初期化順、fzf・zoxide・Atuinのシェル連携もSheldonへ集約します。
+CLI補完の生成コマンドは`home/dot_config/sheldon/generate-completions.zsh`にまとめ、
+`scripts/update-zsh-plugins.rb`でプラグインと同じ未公開の世代へ生成・検証します。
+`_名前`はfpathへ登録し、`名前.zsh`はcompinit後にsourceします。CLIが出力する形式に合わせて選びます。
+未導入CLIは省略し、導入済みCLIの生成失敗時には以前のキャッシュと補完を保持します。
 Git・Docker・ComposeのエイリアスはOh My Zshの選択したファイルを使用し、自前の旧Git短縮形は維持しません。
 プラグインのエイリアスは上流の挙動を維持し、`gwip`などを独自に除去・改変しないでください。
 通常のコミットの自動署名は維持します。エージェント自身のコミットで署名を迂回してはいけません。

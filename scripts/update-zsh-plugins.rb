@@ -5,6 +5,7 @@ require "fileutils"
 require "tempfile"
 require "tmpdir"
 require "open3"
+require "shellwords"
 
 class ZshPluginUpdate
   def run
@@ -19,6 +20,7 @@ class ZshPluginUpdate
     begin
       Dir.mktmpdir("zsh-plugins.") do |work|
         source = File.join(work, "sheldon.zsh")
+        generate_completions(generation)
         fetch_plugins(generation, source)
         validate_plugins(work, source)
         activate_plugins(source)
@@ -48,9 +50,18 @@ class ZshPluginUpdate
 
   def fetch_plugins(generation, source)
     File.open(source, "w") do |output|
+      output.puts("DOTFILES_ZSH_COMPLETIONS=#{Shellwords.escape(File.join(generation, 'completions'))}")
+      output.flush
       system("sheldon", "--non-interactive", "--data-dir", generation,
         "source", "--relock", out: output, exception: true)
     end
+  end
+
+  def generate_completions(generation)
+    directory = File.join(generation, "completions")
+    FileUtils.mkdir_p(directory)
+    generator = File.join(@repo, "home/dot_config/sheldon/generate-completions.zsh")
+    system("zsh", generator, directory, exception: true)
   end
 
   def validate_plugins(work, source)
