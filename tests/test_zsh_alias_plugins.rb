@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "test_helper"
-require "shellwords"
 
 class ZshAliasPluginsTest < RepositoryTest
   def setup
@@ -92,7 +91,8 @@ class ZshAliasPluginsTest < RepositoryTest
       "--data-dir", (@root / "data").to_s, "source")
     source = write(@root / "plugins.zsh", rendered)
     env = @env.merge("DOTFILES_ZSH_COMPLETIONS" => generated.to_s, "PATH" => "/usr/bin:/bin")
-    command = ["zsh", "-f", "-i", "-c", <<~'ZSH', "test", source.to_s]
+    # compinitの権限確認への応答は、この仮ホームの検証内だけで指定する。
+    checked_pty_command("zsh", "-f", "-i", "-c", <<~'ZSH', "test", source.to_s, env: env, input: "y\n")
       [[ -t 0 && -t 1 && -t 2 ]] || exit 7
       original_fpath=("${fpath[@]}")
       autoload -Uz compaudit
@@ -114,10 +114,6 @@ class ZshAliasPluginsTest < RepositoryTest
       [[ $_comps[lazygit] == _lazygit ]] || exit 5
       [[ $(_lazygit) == 'lazygit candidate' ]] || exit 6
     ZSH
-    # CIにも制御端末を用意し、compinitの権限確認にはこの仮ホームの検証内だけで応答する。
-    # --returnでPTY内のZshの終了コードをそのままテストへ返す。
-    checked_command("script", "--quiet", "--return", "--command", Shellwords.join(command),
-      "/dev/null", env: env, input: "y\n")
   end
 
   def test_failed_completion_generation_keeps_previous_plugins_and_completions
