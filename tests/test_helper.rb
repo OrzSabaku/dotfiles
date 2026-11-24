@@ -5,6 +5,7 @@ require "fileutils"
 require "json"
 require "open3"
 require "pathname"
+require "pty"
 require "rbconfig"
 require "tmpdir"
 
@@ -65,6 +66,25 @@ class RepositoryTest < Minitest::Test
 
     assert_predicate status, :success?, stdout + stderr
     stdout
+  end
+
+  # 制御端末が必要なコマンドだけPTYで実行し、子プロセスの失敗もassertへ伝える。
+  def checked_pty_command(*arguments, env: @env, input: "", directory: REPO)
+    output = +""
+    status = nil
+    PTY.spawn(env, *arguments, chdir: directory) do |reader, writer, pid|
+      writer.write(input)
+      loop { output << reader.readpartial(4096) }
+    rescue EOFError, Errno::EIO
+      # PTYの終端は、LinuxではEOFの代わりにEIOになる。
+    ensure
+      reader.close
+      writer.close
+      _, status = Process.wait2(pid)
+    end
+
+    assert_predicate status, :success?, output
+    output
   end
 
   def run_script(name, *arguments, directory: REPO)
