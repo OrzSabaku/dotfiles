@@ -351,7 +351,7 @@ class ChezmoiTest < RepositoryTest
     refute_predicate (@home / "sudo-called"), :exist?
   end
 
-  def test_neovim_detects_modify_templates_before_json_and_toml
+  def test_neovim_detects_chezmoi_sources_before_target_filetypes
     nvim = resolve_command("nvim")
     skip "Neovim is required" unless nvim
 
@@ -359,9 +359,24 @@ class ChezmoiTest < RepositoryTest
       initialize_profile(profile)
       chezmoi("apply")
       plain = write(@root / "modify_plain.toml", "enabled = true\n")
+      external = write(@root / ".chezmoiexternal.toml", "{{ if true }}\n{{ end }}\n")
+      externals = write(@root / ".chezmoiexternals/tools.yaml", "{{ if true }}\n{{ end }}\n")
+      remove = write(@root / ".chezmoiremove", "{{ if true }}\n{{ end }}\n")
+      symlink = write(@root / "symlink_settings.json", "/tmp/settings.json\n")
+      symlink_template = write(@root / "symlink_settings.json.tmpl", "{{ .chezmoi.homeDir }}/settings.json\n")
       cases = [
         [REPO / "home/dot_codex/modify_private_config.toml", "template"],
         [REPO / "home/dot_config/private_amp/modify_private_settings.json", "template"],
+        [REPO / "home/dot_config/discord/modify_settings.json", "template"],
+        [REPO / "home/dot_config/opencode/modify_opencode.json.tmpl", "template"],
+        [REPO / "home/.chezmoiignore", "template"],
+        [REPO / "home/.chezmoitemplates/common/config/mise/config.toml", "template"],
+        [REPO / "home/.chezmoitemplates/shared/jsonc-preferences.rb", "ruby"],
+        [external, "template"],
+        [externals, "template"],
+        [remove, "template"],
+        [symlink, "text"],
+        [symlink_template, "template"],
         [@home / ".codex/config.toml", "toml"],
         [@home / ".config/amp/settings.json", "json"],
         [plain, "toml"]
