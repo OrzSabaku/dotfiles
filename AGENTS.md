@@ -48,8 +48,9 @@ OSに依存しない設定は積極的に共通化し、OS固有の初期化・�
 - `gh`・`chezmoi`は検証済みのバージョンに固定し、`.github/renovate.json`で更新PRの対象にします。
   自動マージはしません。試行対象外のツール・`[runtimes]`・OSパッケージへ対象を広げないでください。
 - 設定ファイルの配置・部分更新・OS差分はchezmoiで管理します。miseにはツール・環境変数・タスク・パッケージ導入の宣言を任せます。
-- OpenCodeの`cli.json`・`opencode.json`はchezmoiの`modify_`テンプレートと共通のRuby処理で部分更新します。
-  コメント・管理外の設定を保持し、反映はほかの設定と同じく`chezmoi diff`→`chezmoi apply`で行います。
+- OpenCode 1.xは`~/.config/dotfiles/opencode/`に管理設定を分離し、miseの`OPENCODE_CONFIG`・
+  `OPENCODE_TUI_CONFIG`で標準マージします。既存の設定・認証情報は編集しません。
+  グローバル設定より管理設定が優先され、プロジェクト設定で上書きできます。miseの環境を引き継ぐ起動が対象です。
 - 通常の`nvim`は共通のLazyVim。Omarchyのテーマ一覧・再読み込みだけOS側の追加設定です。
 - 自作Neovim設定は`experiments/nvim-experiment/`。`mise run --skip-tools nvim-experiment`で明示的に起動します。
   タスクは`home/dot_config/mise/conf.d/nvim-experiment.toml.tmpl`で共通管理し、呼び出し元のディレクトリを維持します。

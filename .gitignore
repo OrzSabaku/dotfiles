@@ -7,6 +7,7 @@
 !/experiments/
 /*
 !/.gitignore
+!/.gitattributes
 !/.gitmodules
 !/.github/
 !/Gemfile
@@ -57,8 +58,6 @@ home/dot_codex/**
 home/dot_config/private_amp/**
 !home/dot_config/private_amp/modify_private_settings.json
 home/dot_config/opencode/**
-!home/dot_config/opencode/modify_opencode.json.tmpl
-!home/dot_config/opencode/modify_private_cli.json.tmpl
 home/dot_pi/**
 !home/dot_pi/agent/
 !home/dot_pi/agent/modify_private_mcp.json

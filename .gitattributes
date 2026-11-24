@@ -1,0 +1,15 @@
+# chezmoiの原本を配置先のJSON/TOMLなどとして表示しない。
+symlink_* linguist-language=Text
+*.tmpl linguist-language=Go-Template
+.chezmoiignore linguist-language=Go-Template
+.chezmoiremove linguist-language=Go-Template
+.chezmoiexternal.* linguist-language=Go-Template
+**/.chezmoiexternals/** linguist-language=Go-Template
+**/.chezmoitemplates/** linguist-language=Go-Template
+
+# Git属性は内容のマーカーを判定できないため、modify-templateだけを列挙する。
+home/dot_codex/modify_private_config.toml linguist-language=Go-Template
+home/dot_config/discord/modify_settings.json linguist-language=Go-Template
+home/dot_config/private_amp/modify_private_settings.json linguist-language=Go-Template
+home/dot_pi/agent/modify_private_mcp.json linguist-language=Go-Template
+home/modify_dot_XCompose linguist-language=Go-Template
