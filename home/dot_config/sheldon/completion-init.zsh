@@ -1,11 +1,6 @@
 # Initialize completion after all completion paths have been registered.
 autoload -Uz compinit
-if [[ -n ${DOTFILES_ZSH_COMPLETIONS:-} ]]; then
-    # ファイル数が同じでも補完の登録先は変わるため、世代ごとにdumpを分ける。
-    compinit -d "${ZDOTDIR:-$HOME}/.zcompdump-${DOTFILES_ZSH_COMPLETIONS:h:t}"
-else
-    compinit
-fi
+compinit
 if (( $+commands[fzf] )); then
     source <(fzf --zsh)
 fi

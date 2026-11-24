@@ -42,7 +42,7 @@ chezmoi apply
 Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから実行します。
 
 - `scripts/setup-zsh.rb` — OmarchyでのZsh初回導入。通常の端末で実行します。
-- `scripts/update-zsh-plugins.rb` — Sheldon設定の適用後にプラグイン取得とCLI補完の生成・検証を行い、キャッシュを切り替えます。ツールの導入・更新後も実行し、完了後に新しい端末を開きます。
+- `scripts/update-zsh-plugins.rb` — Sheldon設定の適用後にプラグインを取得・検証し、キャッシュを切り替えます。完了後に新しい端末を開きます。
 
 実験用Neovimは `mise run --skip-tools nvim-experiment`（ファイル指定は `mise run --skip-tools nvim-experiment -- <ファイル>`）で起動します。
 chezmoiで配置するグローバルタスクです。[実験用設定](experiments/README.md)を参照。
