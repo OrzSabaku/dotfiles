@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "test_helper"
+require "shellwords"
 
 class ZshAliasPluginsTest < RepositoryTest
   def setup
@@ -91,13 +92,18 @@ class ZshAliasPluginsTest < RepositoryTest
       "--data-dir", (@root / "data").to_s, "source")
     source = write(@root / "plugins.zsh", rendered)
     env = @env.merge("DOTFILES_ZSH_COMPLETIONS" => generated.to_s, "PATH" => "/usr/bin:/bin")
-    checked_command("zsh", "-f", "-c", <<~'ZSH', "test", source.to_s, env: env)
+    command = ["zsh", "-f", "-i", "-c", <<~'ZSH', "test", source.to_s]
+      [[ -t 0 && -t 1 && -t 2 ]] || exit 7
       original_fpath=("${fpath[@]}")
+      autoload -Uz compaudit
+      insecure_fpath=("${(@f)$(compaudit 2>/dev/null)}")
       # 実際のzsh.zshと同じく、匿名関数内でキャッシュを評価する。
       () {
         local plugin_source=$(<"$1")
         eval "$plugin_source"
         for directory in "${original_fpath[@]}"; do
+          # compinitが安全でない検索先を除外するのは正しい動作。
+          (( ${insecure_fpath[(Ie)$directory]} )) && continue
           (( ${fpath[(Ie)$directory]} )) || exit 3
         done
         autoload -Uz is-at-least
@@ -108,6 +114,10 @@ class ZshAliasPluginsTest < RepositoryTest
       [[ $_comps[lazygit] == _lazygit ]] || exit 5
       [[ $(_lazygit) == 'lazygit candidate' ]] || exit 6
     ZSH
+    # CIにも制御端末を用意し、compinitの権限確認にはこの仮ホームの検証内だけで応答する。
+    # --returnでPTY内のZshの終了コードをそのままテストへ返す。
+    checked_command("script", "--quiet", "--return", "--command", Shellwords.join(command),
+      "/dev/null", env: env, input: "y\n")
   end
 
   def test_failed_completion_generation_keeps_previous_plugins_and_completions
