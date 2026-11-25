@@ -39,6 +39,7 @@ bitwarden = "latest"
 go = "latest"
 node = "latest"
 ruby = "latest"
+typst = "latest"
 
 [settings.upgrade]
 auto_prune = false
