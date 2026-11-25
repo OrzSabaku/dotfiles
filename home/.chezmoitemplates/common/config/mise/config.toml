@@ -44,5 +44,6 @@ typst = "latest"
 [settings]
 registry_floating = true
 
+# /etc/mise/conf.d/omarchy.tomlを上書き（危険）
 [settings.upgrade]
-auto_prune = false
+auto_prune = true
