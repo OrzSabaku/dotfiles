@@ -36,6 +36,13 @@ return {
       servers = {
         gopls = {
           filetypes = { "go", "gomod", "gowork", "gotmpl", "template" },
+          on_attach = function(_, bufnr)
+            -- goplsはテンプレートの式全体をmacroとして塗るため、Treesitterの色分けを優先する。
+            -- バッファ単位で無効化し、同じgoplsに接続するGoソースの色付けは維持する。
+            if vim.bo[bufnr].filetype == "template" or vim.bo[bufnr].filetype == "gotmpl" then
+              vim.lsp.semantic_tokens.enable(false, { bufnr = bufnr })
+            end
+          end,
           -- chezmoiの拡張子なしの断片も、Goソースではなくテンプレートとして通知する。
           get_language_id = function(_, filetype)
             return filetype == "template" and "gotmpl" or filetype
