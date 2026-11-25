@@ -341,6 +341,7 @@ class ChezmoiTest < RepositoryTest
       remove = write(@root / ".chezmoiremove", "{{ if true }}\n{{ end }}\n")
       symlink = write(@root / "symlink_settings.json", "/tmp/settings.json\n")
       symlink_template = write(@root / "symlink_settings.json.tmpl", "{{ .chezmoi.homeDir }}/settings.json\n")
+      go_template = write(@root / "example.gotmpl", "{{ if .enabled }}yes{{ end }}\n")
       cases = [
         [REPO / "home/dot_codex/modify_private_config.toml", "template"],
         [REPO / "home/dot_config/private_amp/modify_private_settings.json", "template"],
@@ -353,6 +354,7 @@ class ChezmoiTest < RepositoryTest
         [remove, "template"],
         [symlink, "text"],
         [symlink_template, "template"],
+        [go_template, "template"],
         [@home / ".codex/config.toml", "toml"],
         [@home / ".config/amp/settings.json", "json"],
         [plain, "toml"]
@@ -360,6 +362,7 @@ class ChezmoiTest < RepositoryTest
       script = write(@root / "filetypes.lua", <<~LUA)
         vim.opt.rtp:prepend(#{(@home / ".config/nvim").to_s.to_json})
         dofile(#{(@home / ".config/nvim/lua/config/options.lua").to_s.to_json})
+        assert(vim.treesitter.language.get_lang("template") == "gotmpl")
         local events = {}
         vim.api.nvim_create_autocmd("FileType", {
           callback = function(event) table.insert(events, event.match) end,
@@ -368,6 +371,9 @@ class ChezmoiTest < RepositoryTest
           events = {}
           vim.cmd("edit " .. vim.fn.fnameescape(case[1]))
           assert(vim.bo.filetype == case[2], vim.inspect({ case, vim.bo.filetype }))
+          if case[2] == "template" then
+            assert(vim.b.autoformat == false, "template must be formatted explicitly")
+          end
           assert(vim.deep_equal(events, { case[2] }), vim.inspect(events))
         end
         vim.cmd("qa!")
