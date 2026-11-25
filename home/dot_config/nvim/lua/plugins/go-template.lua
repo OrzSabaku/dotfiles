@@ -17,7 +17,7 @@ return {
   {
     "stevearc/conform.nvim",
     opts = function(_, opts)
-      opts.formatters.chezmoi = require("chezmoi-template.format").formatter
+      opts.formatters.chezmoi = require("config.chezmoi_format")
       opts.formatters_by_ft.template = { "chezmoi" }
       -- LSPの付かない整形用バッファでも、既存のCLIを使用できるようにする。
       opts.formatters_by_ft.toml = opts.formatters_by_ft.toml or { "taplo" }
