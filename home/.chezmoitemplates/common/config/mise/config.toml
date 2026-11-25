@@ -13,6 +13,7 @@ bun = "latest"
 clang = "latest"
 "github:anomalyco/opencode" = "latest"
 harper-cli = "latest"
+imagemagick = "latest"
 jq = "latest"
 lazygit = "latest"
 neovim = "latest"
@@ -30,6 +31,7 @@ gh = "2.105.0"
 chezmoi = "2.74.1"
 actionlint = "latest"
 bitwarden = "latest"
+"pipx:google-colab-cli" = "latest"
 
 
 # ランタイムはOSの提供状況に関わらずmiseでバージョン管理する。
