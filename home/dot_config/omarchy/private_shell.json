@@ -85,7 +85,8 @@
           "id": "omarchy.monitor"
         },
         {
-          "id": "omarchy.power"
+          "id": "omarchy.power",
+          "showPercentage": true
         }
       ],
       "tray": []
@@ -113,6 +114,9 @@
     },
     {
       "id": "dotfiles.notifications"
+    },
+    {
+      "id": "io.voxtype.settings"
     }
   ],
   "version": 1
