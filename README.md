@@ -27,6 +27,9 @@ chezmoi apply
 ```
 
 - 原本の変更は `apply` で反映します。管理元で作業するときは `chezmoi cd`。
+- NeovimのchezmoiテンプレートはGo templateの構文強調・構文診断を使用します。
+  整形は `Space c f` で明示的に実行します（TOMLはTaplo、JSONはBiome、シェルはshfmtなど、対象形式のCLIが必要）。
+  保存時の自動整形・自動applyは行いません。診断はテンプレート構文が対象で、展開後の設定は `chezmoi diff` でも確認します。
 - 実ファイル側の変更は差分を確認してから取り込みます。通常ファイルは `chezmoi re-add <パス>`、
   OS別テンプレートは `home/.chezmoitemplates/<環境>/` の該当ファイルを編集します。
 - Codex・Amp・PiとDiscordは `modify_` テンプレートで好みの項目だけ更新します。
