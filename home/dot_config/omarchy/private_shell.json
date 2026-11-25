@@ -114,6 +114,9 @@
     },
     {
       "id": "dotfiles.notifications"
+    },
+    {
+      "id": "io.voxtype.settings"
     }
   ],
   "version": 1
