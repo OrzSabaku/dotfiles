@@ -1,8 +1,8 @@
 {{- /* chezmoi:modify-template */ -}}
-{{- /* 設定項目だけを更新し、認証情報・信頼設定・生成された連携情報は保持する。 */ -}}
+{{- /* 設定項目だけを更新し，認証情報・信頼設定・生成された連携情報は保持する． */ -}}
 {{- $original := (.chezmoi.stdin | fromToml) -}}
 {{- $config := deepCopy $original -}}
-{{- /* 作業領域のGit操作を許可する。ほかの保護対象は:workspaceの設定を継承する。 */ -}}
+{{- /* 作業領域のGit操作を許可する．ほかの保護対象は:workspaceの設定を継承する． */ -}}
 {{- $config = setValueAtPath (list "default_permissions") "workspace-git" $config -}}
 {{- $config = setValueAtPath (list "permissions" "workspace-git" "extends") ":workspace" $config -}}
 {{- $config = setValueAtPath (list "permissions" "workspace-git" "filesystem" ":workspace_roots" ".git") "write" $config -}}

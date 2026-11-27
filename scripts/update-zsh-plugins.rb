@@ -27,8 +27,8 @@ class ZshPluginUpdate
         activated = true
       end
     ensure
-      # Sheldonは未使用の取得先を削除するため、現在のキャッシュとは別の世代で検証する。
-      # 成功した世代はキャッシュから参照されるので残し、失敗した世代だけ削除する。
+      # Sheldonは未使用の取得先を削除するため，現在のキャッシュとは別の世代で検証する．
+      # 成功した世代はキャッシュから参照されるので残し，失敗した世代だけ削除する．
       FileUtils.remove_entry(generation) unless activated
     end
     puts "Validated Zsh plugins activated. Open a new terminal."
@@ -76,7 +76,7 @@ class ZshPluginUpdate
     current = File.join(cache, "sheldon.zsh")
     backup_cache(current) if File.file?(current)
 
-    # 同じディレクトリでrenameし、新しい端末が書き込み途中のキャッシュを読まないようにする。
+    # 同じディレクトリでrenameし，新しい端末が書き込み途中のキャッシュを読まないようにする．
     Tempfile.create([".sheldon.", ".zsh"], cache) do |pending|
       FileUtils.copy_file(source, pending.path)
       File.chmod(0o600, pending.path)

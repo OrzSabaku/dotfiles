@@ -2,7 +2,7 @@
 
 {{- $packages := dict -}}
 {{- if eq .profile "omarchy" -}}
-{{- /* Omarchy所有の一覧は管理・変更せず、生成時に読む。取得できなければ生成を止める。 */ -}}
+{{- /* Omarchy所有の一覧は管理・変更せず，生成時に読む．取得できなければ生成を止める． */ -}}
 {{- range output "cat" "/usr/share/omarchy/install/omarchy-base.packages" | splitList "\n" -}}
 {{- $package := regexReplaceAll "#.*$" . "" | trim -}}
 {{- if $package -}}
@@ -10,7 +10,7 @@
 {{- end -}}
 {{- end -}}
 
-{{- /* expacでpacmanのProvidesを読む。標準一覧の仮想名（nvim等）を実パッケージ名へ解決する。 */ -}}
+{{- /* expacでpacmanのProvidesを読む．標準一覧の仮想名（nvim等）を実パッケージ名へ解決する． */ -}}
 {{- $standard := deepCopy $packages -}}
 {{- range output "expac" "-Q" "%n %P" | splitList "\n" -}}
 {{- $fields := splitList " " . | compact -}}
@@ -41,5 +41,5 @@
 {{- $_ := set $config "bootstrap" (dict "packages" $systemPackages) -}}
 {{- end -}}
 
-# 共通一覧から生成。Omarchy標準のCLIはbootstrap.packagesで宣言する。
+# 共通一覧から生成．Omarchy標準のCLIはbootstrap.packagesで宣言する．
 {{ $config | toToml }}

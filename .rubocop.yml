@@ -8,7 +8,7 @@ Minitest:
   Include:
     - 'tests/**/*.rb'
 
-# 同じ利用場面の結果をまとめて検証し、assert数だけを理由に分割しない。
+# 同じ利用場面の結果をまとめて検証し，assert数だけを理由に分割しない．
 Minitest/MultipleAssertions:
   Enabled: false
 

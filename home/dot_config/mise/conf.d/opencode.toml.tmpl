@@ -1,5 +1,5 @@
-# OpenCode 1.xの標準マージで管理設定を重ねる。既存JSONCには書き込まない。
-# グローバル設定より優先されるが、プロジェクト側からは上書きできる。
+# OpenCode 1.xの標準マージで管理設定を重ねる．既存JSONCには書き込まない．
+# グローバル設定より優先されるが，プロジェクト側からは上書きできる．
 [env]
 OPENCODE_CONFIG = {{ joinPath .chezmoi.homeDir ".config/dotfiles/opencode/opencode.json" | quote }}
 OPENCODE_TUI_CONFIG = {{ joinPath .chezmoi.homeDir ".config/dotfiles/opencode/tui.json" | quote }}

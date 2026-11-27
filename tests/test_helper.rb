@@ -12,7 +12,7 @@ require "tmpdir"
 REPO = Pathname.new(File.expand_path("..", __dir__))
 RUBY = RbConfig.ruby
 
-# miseのshimは仮HOMEで別の設定を探すため、HOMEを替える前に実行ファイルを解決する。
+# miseのshimは仮HOMEで別の設定を探すため，HOMEを替える前に実行ファイルを解決する．
 def resolve_command(name)
   path = ENV.fetch("PATH").split(File::PATH_SEPARATOR)
     .map { |directory| File.join(directory, name) }
@@ -59,8 +59,8 @@ class RepositoryTest < Minitest::Test
     write(directory / name, "#!#{RUBY}\n#{body}", mode: 0o755)
   end
 
-  # 成功を前提とするコマンドだけ、診断とassertを共通化する。
-  # 失敗を検証するテストではOpen3.capture3の戻り値を直接使う。
+  # 成功を前提とするコマンドだけ，診断とassertを共通化する．
+  # 失敗を検証するテストではOpen3.capture3の戻り値を直接使う．
   def checked_command(*arguments, env: @env, input: "", directory: REPO)
     stdout, stderr, status = Open3.capture3(env, *arguments, stdin_data: input, chdir: directory)
 
@@ -68,7 +68,7 @@ class RepositoryTest < Minitest::Test
     stdout
   end
 
-  # 制御端末が必要なコマンドだけPTYで実行し、子プロセスの失敗もassertへ伝える。
+  # 制御端末が必要なコマンドだけPTYで実行し，子プロセスの失敗もassertへ伝える．
   def checked_pty_command(*arguments, env: @env, input: "", directory: REPO)
     output = +""
     status = nil
@@ -76,7 +76,7 @@ class RepositoryTest < Minitest::Test
       writer.write(input)
       loop { output << reader.readpartial(4096) }
     rescue EOFError, Errno::EIO
-      # PTYの終端は、LinuxではEOFの代わりにEIOになる。
+      # PTYの終端は，LinuxではEOFの代わりにEIOになる．
     ensure
       reader.close
       writer.close

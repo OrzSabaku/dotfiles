@@ -1,12 +1,12 @@
-# 更新時だけ実行する。出力先は未公開の世代なので、失敗時に以前の補完を壊さない。
+# 更新時だけ実行する．出力先は未公開の世代なので，失敗時に以前の補完を壊さない．
 setopt ERR_EXIT NO_UNSET
 destination=$1
 
 generate() {
-    # _名前はfpath用、名前.zshはcompinit後にsourceする補完。
+    # _名前はfpath用，名前.zshはcompinit後にsourceする補完．
     local filename=$1
     shift
-    # 未導入のCLIは省略する。導入済みCLIの生成失敗は更新全体を中止する。
+    # 未導入のCLIは省略する．導入済みCLIの生成失敗は更新全体を中止する．
     if (( $+commands[$1] )); then
         "$@" > "$destination/$filename"
         [[ -s "$destination/$filename" ]] || {

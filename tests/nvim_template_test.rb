@@ -2,7 +2,7 @@
 
 require_relative "test_helper"
 
-# インストール済みのプラグインを使う任意の結合テスト。テストから取得・更新しない。
+# インストール済みのプラグインを使う任意の結合テスト．テストから取得・更新しない．
 # 実行: bundle exec ruby -Itests tests/nvim_template_test.rb
 class NvimTemplateTest < RepositoryTest
   def test_manual_formatting_avoids_chezmoi_and_buffer_name_collisions

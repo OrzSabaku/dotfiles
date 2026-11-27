@@ -26,7 +26,7 @@ class ZshAliasPluginsTest < RepositoryTest
     sources.each { |name, content| write(fixture / name, content) }
     helper = REPO / "home/dot_config/sheldon/omz-aliases.zsh"
     write(@home / ".config/sheldon/omz-aliases.zsh", helper.read)
-    # 実際のTOMLをSheldon自身で解釈する。取得先だけをローカルのフィクスチャへ置き換える。
+    # 実際のTOMLをSheldon自身で解釈する．取得先だけをローカルのフィクスチャへ置き換える．
     configuration = (REPO / "home/dot_config/sheldon/plugins.toml").read.split("[plugins.", 2).first
     configuration += <<~TOML
       [plugins.fixture]
@@ -55,7 +55,7 @@ class ZshAliasPluginsTest < RepositoryTest
   end
 
   def test_generated_completions_are_registered_before_initialization
-    # 実際の登録順を検証し、ネットワークや各CLIの実装には依存しない。
+    # 実際の登録順を検証し，ネットワークや各CLIの実装には依存しない．
     tool("herdr", <<~'STUB')
       puts <<~'ZSH'
         #compdef herdr
@@ -73,7 +73,7 @@ class ZshAliasPluginsTest < RepositoryTest
     generated = @root / "generated completions"
     generated.mkpath
     generator = REPO / "home/dot_config/sheldon/generate-completions.zsh"
-    # 導入していないCLIは省略できることも、この隔離したPATHで確認する。
+    # 導入していないCLIは省略できることも，この隔離したPATHで確認する．
     File.symlink(resolve_command("zsh"), @tools / "zsh")
     env = @env.merge("PATH" => @tools.to_s)
     checked_command("/usr/bin/zsh", generator.to_s, generated.to_s, env: env)
@@ -91,18 +91,18 @@ class ZshAliasPluginsTest < RepositoryTest
       "--data-dir", (@root / "data").to_s, "source")
     source = write(@root / "plugins.zsh", rendered)
     env = @env.merge("DOTFILES_ZSH_COMPLETIONS" => generated.to_s, "PATH" => "/usr/bin:/bin")
-    # compinitの権限確認への応答は、この仮ホームの検証内だけで指定する。
+    # compinitの権限確認への応答は，この仮ホームの検証内だけで指定する．
     checked_pty_command("zsh", "-f", "-i", "-c", <<~'ZSH', "test", source.to_s, env: env, input: "y\n")
       [[ -t 0 && -t 1 && -t 2 ]] || exit 7
       original_fpath=("${fpath[@]}")
       autoload -Uz compaudit
       insecure_fpath=("${(@f)$(compaudit 2>/dev/null)}")
-      # 実際のzsh.zshと同じく、匿名関数内でキャッシュを評価する。
+      # 実際のzsh.zshと同じく，匿名関数内でキャッシュを評価する．
       () {
         local plugin_source=$(<"$1")
         eval "$plugin_source"
         for directory in "${original_fpath[@]}"; do
-          # compinitが安全でない検索先を除外するのは正しい動作。
+          # compinitが安全でない検索先を除外するのは正しい動作．
           (( ${insecure_fpath[(Ie)$directory]} )) && continue
           (( ${fpath[(Ie)$directory]} )) || exit 3
         done
@@ -172,7 +172,7 @@ class ZshAliasPluginsTest < RepositoryTest
   end
 
   def test_update_uses_isolated_generation
-    # 取得処理が取得先を掃除しても、稼働中のプラグインを壊さないこと。
+    # 取得処理が取得先を掃除しても，稼働中のプラグインを壊さないこと．
     state = write(@root / "data/dotfiles/sheldon/active/plugin-state", "working plugins")
 
     assert_failed_update_preserves_cache(<<~'STUB')

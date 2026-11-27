@@ -10,7 +10,7 @@ dofile((os.getenv("OMARCHY_PATH") or "/usr/share/omarchy") .. "/default/hypr/boo
 -- keeping core window-manager bindings:
 -- omarchy_preinstalled_bindings = false
 
--- ワークスペース共有の動作は公開プラグインで管理する。
+-- ワークスペース共有の動作は公開プラグインで管理する．
 local shared_workspaces = dofile(os.getenv("HOME") .. "/.config/omarchy/plugins/sabaku.workspaces/workspaces.lua")
 
 -- Load Omarchy defaults.
