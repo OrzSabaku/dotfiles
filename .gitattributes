@@ -1,6 +1,39 @@
-# chezmoiの原本を配置先のJSON/TOMLなどとして表示しない．
-linguist-detectable=true
+# 設定言語と文書のマークアップも言語統計に含める．
+* linguist-detectable
+*.md -linguist-documentation
+examples/** -linguist-documentation
+home/dot_config/omarchy/branding/*.txt -linguist-detectable
 
+# Linguistが既定で集計から外す，このリポジトリ自身のGit・GitHub設定．
+.gitattributes -linguist-vendored
+.gitignore -linguist-vendored
+.gitmodules -linguist-vendored
+.github/** -linguist-vendored
+
+# chezmoiのファイル名やアプリ固有の拡張子から判定できない設定．
+home/dot_bash_profile linguist-language=Shell
+home/dot_zshenv linguist-language=Shell
+home/dot_config/private_user-dirs.dirs linguist-language=Shell
+home/dot_bundle/config linguist-language=YAML
+home/dot_config/git/config linguist-language=Git-Config
+examples/git/config.private.example linguist-language=Git-Config
+dot_gitignore linguist-language=Ignore-List
+home/dot_config/environment.d/*.conf linguist-language=Dotenv
+home/dot_config/private_Code/User/settings.json linguist-language=jsonc
+home/dot_config/omarchy/themed/*.toml.tpl.sample linguist-language=TOML
+
+home/dot_config/btop/btop.conf linguist-language=INI
+home/dot_config/dotfiles/desktop.dconf linguist-language=INI
+home/dot_config/fcitx5/conf/*.conf linguist-language=INI
+home/dot_config/fcitx5/private_config linguist-language=INI
+home/dot_config/fcitx5/private_profile linguist-language=INI
+home/dot_config/*mimeapps.list linguist-language=INI
+home/dot_config/imv/config linguist-language=INI
+home/dot_config/private_htop/private_htoprc linguist-language=INI
+home/dot_config/private_kdenliverc linguist-language=INI
+home/dot_config/xdg-desktop-portal/*-portals.conf linguist-language=INI
+
+# chezmoiの原本を配置先のJSON/TOMLなどとして表示しない．
 symlink_* linguist-language=Text
 *.tmpl linguist-language=Go-Template
 .chezmoiignore linguist-language=Go-Template
