@@ -5,7 +5,7 @@ require "fileutils"
 require "shellwords"
 require "open3"
 
-# 通常のユーザー端末で実行する。sudo/chshの入力は端末に引き継ぐ。
+# 通常のユーザー端末で実行する．sudo/chshの入力は端末に引き継ぐ．
 class ZshSetup
   DEPENDENCIES = %w[zsh sheldon starship mise fzf zoxide eza bat chezmoi].freeze
 
@@ -13,7 +13,7 @@ class ZshSetup
     check_environment
     previous_shell = login_shell
 
-    # 導入・適用・起動確認がすべて成功するまでログインシェルを変更しない。
+    # 導入・適用・起動確認がすべて成功するまでログインシェルを変更しない．
     system("omarchy", "pkg", "add", "zsh", "sheldon", exception: true)
     zsh = check_dependencies
     apply_configuration
@@ -79,7 +79,7 @@ class ZshSetup
   end
 
   def apply_configuration
-    # CIのソース配置ではなく、利用者がchezmoiで管理するチェックアウトを使う。
+    # CIのソース配置ではなく，利用者がchezmoiで管理するチェックアウトを使う．
     repo, status = Open3.capture2("chezmoi", "execute-template", "{{ .chezmoi.workingTree }}")
     exit(status.exitstatus || 128 + status.termsig) unless status.success?
     @repo = repo.strip

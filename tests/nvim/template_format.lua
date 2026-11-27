@@ -39,7 +39,7 @@ for _, name in ipairs({
   root .. "/.chezmoitemplates/common/config/mise/config.toml",
   root .. "/modify_settings.toml",
 }) do
-  -- .tmplを除いた名前のバッファが開かれていても整形できること。
+  -- .tmplを除いた名前のバッファが開かれていても整形できること．
   local target = name:gsub("%.tmpl$", "")
   local other = target ~= name and buffer(target, { "local data" }) or nil
   local source = buffer(name, input)
@@ -67,7 +67,7 @@ assert(format(broken), "invalid TOML must fail")
 assert(vim.deep_equal(invalid, vim.api.nvim_buf_get_lines(broken, 0, -1, false)), "failed format changed source")
 assert(#vim.api.nvim_list_bufs() == count, "failed format leaked a buffer")
 
--- 形式を判定できない場合も、CLIへフォールバックしない。
+-- 形式を判定できない場合も，CLIへフォールバックしない．
 local unknown = buffer(root .. "/unknown-format.tmpl", { "{{ if true }}text{{ end }}" })
 assert(not format(unknown))
 assert(vim.deep_equal(vim.api.nvim_buf_get_lines(unknown, 0, -1, false), { "{{ if true }}text{{ end }}" }))

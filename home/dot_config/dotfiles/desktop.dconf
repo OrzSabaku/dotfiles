@@ -1,5 +1,5 @@
 # dconf load / < ~/.config/dotfiles/desktop.dconf
-# テーマはOmarchyが管理するため、生成されたテーマ名や色設定は含めない。
+# テーマはOmarchyが管理するため，生成されたテーマ名や色設定は含めない．
 [org/gnome/desktop/interface]
 cursor-size=24
 gtk-enable-primary-paste=true

@@ -7,7 +7,7 @@ class ChezmoiTest < RepositoryTest
     super
     skip "chezmoi is required" unless CHEZMOI
     @config = @root / "chezmoi.toml"
-    # Omarchyの外部一覧は固定データで検証し、ホストOSには依存しない。
+    # Omarchyの外部一覧は固定データで検証し，ホストOSには依存しない．
     tool("cat", 'puts %w[bat eza fd fzf ripgrep starship zoxide ruby nvim]')
     tool("expac", 'puts "neovim nvim=0.12.6 vim-plugin-runtime"')
     tool("dconf", 'File.write(File.join(ENV.fetch("HOME"), "gnome-import"), STDIN.read)')
@@ -26,7 +26,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def reset_home
-    # OS切り替えではなく、それぞれ新規のホームへの導入を検証する。
+    # OS切り替えではなく，それぞれ新規のホームへの導入を検証する．
     FileUtils.remove_entry(@home)
     @home.mkdir
     @config.unlink
@@ -81,7 +81,7 @@ class ChezmoiTest < RepositoryTest
   end
 
   def test_mise_routes_only_standard_cli_tools_to_os_packages
-    # 現在のツール一覧とは独立した入力で、変換規則だけを検証する。
+    # 現在のツール一覧とは独立した入力で，変換規則だけを検証する．
     source = @root / "mise-source"
     write(source / ".chezmoitemplates/common/config/mise/config.toml", <<~TOML)
       [tools]
@@ -104,7 +104,7 @@ class ChezmoiTest < RepositoryTest
           "runtime" => "7.8" }, config.fetch("tools"))
         assert_equal({ "pacman:standard" => "latest", "pacman:virtual-editor" => "latest" },
           config.dig("bootstrap", "packages"))
-        # 標準一覧から外れたCLIは、ハードコードした除外一覧に残らない。
+        # 標準一覧から外れたCLIは，ハードコードした除外一覧に残らない．
         tool("cat", 'puts "runtime"')
         changed = parse_toml(chezmoi("execute-template", template, source: source))
 
@@ -159,7 +159,7 @@ class ChezmoiTest < RepositoryTest
   def test_neovim_task_preserves_environment_arguments_directory_and_exit_code
     skip "mise is required" unless MISE
     initialize_profile("omarchy")
-    # タスクだけを配置し、テスト中に[tools]の導入を発生させない。
+    # タスクだけを配置し，テスト中に[tools]の導入を発生させない．
     (@home / ".config/mise/conf.d").mkpath
     chezmoi("apply", (@home / ".config/mise/conf.d/nvim-experiment.toml").to_s)
     tool("nvim", <<~'STUB')

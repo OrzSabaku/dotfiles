@@ -15,7 +15,7 @@ apply = ["completions"]
 
 [plugins.completion-paths]
 inline = '''
-# 更新スクリプトが検証した世代の補完を使う。未生成ならOS標準の補完を使う。
+# 更新スクリプトが検証した世代の補完を使う．未生成ならOS標準の補完を使う．
 if [[ -n ${DOTFILES_ZSH_COMPLETIONS:-} ]]; then
     fpath=("$DOTFILES_ZSH_COMPLETIONS" $fpath)
 fi
@@ -31,7 +31,7 @@ source "$HOME/.config/sheldon/completion-init.zsh"
 
 [plugins.generated-completion-scripts]
 inline = '''
-# autoload用の関数ファイルではなく、compdefを実行するCLIの出力を読む。
+# autoload用の関数ファイルではなく，compdefを実行するCLIの出力を読む．
 if [[ -n ${DOTFILES_ZSH_COMPLETIONS:-} ]]; then
     for completion_script in "$DOTFILES_ZSH_COMPLETIONS"/*.zsh(N); do
         source "$completion_script"
@@ -64,7 +64,7 @@ github = "zsh-users/zsh-autosuggestions"
 [plugins.fast-syntax-highlighting]
 github = "zdharma-continuum/fast-syntax-highlighting"
 
-# 履歴キーバインドはfzfやウィジェットを包むプラグインの初期化後に設定する。
+# 履歴キーバインドはfzfやウィジェットを包むプラグインの初期化後に設定する．
 [plugins.atuin]
 inline = '''
 [[ -r "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"

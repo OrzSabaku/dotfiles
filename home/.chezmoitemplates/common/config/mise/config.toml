@@ -34,7 +34,7 @@ bitwarden = "latest"
 "pipx:google-colab-cli" = "latest"
 
 
-# ランタイムはOSの提供状況に関わらずmiseでバージョン管理する。
+# ランタイムはOSの提供状況に関わらずmiseでバージョン管理する．
 [runtimes]
 go = "latest"
 node = "latest"

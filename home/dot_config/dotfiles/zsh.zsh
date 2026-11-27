@@ -1,6 +1,6 @@
 [[ -r "$HOME/.config/dotfiles/env.sh" ]] && source "$HOME/.config/dotfiles/env.sh"
 
-# 個人用コマンドの検索パスはここで管理する。
+# 個人用コマンドの検索パスはここで管理する．
 path=("$HOME/.local/bin" $path)
 
 # History
@@ -65,19 +65,19 @@ if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
   fi
   eval "$plugin_source"
 }
-# ツールがPATHを追加した後で、重複を取り除く。
+# ツールがPATHを追加した後で，重複を取り除く．
 typeset -U path
 
-# コマンドを実行する前に、インストール済みか確認する。
+# コマンドを実行する前に，インストール済みか確認する．
 exists() {
   local command="$1"
   if ! (( ${+commands[$command]} )); then
-    print -u2 -- "Error: ${command} がインストールされていません。"
+    print -u2 -- "Error: ${command} がインストールされていません．"
     return 1
   fi
 }
 
-# Yaziで最後に開いていたディレクトリへ移動する。
+# Yaziで最後に開いていたディレクトリへ移動する．
 y() {
   local tmp cwd
   tmp="$(mktemp -t yazi-cwd.XXXXXX)" || return

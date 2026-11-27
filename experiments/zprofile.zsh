@@ -6,7 +6,7 @@ align_center() {
   local filter="${3:-metal}"
 
   if ! (( ${+commands[toilet]} )); then
-    echo "Error: toilet がインストールされていません。" >&2
+    echo "Error: toilet がインストールされていません．" >&2
     return 1
   fi
 

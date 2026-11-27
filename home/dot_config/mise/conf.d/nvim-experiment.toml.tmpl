@@ -1,13 +1,13 @@
 [tasks.nvim-experiment]
 description = "実験用Neovim設定を起動する"
-# 相対パスのファイルは、miseを呼び出したディレクトリから開く。
+# 相対パスのファイルは，miseを呼び出したディレクトリから開く．
 dir = "{{ "{{ cwd }}" }}"
 run = "nvim"
 raw = true
 raw_args = true
 quiet = true
 
-# 設定・データ・状態・キャッシュを分ける。ファイルアクセスの隔離ではない。
+# 設定・データ・状態・キャッシュを分ける．ファイルアクセスの隔離ではない．
 [tasks.nvim-experiment.env]
 XDG_CONFIG_HOME = {{ joinPath .chezmoi.workingTree "experiments" | quote }}
 NVIM_APPNAME = "nvim-experiment"
