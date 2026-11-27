@@ -49,7 +49,7 @@ Rubyが必要です（追加gemは不要）。`chezmoi cd` で移動してから
 | `examples/` | 非管理設定の記入例 |
 | `experiments/` | 通常の導入対象に含めない実験用設定 |
 
-OS別のパッケージ・デスクトップ設定、miseとbootstrapの仕組み、OpenCode・AI設定の運用、Renovate設定、Rubyスクリプトの開発手順はGitHub Wikiにまとめています。
+OS別のパッケージ・デスクトップ設定、miseとbootstrapの仕組み、OpenCode・AI設定の運用、Rubyスクリプトの開発手順はGitHub Wikiにまとめています。
 
 - [GitHub Wiki](https://github.com/OrzSabaku/dotfiles/wiki)
 - [Omarchy](https://github.com/OrzSabaku/dotfiles/wiki/Omarchy)
