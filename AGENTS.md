@@ -76,7 +76,7 @@ bundle exec rake test
 git diff --check
 ```
 
-- chezmoi構成変更では上記テストを実行します．テストは仮ホームを使い，実環境に導入しません．
+- chezmoi構成変更ではrakeでテストを実行します．テストは仮ホームを使い，実環境に導入しません．
 - テンプレートはOmarchy・Fedoraの両方を検証し，権限と管理外ファイルの保持も確認します．
 - Rubyスクリプトは `ruby -c <ファイル>`，`bundle exec rake test`，`bundle exec rubocop --cache false` で検証します．パッケージ導入や `chsh` の実行はモックに置き換えます．
 - シェル変更は構文検証と新しいシェルでの起動確認を行います．Zsh未導入なら未検証と明示してください．
