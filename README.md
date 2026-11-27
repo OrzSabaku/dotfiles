@@ -1,7 +1,7 @@
 # dotfiles
 
 FedoraとOmarchyで使う個人設定をchezmoiで管理するリポジトリです．
-普段はOmarchy・Zsh・Ghostty・Neovim（LazyVim）を使います．
+普段はOmarchy・Zsh・Ghostty・Neovimを使います．
 
 ## 導入
 
